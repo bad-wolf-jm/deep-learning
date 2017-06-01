@@ -21,14 +21,17 @@ model.add(Conv1D(10, kernel_size = 5, strides=1, padding='causal', activation='r
 model.add(MaxPooling1D(pool_size=1, strides=None, padding='valid'))
 model.add(Flatten())
 model.add(Dense(200))
-model.add(Dense(3, activation = 'softmax'))
+model.add(Dense(2, activation = 'softmax'))
 print(model.summary())
 
-model_folder = 'model_structure'
-model_name   = 'convolutional_model.json'
 
-if not os.path.exists(model_folder):
-    os.makedirs(model_folder)
+if __name__ == '__main__':
 
-with open(os.path.join(model_folder, model_name), 'w') as model_file:
-    model_file.write(model.to_json())
+    model_folder = 'model_structure'
+    model_name   = 'convolutional_model.json'
+
+    if not os.path.exists(model_folder):
+        os.makedirs(model_folder)
+
+    with open(os.path.join(model_folder, model_name), 'w') as model_file:
+        model_file.write(model.to_json())

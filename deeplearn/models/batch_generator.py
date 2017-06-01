@@ -1,3 +1,6 @@
+import numpy as np
+from models.utils import train_test_split_indices
+
 def basic_train_test_split(data_x, data_y, fraction):
     test_indices = train_test_split_indices(len(data_x), fraction)
     train_in  = []
@@ -13,6 +16,21 @@ def basic_train_test_split(data_x, data_y, fraction):
             train_out.append(data_y[index])
     return {'train': {'input': np.array(train_in), 'output': np.array(train_out)},
             'test':  {'input': np.array(test_in), 'output': np.array(test_out)}}
+
+def choose_samples(data_x, data_y, number):
+    """
+    This funtion chooses 'number' samples from data_x and data_y, and returns a pair of matrices in the form
+    of a dictionary {'input':<...>, 'output':<...>}. This is meant to be used to choose a validation set from
+    a subset of the data which might have been set aside for validation purposes.
+    """
+    test_indices = set(list(np.random.choice(len(data_x), size = [number], replace = False)))
+    test_in   = []
+    test_out  = []
+    for index, point in enumerate(data_x):
+        if index in test_indices:
+            test_in.append(data_x[index])
+            test_out.append(data_y[index])
+    return {'input': np.array(test_in), 'output': np.array(test_out)}
 
 
 def simple_generator(data_x, data_y, batch_size, epochs, validation = None, validation_size = None):
