@@ -92,8 +92,9 @@ def train(model, data, loss = None, optimizer = None, initial_weights = None,
             B += 1
     except StopTraining:
         pass
-    finally:
-        save_dir = os.path.dirname(model_weight_file)
-        if save_dir != '' and not os.path.exists(save_dir):
-            os.makedirs(save_dir)
-        model.save_weights(model_weight_file)
+#    finally:
+#        if model_weight_file is not None:
+#            save_dir = os.path.dirname(model_weight_file)
+#            if save_dir != '' and not os.path.exists(save_dir):
+#                os.makedirs(save_dir)
+#            model.save_weights(model_weight_file)
