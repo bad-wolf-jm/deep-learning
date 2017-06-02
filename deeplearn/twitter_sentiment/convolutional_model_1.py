@@ -2,7 +2,7 @@ import time, os, sys
 
 import keras
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from keras.utils.vis_utils import model_to_dot
 
 from models.batch_generator import simple_generator
