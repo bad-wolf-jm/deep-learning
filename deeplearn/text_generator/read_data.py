@@ -8,21 +8,25 @@ def read_file(file_name):
     content = []
     num_chars = 0
     while line != "":
+        line = line.replace('\t', ' ')
         if line == '\n':
             if end_of_sentence:
-                content.append('\n')
+                content.extend('\n\n')
+            #else:
+            #    content.append(' ')
                 num_chars += 1
             while line == '\n':
                 line = file_.readline()
-        else:
-            line = line[:-1]
-            try:
-                end_of_sentence = (line[-1] == '.')
-            except:
-                end_of_sentence = False
-            content.extend([x for x in line if ord(x) < 128])
-            num_chars += len(line)
-            line = file_.readline()
+        #else:
+
+        try:
+            end_of_sentence = (line[-2] in '.!?')
+        except:
+            end_of_sentence = False
+        line = line[:-1] + ' '
+        content.extend([x for x in line if ord(x) < 128])
+        num_chars += len(line)
+        line = file_.readline()
     file_.close()
     return content
 
@@ -98,5 +102,6 @@ def read_data_files_from_folder(directory, validation = 0.1):
 
 
 if __name__ == '__main__':
-    text, valitext, ranges = read_data_files_from_folder('training_data/gcc-master/**/*.c')
-    print(len(text), len(valitext), len(set(text)))
+    text, valitext, ranges = read_data_files_from_folder('text_generator/training_data/harry_potter/1 - *.txt')
+    print(''.join(text[:10000]))
+    #print(len(text), len(valitext), len(set(text)))

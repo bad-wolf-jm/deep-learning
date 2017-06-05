@@ -69,7 +69,7 @@ data_out = np.array(data_out)
 #test_in  = np.array(test_in)
 #test_out = np.array(test_out)
 
-batch_iterator = simple_generator(data_in, data_out, batch_size = 2000, epochs = 250, validation = 0.1, validation_size = 200)
+batch_iterator = simple_generator(data_in, data_out, batch_size = 200, epochs = 250, validation = 0.1, validation_size = 200)
 
 train(model,
       batch_iterator,
