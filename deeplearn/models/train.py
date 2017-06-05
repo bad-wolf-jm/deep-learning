@@ -11,7 +11,7 @@ from models.exceptions import StopTraining, OvertrainWarning
 
 
 
-def train(model, data, loss = None, optimizer = None, initial_weights = None,
+def train(model, data, loss = None, accuracy = None, optimizer = None, initial_weights = None,
           callbacks = None, checkpoint_interval = None, checkpoint_folder = None,
           model_weight_file = None):
     """
@@ -40,7 +40,7 @@ def train(model, data, loss = None, optimizer = None, initial_weights = None,
     checkpoint_interval: save a copy of the weights after each of these intervals
     """
 
-    model.compile(loss = loss, optimizer = optimizer, metrics = ['accuracy'])
+    model.compile(loss = loss, optimizer = optimizer, metrics = accuracy if accuracy is not None else ['accuracy'])
     if initial_weights is not None and os.path.exists(initial_weights):
         try:
             model.load_weights(initial_weights)
@@ -55,20 +55,21 @@ def train(model, data, loss = None, optimizer = None, initial_weights = None,
             if data_point['validate'] is not None:
                 validation_loss, validation_accuracy = model.test_on_batch(data_point['validate']['in'], data_point['validate']['out'])
 
-            if checkpoint_interval is not None and B % checkpoint_interval == 0:
-                if not os.path.exists(checkpoint_folder):
-                    os.makedirs(checkpoint_folder)
-                w_file_name = 'checkpoint-epoch-{0}-batch-{1}-loss-{2}-accuracy-{3}.hd5'
-                w_file_name = w_file_name.format(data_point['epoch_number'],
-                                                 data_point['batch_number'],
-                                                 loss,
-                                                 accuracy)
-                weight_file_name = os.path.join(checkpoint_folder, w_file_name)
-                model.save_weights(weight_file_name)
+            #if checkpoint_interval is not None and B % checkpoint_interval == 0:
+            #    if not os.path.exists(checkpoint_folder):
+            #        os.makedirs(checkpoint_folder)
+            #    w_file_name = 'checkpoint-epoch-{0}-batch-{1}-loss-{2}-accuracy-{3}.hd5'
+            #    w_file_name = w_file_name.format(data_point['epoch_number'],
+            #                                     data_point['batch_number'],
+            #                                     loss,
+            #                                     accuracy)
+            #    weight_file_name = os.path.join(checkpoint_folder, w_file_name)
+            #    model.save_weights(weight_file_name)
             batch_time = time.time() - t1
             for c in (callbacks if callbacks is not None else []):
                 try:
                     c(model               = model,
+                      data_point          = data_point,
                       batch_number        = data_point['batch_number'],
                       batch_index         = data_point['batch_index'],
                       epoch_number        = data_point['epoch_number'],
@@ -88,6 +89,7 @@ def train(model, data, loss = None, optimizer = None, initial_weights = None,
                 except Exception as e:
                     # DO SOMETHING
                     print('FOO', e)
+                    raise
                     pass
             B += 1
     except StopTraining:

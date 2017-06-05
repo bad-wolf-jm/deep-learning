@@ -14,14 +14,13 @@ def read_file(file_name):
                 num_chars += 1
             while line == '\n':
                 line = file_.readline()
-
         else:
             line = line[:-1]
             try:
                 end_of_sentence = (line[-1] == '.')
             except:
                 end_of_sentence = False
-            content.extend([x for x in line])
+            content.extend([x for x in line if ord(x) < 128])
             num_chars += len(line)
             line = file_.readline()
     file_.close()
@@ -53,7 +52,7 @@ def read_data_files_from_folder(directory, validation = 0.1):
     # or one book (the content of one file).  If validdation parameter is set and is a floating
     # point number, then that fraction is used as the cap.
 
-    total_length = len(codetext)
+    total_length          = len(codetext)
     validation_length_max = 90 * 1024
     validation_length_max = min(validation_length_max, validation * total_length)
 
@@ -89,13 +88,13 @@ def read_data_files_from_folder(directory, validation = 0.1):
 #    # pick the smallest
 #    nb_books = min(nb_books1, nb_books2, nb_books3)
 #
-    if nb_books == 0 or not validation:
-        cutoff = len(codetext)
-    else:
-        cutoff = bookranges[-nb_books]["start"]
-    valitext = codetext[cutoff:]
-    codetext = codetext[:cutoff]
-    return codetext, valitext, bookranges
+    #if nb_books == 0 or not validation:
+    #    cutoff = len(codetext)
+    #else:
+    #    cutoff = bookranges[-nb_books]["start"]
+    #valitext = codetext[cutoff:]
+    #codetext = codetext[:cutoff]
+    return codetext, [], bookranges
 
 
 if __name__ == '__main__':
