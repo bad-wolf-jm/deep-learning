@@ -52,7 +52,6 @@ decision_layer = Dense(2048, activation='linear')(decision_layer)
 decision_layer = Dense(512, activation='linear')(decision_layer)
 decision_layer = Dense(2, activation='softmax')(decision_layer)
 
-
 model = Model(inputs = input_, outputs=decision_layer)
 
 print(model.summary())
