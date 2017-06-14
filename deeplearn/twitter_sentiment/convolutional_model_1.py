@@ -26,30 +26,36 @@ def convolutional_block(input_, output_channels):
     x = convolutional_block_part(x, output_channels)
     return x
 
+
+CNN_LEVEL_1_FEATURES = 64
+CNN_LEVEL_2_FEATURES = 128
+CNN_LEVEL_3_FEATURES = 256
+CNN_LEVEL_4_FEATURES = 512
+
 input_  = Input(shape = [144], dtype='uint16')
 
 layer_1 = Embedding(256, 16, input_length = 144)(input_)
 layer_1 = Conv1D(64, kernel_size = [3], strides=1, padding='causal', use_bias = True)(layer_1)
 
-layer_2 = convolutional_block(layer_1, 64)
-layer_2 = convolutional_block(layer_2, 64)
+layer_2 = convolutional_block(layer_1, CNN_LEVEL_1_FEATURES)
+layer_2 = convolutional_block(layer_2, CNN_LEVEL_1_FEATURES)
 layer_2 = MaxPooling1D(pool_size= 2, strides=2)(layer_2)
 
-layer_3 = convolutional_block(layer_2, 128)
-layer_3 = convolutional_block(layer_3, 128)
+layer_3 = convolutional_block(layer_2, CNN_LEVEL_2_FEATURES)
+layer_3 = convolutional_block(layer_3, CNN_LEVEL_2_FEATURES)
 layer_3 = MaxPooling1D(pool_size= 2, strides=2)(layer_3)
 
-layer_4 = convolutional_block(layer_3, 256)
-layer_4 = convolutional_block(layer_4, 256)
+layer_4 = convolutional_block(layer_3, CNN_LEVEL_3_FEATURES)
+layer_4 = convolutional_block(layer_4, CNN_LEVEL_3_FEATURES)
 layer_4 = MaxPooling1D(pool_size= 2, strides=2)(layer_4)
 
-layer_5 = convolutional_block(layer_4, 512)
-layer_5 = convolutional_block(layer_5, 512)
+layer_5 = convolutional_block(layer_4, CNN_LEVEL_4_FEATURES)
+layer_5 = convolutional_block(layer_5, CNN_LEVEL_4_FEATURES)
 layer_5 = MaxPooling1D(pool_size= 3, strides=2)(layer_5)
 
 decision_layer = Flatten()(layer_5)
 decision_layer = Dense(2048, activation='linear')(decision_layer)
-decision_layer = Dense(512, activation='linear')(decision_layer)
+decision_layer = Dense(2048, activation='linear')(decision_layer)
 decision_layer = Dense(2, activation='softmax')(decision_layer)
 
 model = Model(inputs = input_, outputs=decision_layer)

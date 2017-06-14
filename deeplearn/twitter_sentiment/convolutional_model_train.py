@@ -83,38 +83,3 @@ train(model,
 print("Training done!!!")
 print("Writing the model's weights to 'data/convolutional_character_model.hd5'")
 model.save_weights('data/convolutional_character_model.hd5')
-
-"""
-foo = model.predict(test_in)
-
-N   = len(foo)
-#IND = 29
-
-C = 0
-for i, x in enumerate(foo):
-    #print(x, np.argmax(x), '... true value...', np.argmax(test_out[i]))
-    if  vec_decode[np.argmax(x)] == vec_decode[np.argmax(test_out[i])]:
-        C += 1
-print(float(C) / i)
-#print (foo.shape)
-
-print("        ", vec_decode)
-for x in vec_decode:
-    nums  = {x:0 for x in vec_decode}
-    wrong = {x:0 for x in vec_decode}
-
-    #for y in vec_decode:
-    #wrong = 0
-    #print(wrong)
-    for idx, predicted_value in enumerate(foo):
-        pred_sent = vec_decode[np.argmax(predicted_value)]
-        real_sent = vec_decode[np.argmax(test_out[idx])]
-        if real_sent == x:
-            nums[pred_sent] += 1
-            others = [y for y in vec_decode if y != x]
-            if pred_sent in others:
-                for z in vec_decode:
-                    wrong[z] += 1
-    #print(wrong)
-    print(x, [nums[x] for x in vec_decode], float(wrong[pred_sent])/ sum([nums[x] for x in vec_decode]))
-"""

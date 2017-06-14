@@ -87,30 +87,11 @@ for i, w in enumerate(list_):#
     file_.write("%s\t%s\t%s\n"%(i, word_dictionary[w], w))
 file_.close()
 
-
-    # The tweet is added to the current batch.
-#    tweet = " ".join(words)
-#    if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= 140:
-#        str_line = "\t".join([sent, tweet+'\n'])
-#        buffer_.append(str_line)
-#        sentiments_stats[int(sent)] += 1
-#        num_tweets += 1
-#        if len(tweet) not in tweet_lengths:
-#            tweet_lengths[len(tweet)] = 0
-#        tweet_lengths[len(tweet)] += 1
-
-
-
-
-
 train_file_name = 'datasets/training-tweets.csv'
 test_file_name  = 'datasets/testing_tweets.csv'
 
 training_size = 60000
 testing_size  = 15000
-
-
-
 
 buffer_    = []
 index      = 1
