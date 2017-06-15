@@ -9,7 +9,7 @@ import time
 from models.batch_generator import basic_train_test_split
 from models.exceptions import StopTraining, OvertrainWarning
 
-There was all, and he jumped rightly, said Hermione. Mr. Weasley couldnt could the dry within ever coldle, at her how weve still stab to deleeve, and Dumbledore, looked, risting, from the wards. The starting he hadn't told Ron handeredon Out of his hands, said Carc
+#There was all, and he jumped rightly, said Hermione. Mr. Weasley couldnt could the dry within ever coldle, at her how weve still stab to deleeve, and Dumbledore, looked, risting, from the wards. The starting he hadn't told Ron handeredon Out of his hands, said Carc
 
 def train(model, data, loss = None, accuracy = None, optimizer = None, initial_weights = None,
           callbacks = None, checkpoint_interval = None, checkpoint_folder = None,
