@@ -56,8 +56,10 @@ layer_5 = convolutional_block(layer_5, CNN_LEVEL_4_FEATURES)
 layer_5 = MaxPooling1D(pool_size= 3, strides=2)(layer_5)
 
 decision_layer = Flatten()(layer_5)
-decision_layer = Dense(2048, activation='softmax')(decision_layer)
-decision_layer = Dense(2048, activation='softmax')(decision_layer)
+decision_layer = Dense(2048, activation='softmax', use_bias = True)(decision_layer)
+decision_layer = Dropout(0.3)(decision_layer)
+decision_layer = Dense(2048, activation='softmax', use_bias = True)(decision_layer)
+decision_layer = Dropout(0.3)(decision_layer)
 decision_layer = Dense(2, activation='softmax')(decision_layer)
 model = Model(inputs = input_, outputs=decision_layer)
 
