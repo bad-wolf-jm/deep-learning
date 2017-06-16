@@ -196,7 +196,7 @@ def training_batches(batch_size, epochs, validation_size = 0):
 
 
 
-batch_iterator = training_batches(batch_size = 20, epochs = 250, validation_size = 25)
+batch_iterator = training_batches(batch_size = 250, epochs = 250, validation_size = 25)
 
 def train(model, data, loss = None, accuracy = None, optimizer = None, initial_weights = None,
           checkpoint_interval = None, checkpoint_folder = None,
