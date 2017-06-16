@@ -36,8 +36,8 @@ CNN_LEVEL_4_FEATURES = 512
 INPUT_LENGTH = 140
 
 input_  = Input(shape = [INPUT_LENGTH], dtype='uint8')
-layer_1  = Lambda(K.one_hot, arguments={'num_classes': 128}, output_shape=[INPUT_LENGTH, 128])(input_)
-#layer_1 = Embedding(256, 16, input_length = INPUT_LENGTH)(input_)
+#layer_1  = Lambda(K.one_hot, arguments={'num_classes': 128}, output_shape=[INPUT_LENGTH, 128])(input_)
+layer_1 = Embedding(128, 16, input_length = INPUT_LENGTH)(input_)
 layer_1 = Conv1D(64, kernel_size = [3], strides=1, padding='causal', use_bias = True)(layer_1)
 
 layer_2 = convolutional_block(layer_1, CNN_LEVEL_1_FEATURES)

@@ -142,7 +142,7 @@ print('-- Found {tweets} positive tweets'.format(tweets=sentiment_stats[1]))
 print('-- Found {tweets} negative tweets'.format(tweets=sentiment_stats[0]))
 
 
-train_size         = int(0.10 * len(DATA_INPUT)) #len(DATA_INPUT) - test_size
+train_size         = int(0.01 * len(DATA_INPUT)) #len(DATA_INPUT) - test_size
 test_size          = int(0.10 * train_size)
 
 
@@ -199,7 +199,7 @@ def training_batches(batch_size, epochs, validation_size = 0):
 
 
 
-batch_iterator = training_batches(batch_size = 10, epochs = 250, validation_size = 25)
+batch_iterator = training_batches(batch_size = 750, epochs = 250, validation_size = 25)
 
 def train(model, data, loss = None, accuracy = None, optimizer = None, initial_weights = None,
           checkpoint_interval = None, checkpoint_folder = None,
