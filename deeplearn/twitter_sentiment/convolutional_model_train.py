@@ -45,7 +45,7 @@ signal.signal(signal.SIGTERM, save_before_exiting)
 
 max_line_length = 0
 LENGTH_CUTOFF = 10
-MAX_TWEET_LENGTH = 500
+MAX_TWEET_LENGTH = 140
 
 CHECKPOINT     = 'datasets/very-deep-cnn-checkpoint.hd5'
 MODEL_FILENAME = 'datasets/very-deep-cnn.hd5'
@@ -117,7 +117,8 @@ while True:
 
     if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= MAX_TWEET_LENGTH:
 
-        bytes_  = list(bytes(tweet.encode('utf-8')))
+        bytes_  = [ord(x) for x in tweet if 0 < ord(x) < 128] #list(bytes(tweet.encode('utf-8')))
+        #print([type(x) for x in bytes_])
         sentiment = {0: [1,0],
                      1: [0,1]}[int(sent)]
         DATA_INPUT.append(bytes_)
@@ -141,14 +142,16 @@ print('-- Found {tweets} positive tweets'.format(tweets=sentiment_stats[1]))
 print('-- Found {tweets} negative tweets'.format(tweets=sentiment_stats[0]))
 
 
-test_size          = int(0.35 * len(DATA_INPUT))
-train_size         = len(DATA_INPUT) - test_size
+train_size         = int(0.10 * len(DATA_INPUT)) #len(DATA_INPUT) - test_size
+test_size          = int(0.10 * train_size)
 
-test_index_numbers = set(list(np.random.choice(len(DATA_INPUT), size = [test_size], replace = False)))
+
+train_index_numbers = set(list(np.random.choice(len(DATA_INPUT), size = [train_size], replace = False)))
+test_index_numbers = set(list(np.random.choice(train_size, size = [test_size], replace = False)))
 
 #train_indices = {idx:index[idx] for idx in index if idx not in test_index_numbers}
 #test_indices  = {idx:index[idx] for idx in test_index_numbers}
-TRAINING_SET = [(DATA_INPUT[x], DATA_OUTPUT[x]) for x in range(len(DATA_INPUT)) if x not in test_index_numbers]
+TRAINING_SET = [(DATA_INPUT[x], DATA_OUTPUT[x]) for x in train_index_numbers if x not in test_index_numbers]
 print('Made the training set')
 
 TESTING_SET = [(DATA_INPUT[x], DATA_OUTPUT[x]) for x in test_index_numbers]
@@ -175,11 +178,11 @@ def training_batches(batch_size, epochs, validation_size = 0):
     for epoch in range(epochs):
         for batch in range(batches_per_epoch):
             batch = TRAINING_SET[:batch_size]
-            batch_x = np.array([pad(element[0], 560) for element in batch])
+            batch_x = np.array([pad(element[0], MAX_TWEET_LENGTH) for element in batch])
             batch_y = np.array([element[1] for element in batch])
 
             validation_sample = set(list(np.random.choice(len(TESTING_SET), size = [validation_size], replace = False)))
-            validation_x = np.array([pad(element[0], 560) for element in [TESTING_SET[i] for i in validation_sample]])
+            validation_x = np.array([pad(element[0], MAX_TWEET_LENGTH) for element in [TESTING_SET[i] for i in validation_sample]])
             validation_y = np.array([element[1] for element in [TESTING_SET[i] for i in validation_sample]])
             TRAINING_SET = np.roll(TRAINING_SET, -batch_size, axis = 0)
             I += 1
@@ -196,7 +199,7 @@ def training_batches(batch_size, epochs, validation_size = 0):
 
 
 
-batch_iterator = training_batches(batch_size = 1250, epochs = 250, validation_size = 25)
+batch_iterator = training_batches(batch_size = 10, epochs = 250, validation_size = 25)
 
 def train(model, data, loss = None, accuracy = None, optimizer = None, initial_weights = None,
           checkpoint_interval = None, checkpoint_folder = None,
@@ -240,8 +243,8 @@ def train(model, data, loss = None, accuracy = None, optimizer = None, initial_w
 
 train(model,
       batch_iterator,
-      loss                = 'binary_crossentropy',
-      optimizer           = 'adagrad',
+      loss                = 'categorical_crossentropy',
+      optimizer           = 'adadelta',
       #callbacks           = [basic_callback],
       checkpoint_interval = 50,
       checkpoint_folder   = 'data/checkpoints',
