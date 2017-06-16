@@ -142,7 +142,7 @@ def generate_text(model, num_lines, max_chars_ler_line, **args):
 
 def test_callback(model, batch_index, data_point,  **args):
     # Every 20 batches, print the predicted values:
-    if batch_index % 50 == 0:
+    if batch_index % 250 == 0:
         inputs = data_point['train_x'][0]
         outputs = data_point['train_x'][1]
         predictions = model.predict_on_batch(data_point['train_x'])
