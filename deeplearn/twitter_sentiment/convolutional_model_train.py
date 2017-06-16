@@ -1,10 +1,15 @@
 from convolutional_model_1 import model
+import os
 import glob
 import numpy as np
+import html
 import time
 import sys
-training_data_folder = 'twitter_sentiment/batch_files/*.csv'
-training_data_files  = [path for path in glob.glob(training_data_folder)]
+import zipfile
+import signal
+
+#training_data_folder = 'twitter_sentiment/batch_files/*.csv'
+#training_data_files  = [path for path in glob.glob(training_data_folder)]
 
 #print(training_data_files)
 # each training data file contains a batch of about 1000 tweets. For the convolutional network
@@ -12,10 +17,35 @@ training_data_files  = [path for path in glob.glob(training_data_folder)]
 # and 2% of the files to serve as a test set (because the dataset is so huge). As a first approximation
 # use the simple_generator defined in the models module.
 
-from batch_generator import training_batches
+#from batch_generator import training_batches
 import sys
 
+
+if not os.path.exists('models'):
+    os.makedirs('models')
+
+MODEL_WEIGHT_KILLED_FILE = os.path.join('models', 'byte_cnn_resume_weights.hd5')
+
+#def save_model_weights():
+#    print()
+#    model.save_weights(MODEL_WEIGHT_KILLED_FILE)
+#    print("Model weights saved to", MODEL_WEIGHT_KILLED_FILE)
+
+
+def save_before_exiting(*a):
+    print(a)
+    print("Process is being killed, I'm saving the weights")
+    model.save_weights(MODEL_WEIGHT_KILLED_FILE)
+    print("Model weights saved to", MODEL_WEIGHT_KILLED_FILE)
+    print("Exiting")
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, save_before_exiting)
+
+
 max_line_length = 0
+LENGTH_CUTOFF = 10
+MAX_TWEET_LENGTH = 500
 
 CHECKPOINT     = 'datasets/very-deep-cnn-checkpoint.hd5'
 MODEL_FILENAME = 'datasets/very-deep-cnn.hd5'
@@ -35,7 +65,138 @@ def basic_callback(**args):
     sys.stdout.write(line)
     sys.stdout.flush()
 
-batch_iterator = training_batches(batch_size = 2000, epochs = 250, validation_size = 0.1)
+DATA_INPUT = []
+DATA_OUTPUT = []
+
+file_name    = 'datasets/twitter-binary-sentiment-classification-clean.csv.zip'
+batch_folder = 'batch_files'
+
+if not os.path.exists(batch_folder):
+    os.makedirs('batch_files')
+
+batch_file_name_root = 'twitter-binary-sentiment-batch-{0}.csv'
+
+
+foo = zipfile.ZipFile(file_name)
+
+bar = foo.open('twitter-binary-sentiment-classification-clean.csv')
+#training_file = open(train_file_name, 'wb')
+sentiments_stats = {0:0, 1:0}
+
+# The first line can be discarded
+line = bar.readline()
+
+#list_ = []
+sentiment_stats = {0:0, 1:0}
+tweet_index = 0
+#stats = {}
+
+#TWEET_DATA_FILE  = 'datasets/binary_twitter_training_set.db'
+#TWEET_INDEX_FILE = 'datasets/binary_twitter_index_set.db'
+#
+#offset = 0
+
+#BINARY_DATA_FILE = open(TWEET_DATA_FILE, 'wb')
+#BINARY_INDEX_FILE = open(TWEET_INDEX_FILE, 'wb')
+
+
+
+while True:
+    line = bar.readline()
+    if len(line) == 0:
+        break
+    str_line = line.decode('utf-8')
+    sent, tweet = str_line.split('\t')
+    tweet = tweet[:-1]
+    tweet = html.unescape(tweet)
+
+    #remove the quotation marks at the beginning and end of every tweet
+    if tweet[0] == '"' and tweet[-1] == '"':
+        while tweet[0] == '"' and tweet[-1] == '"':
+            tweet = tweet[1:-1]
+
+    if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= MAX_TWEET_LENGTH:
+
+        bytes_  = list(bytes(tweet.encode('utf-8')))
+        sentiment = {0: [1,0],
+                     1: [0,1]}[int(sent)]
+        DATA_INPUT.append(bytes_)
+        DATA_OUTPUT.append(sentiment)
+        sentiment_stats[int(sent)] += 1
+        #bytes_ = sentiment + bytes_
+        #BINARY_DATA_FILE.write(bytes_)
+        #BINARY_INDEX_FILE.write(struct.pack('=III', tweet_index, offset, len(bytes_)))
+        tweet_index += 1
+        #if tweet_index > 1000:
+        #    break
+        #offset += len(bytes_)
+        #print(tweet_index, offset, bytes_[2:].decode('utf-8'))
+#
+#BINARY_DATA_FILE.close()
+#BINARY_INDEX_FILE.close()
+
+print('----- Done making the binary files -----')
+print('-- Found {tweets} many tweets'.format(tweets=len(DATA_INPUT)))
+print('-- Found {tweets} positive tweets'.format(tweets=sentiment_stats[1]))
+print('-- Found {tweets} negative tweets'.format(tweets=sentiment_stats[0]))
+
+
+test_size          = int(0.35 * len(DATA_INPUT))
+train_size         = len(DATA_INPUT) - test_size
+
+test_index_numbers = set(list(np.random.choice(len(DATA_INPUT), size = [test_size], replace = False)))
+
+#train_indices = {idx:index[idx] for idx in index if idx not in test_index_numbers}
+#test_indices  = {idx:index[idx] for idx in test_index_numbers}
+TRAINING_SET = [(DATA_INPUT[x], DATA_OUTPUT[x]) for x in range(len(DATA_INPUT)) if x not in test_index_numbers]
+print('Made the training set')
+
+TESTING_SET = [(DATA_INPUT[x], DATA_OUTPUT[x]) for x in test_index_numbers]
+print('Made the test set')
+
+#print(TRAINING_SET)
+
+def pad(array, length):
+    array = list(array[:length])
+    array += [0]*(length - len(array))
+    return array
+
+def training_batches(batch_size, epochs, validation_size = 0):
+    global TRAINING_SET
+    N                 = len(TRAINING_SET)
+    total             = N * epochs
+    total_num_batches = total // batch_size
+    batches_per_epoch = N // batch_size
+    #validation_size   = validation_siz if validation_size is not None else 0
+    #train_size        = batch_size - validation_size
+
+    I = 0
+    #indices = list(train_indices.keys())
+    for epoch in range(epochs):
+        for batch in range(batches_per_epoch):
+            batch = TRAINING_SET[:batch_size]
+            batch_x = np.array([pad(element[0], 560) for element in batch])
+            batch_y = np.array([element[1] for element in batch])
+
+            validation_sample = set(list(np.random.choice(len(TESTING_SET), size = [validation_size], replace = False)))
+            validation_x = np.array([pad(element[0], 560) for element in [TESTING_SET[i] for i in validation_sample]])
+            validation_y = np.array([element[1] for element in [TESTING_SET[i] for i in validation_sample]])
+            TRAINING_SET = np.roll(TRAINING_SET, -batch_size, axis = 0)
+            I += 1
+            yield {'train_x':  batch_x,
+                   'train_y':  batch_y,
+                   'validate_x': validation_x,
+                   'validate_y': validation_y,
+                   'batch_number':  batch,
+                   'epoch_number':  epoch,
+                   'batch_index':   I,
+                   'total_batches': total_num_batches,
+                   'total_epochs':  epochs}
+
+
+
+
+batch_iterator = training_batches(batch_size = 20, epochs = 250, validation_size = 25)
 
 def train(model, data, loss = None, accuracy = None, optimizer = None, initial_weights = None,
           checkpoint_interval = None, checkpoint_folder = None,
@@ -69,11 +230,12 @@ def train(model, data, loss = None, accuracy = None, optimizer = None, initial_w
             B += 1
         model.save_weights(MODEL_FILENAME)
     except KeyboardInterrupt:
-        print()
-        print('Stopping')
-        print('Saving the weights')
-        model.save_weights(CHECKPOINT)
-        sys.exit(0)
+        #print()
+#        print('Stopping')
+#        print('Saving the weights')
+#        model.save_weights(CHECKPOINT)
+        save_before_exiting()
+#        sys.exit(0)
 
 
 train(model,

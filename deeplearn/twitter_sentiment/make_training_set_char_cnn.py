@@ -95,6 +95,8 @@ offset = 0
 BINARY_DATA_FILE = open(TWEET_DATA_FILE, 'wb')
 BINARY_INDEX_FILE = open(TWEET_INDEX_FILE, 'wb')
 
+
+
 while True:
     line = bar.readline()
     if len(line) == 0:
