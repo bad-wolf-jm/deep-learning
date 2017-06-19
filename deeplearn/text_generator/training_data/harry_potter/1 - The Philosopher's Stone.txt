@@ -1,4 +1,4 @@
-THE BOY WHO LIVED
+## THE BOY WHO LIVED
 
 Mr. and Mrs. Dursley, of number four, Privet Drive,
 were proud to say that they were perfectly normal,
@@ -23,10 +23,6 @@ also had a secret, and their greatest fear was that
 somebody would discover it. They didn’t think they
 could bear it if anyone found out about the Potters.
 Mrs. Potter was Mrs. Dursley’s sister, but they hadn’t
-
-
-
-
 met for several years; in fact, Mrs. Dursley pretended
 she didn’t have a sister, because her sister and her
 good-for-nothing husband were as unDursleyish as it
@@ -67,11 +63,6 @@ again. There was a tabby cat standing on the corner
 of Privet Drive, but there wasn’t a map in sight. What
 could he have been thinking of? It must have been a
 trick of the light. Mr. Dursley blinked and stared at
-
-
-
-
-
 the cat. It stared back. As Mr. Dursley drove around
 the corner and up the road, he watched the cat in his
 mirror. It was now reading the sign that said Privet
@@ -111,11 +102,6 @@ owl sped overhead. Most of them had never seen an
 owl even at nighttime. Mr. Dursley, however, had a
 perfectly normal, owl-free morning. He yelled at five
 different people. He made several important telephone
-
-
-
-
-
 calls and shouted a bit more. He was in a very good
 mood until lunchtime, when he thought he’d stretch
 his legs and walk across the road to buy himself a
@@ -153,13 +139,6 @@ point in worrying Mrs. Dursley; she always got so
 upset at any mention of her sister. He didn’t blame
 her — if he’d had a sister like that ... but all the
 same, those people in cloaks ...
-
-
-
-
-
-
-
 
 He found it a lot harder to concentrate on drills that
 afternoon and when he left the building at five o’clock,
@@ -201,12 +180,6 @@ The cat didn’t move. It just gave him a stern look.
 
 Was this normal cat behavior? Mr. Dursley wondered.
 Trying to pull himself together, he let himself into the
-
-
-
-
-
-
 house. He was still determined not to mention
 anything to his wife.
 
@@ -244,13 +217,6 @@ Mr. Dursley sat frozen in his armchair. Shooting stars
 all over Britain? Owls flying by daylight? Mysterious
 people in cloaks all over the place? And a whisper, a
 whisper about the Potters . . .
-
-
-
-
-
-
-
 
 Mrs. Dursley came into the living room carrying two
 cups of tea. It was no good. He’d have to say
@@ -291,12 +257,6 @@ horribly. “Yes, I quite agree.”
 He didn’t say another word on the subject as they
 went upstairs to bed. While Mrs. Dursley was in the
 bathroom, Mr. Dursley crept to the bedroom window
-
-
-
-
-
-
 and peered down into the front garden. The cat was
 still there. It was staring down Privet Drive as though
 it were waiting for something.
@@ -336,12 +296,6 @@ cat’s tail twitched and its eyes narrowed.
 Nothing like this man had ever been seen on Privet
 Drive. He was tall, thin, and very old, judging by the
 silver of his hair and beard, which were both long
-
-
-
-
-
-
 enough to tuck into his belt. He was wearing long
 robes, a purple cloak that swept the ground, and
 high-heeled, buckled boots. His blue eyes were light,
@@ -379,13 +333,6 @@ wall next to the cat. He didn’t look at it, but after a
 moment he spoke to it.
 
 “Fancy seeing you here, Professor McGonagall.”
-
-
-
-
-
-
-
 
 He turned to smile at the tabby, but it had gone.
 Instead he was smiling at a rather severe-looking
@@ -427,12 +374,6 @@ years.”
 
 “But that’s no reason to lose our heads. People are
 being downright careless, out on the streets in broad
-
-
-
-
-
-
 daylight, not even dressed in Muggle clothes,
 swapping rumors.”
 
@@ -473,15 +414,8 @@ sounding half exasperated, half admiring. “But you’re
 different. Everyone knows you’re the only one You-
 Know- oh, all right, Voldemort, was frightened of.”
 
-
-
-
-
-
 “You flatter me,” said Dumbledore calmly. “Voldemort
 had powers I will never have.”
-
-
 
 “Only because you’re too — well — noble to use
 them.”
@@ -520,11 +454,6 @@ believe it ... Oh, Albus ...”
 
 Dumbledore reached out and patted her on the
 shoulder. “I know ... I know ...” he said heavily.
-
-
-
-
-
 
 Professor McGonagall’s voice trembled as she went
 on. “That’s not all. They’re saying he tried to kill the
@@ -565,12 +494,6 @@ They’re the only family he has left now.”
 
 “You don’t mean — you can’t mean the people who
 live here?” cried Professor McGonagall, jumping to her
-
-Page | 14 Harry Potter and the Philosophers Stone -J.K. Rowling
-
-
-
-
 feet and pointing at number four. “Dumbledore — you
 can’t. I’ve been watching them all day. You couldn’t
 find two people who are less like us. And they’ve got
@@ -612,13 +535,6 @@ she thought he might be hiding Harry underneath it.
 “You think it — wise — to trust Hagrid with
 something as important as this?”
 
-
-
-
-
-
-
-
 “I would trust Hagrid with my life,” said Dumbledore.
 
 “I’m not saying his heart isn’t in the right place,” said
@@ -656,13 +572,6 @@ sir.”
 “No, sir — house was almost destroyed, but I got him
 out all right before the Muggles started swarmin’
 around. He fell asleep as we was flyin’ over Bristol.”
-
-
-
-
-
-
-
 
 Dumbledore and Professor McGonagall bent forward
 over the bundle of blankets. Inside, just visible, was a
@@ -704,11 +613,6 @@ Hagrid, or we’ll be found,” Professor McGonagall
 whispered, patting Hagrid gingerly on the arm as
 Dumbledore stepped over the low garden wall and
 walked to the front door. He laid Harry gently on the
-
-
-
-
-
 doorstep, took a letter out of his cloak, tucked it
 inside Harry’s blankets, and then came back to the
 other two. For a full minute the three of them stood
@@ -769,16 +673,7 @@ moment, people meeting in secret all over the country
 were holding up their glasses and saying in hushed
 voices: “To Harry Potter — the boy who lived!”
 
-
-
-
-
-
-
-
-
-
-THE VANASHIG GLASS
+## THE VANASHIG GLASS
 
 Nearly ten years had passed since the Dursleys had
 woken up to find their nephew on the front step, but
@@ -801,14 +696,6 @@ lived in the house, too.
 
 Yet Harry Potter was still there, asleep at the moment,
 but not for long. His Aunt Petunia was awake and it
-
-
-
-
-
-
-
-
 was her shrill voice that made the first noise of the
 day.
 
@@ -848,10 +735,6 @@ socks. He found a pair under his bed and, after
 pulling a spider off one of them, put them on. Harry
 was used to spiders, because the cupboard under the
 stairs was full of them, and that was where he slept.
-
-
-
-
 
 When he was dressed he went down the hall into the
 kitchen. The table was almost hidden beneath all
@@ -893,11 +776,6 @@ turning over the bacon.
 “Comb your hair!” he barked, by way of a morning
 greeting.
 
-
-
-
-
-
 About once a week, Uncle Vernon looked over the top
 of his newspaper and shouted that Harry needed a
 haircut. Harry must have had more haircuts than the
@@ -935,13 +813,6 @@ Aunt Petunia obviously scented danger, too, because
 she said quickly, “And we’ll buy you another two
 presents while we’re out today. How’s that, popkin?
 Two more presents. Is that all right?”
-
-
-
-
-
-
-
 
 Dudley thought for a moment. It looked like hard
 work. Finally he said slowly, “So I’ll have thirty ...
@@ -983,12 +854,6 @@ of all the cats she’d ever owned.
 
 “Now what?” said Aunt Petunia, looking furiously at
 Harry as though he’d planned this. Harry knew he
-
-
-
-
-
-
 ought to feel sorry that Mrs. Figg had broken her leg,
 but it wasn’t easy when he reminded himself it would
 be a whole year before he had to look at Tibbies,
@@ -1026,13 +891,6 @@ weren’t listening.
 Petunia slowly, "... and leave him in the car. ...”
 
 “That cars new, he’s not sitting in it alone. ...”
-
-
-
-
-
-
-
 
 Dudley began to cry loudly. In fact, he wasn’t really
 crying — it had been years since he’d really cried —
@@ -1072,16 +930,7 @@ Christmas.”
 
 I’m not going to do anything,” said Harry, “honestly
 
-
-
-
-
-
-
-
 But Uncle Vernon didn’t believe him. No one ever did.
-
-
 
 The problem was, strange things often happened
 around Harry and it was just no good telling the
@@ -1120,11 +969,6 @@ received a very angry letter from Harry’s headmistress
 telling them Harry had been climbing school
 buildings. But all he’d tried to do (as he shouted at
 Uncle Vernon through the locked door of his
-
-
-
-
-
 cupboard) was jump behind the big trash cans
 outside the kitchen doors. Harry supposed that the
 wind must have caught him in mid-jump.
@@ -1164,12 +1008,6 @@ might get dangerous ideas.
 
 It was a very sunny Saturday and the zoo was
 crowded with families. The Dursleys bought Dudley
-
-
-
-
-
-
 and Piers large chocolate ice creams at the entrance
 and then, because the smiling lady in the van had
 asked Harry what he wanted before they could hurry
@@ -1208,13 +1046,6 @@ staring at the glistening brown coils.
 
 “Make it move,” he whined at his father. Uncle Vernon
 tapped on the glass, but the snake didn’t budge.
-
-
-
-
-
-
-
 
 “Do it again,” Dudley ordered. Uncle Vernon rapped
 the glass smartly with his knuckles, but the snake
@@ -1256,11 +1087,6 @@ The snake nodded vigorously.
 
 “Where do you come from, anyway?” Harry asked.
 
-
-
-
-
-
 The snake jabbed its tail at a little sign next to the
 glass. Harry peered at it.
 
@@ -1298,13 +1124,6 @@ sworn a low, hissing voice said, “Brazil, here I come.
 ... Thanksss, amigo.”
 
 The keeper of the reptile house was in shock.
-
-
-
-
-
-
-
 
 “But the glass,” he kept saying, “where did the glass
 go?” "
@@ -1346,11 +1165,6 @@ blinding flash of green light and a burning pain on his
 forehead. This, he supposed, was the crash, though
 he couldn’t imagine where all the green light came
 from. He couldn’t remember his parents at all. His
-
-
-
-
-
 aunt and uncle never spoke about them, and of
 course he was forbidden to ask questions. There were
 no photographs of them in the house.
@@ -1379,19 +1193,7 @@ Dudley’s gang hated that odd Harry Potter in his
 baggy old clothes and broken glasses, and nobody
 liked to disagree with Dudley’s gang.
 
-
-
-
-
-
-
-
-3
-
-
-
-
-THE LETTERS FROM NO ONE
+## 3 - THE LETTERS FROM NO ONE
 
 The escape of the Brazilian boa constrictor earned
 Harry his longest-ever punishment. By the time he
@@ -1415,11 +1217,7 @@ out of the house, wandering around and thinking
 about the end of the holidays, where he could see a
 tiny ray of hope. When September came he would be
 going off to secondary school and, for the first time in
-
-
-
-
-his life, he wouldn’t be with Dudley. Dudley had been
+shis life, he wouldn’t be with Dudley. Dudley had been
 accepted at Uncle Vernon’s old private school,
 Smeltings. Piers Polkiss was going there too. Harry,
 on the other hand, was going to Stonewall High, the
@@ -1457,22 +1255,8 @@ Uncle Vernon said gruffly that it was the proudest
 moment of his life. Aunt Petunia burst into tears and
 said she couldn’t believe it was her Ickle Dudleykins,
 he looked so handsome and grown-up. Harry didn’t
-
-
-
-
-
-
-
-
 trust himself to speak. He thought two of his ribs
 might already have cracked from trying not to laugh.
-
-
-
-k k k
-
-
 
 There was a horrible smell in the kitchen the next
 morning when Harry went in for breakfast. It seemed
@@ -1509,11 +1293,6 @@ he carried everywhere, on the table.
 They heard the click of the mail slot and flop of letters
 on the doormat.
 
-
-
-
-
-
 “Get the mail, Dudley,” said Uncle Vernon from
 behind his paper.
 
@@ -1549,13 +1328,6 @@ Surrey
 The envelope was thick and heavy, made of yellowish
 parchment, and the address was written in emerald-
 green ink. There was no stamp.
-
-
-
-
-
-
-
 
 Turning the envelope over, his hand trembling, Harry
 saw a purple wax seal bearing a coat of arms; a lion,
