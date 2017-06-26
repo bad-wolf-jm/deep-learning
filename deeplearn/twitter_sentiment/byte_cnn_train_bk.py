@@ -134,7 +134,7 @@ while True:
         # BINARY_DATA_FILE.write(bytes_)
         #BINARY_INDEX_FILE.write(struct.pack('=III', tweet_index, offset, len(bytes_)))
         tweet_index += 1
-        if tweet_index > 15000:
+        if tweet_index > 1000:
             break
         #offset += len(bytes_)
         #print(tweet_index, offset, bytes_[2:].decode('utf-8'))
@@ -205,11 +205,11 @@ def training_batches(batch_size, epochs, validation_size=0):
                    'total_epochs':  epochs}
 
 
-batch_iterator = training_batches(batch_size=50, epochs=250, validation_size=25)
+batch_iterator = training_batches(batch_size=150, epochs=250, validation_size=25)
 foo = ByteCNN()
 foo.build_training_model()
-#foo.build_summaries()
-#foo.init_summary()
+foo.build_summaries()
+foo.init_summary()
 foo.initialize()
 
 def train(model, data, loss=None, accuracy=None, optimizer=None, initial_weights=None,

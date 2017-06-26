@@ -17,14 +17,21 @@ max_line_length = 0
 LENGTH_CUTOFF = 10
 MAX_TWEET_LENGTH = 140
 
-connection = pymysql.connect(host='10.137.11.91',
-                             user='jalbert',
-                             password='gameloft2017',
-                             db='tren_games',
+#connection = pymysql.connect(host='10.137.11.91',
+#                             user='jalbert',
+#                             password='gameloft2017',
+#                             db='tren_games',
+#                             charset='utf8mb4',
+#                             cursorclass=pymysql.cursors.DictCursor)
+
+connection = pymysql.connect(host='localhost',
+                             user='root',
+                             password='root',
+                             db='sentiment_analysis_data',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 
-sql = """SELECT vader, message FROM twitter__tweets WHERE lang='en'"""
+sql = """SELECT sentiment, sanitized_text FROM trinary_sentiment_dataset"""
 with connection.cursor() as cursor:
     cursor.execute(sql)
     data = cursor.fetchall()
@@ -32,16 +39,16 @@ with connection.cursor() as cursor:
 data_set = []
 
 for line in data:
-    tweet = line['message']
+    tweet = line['sanitized_text']
     tweet = html.unescape(tweet)
 
-    if tweet[0] == '"' and tweet[-1] == '"':
-        while tweet[0] == '"' and tweet[-1] == '"':
-            tweet = tweet[1:-1]
+    #if tweet[0] == '"' and tweet[-1] == '"':
+    #    while tweet[0] == '"' and tweet[-1] == '"':
+    #        tweet = tweet[1:-1]
 
-    if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= MAX_TWEET_LENGTH:
-        bytes_ = [ord(x) for x in tweet if 0 < ord(x) < 256]  # list(bytes(tweet.encode('utf-8')))
-        data_set.append({'message': bytes_, 'vader':line['vader']})
+    #if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= MAX_TWEET_LENGTH:
+    bytes_ = [ord(x) for x in tweet if 0 < ord(x) < 256]  # list(bytes(tweet.encode('utf-8')))
+    data_set.append({'sanitized_text': bytes_, 'sentiment':line['sentiment']+1})
 
 train_size = int(0.9 * len(data_set))
 test_size = len(data_set) -  train_size
@@ -61,12 +68,12 @@ def training_batches(batch_size, epochs, validation_size=0):
     for epoch in range(epochs):
         for batch in range(batches_per_epoch):
             batch = TRAINING_SET[:batch_size]
-            batch_x = np.array([pad(element['message'], MAX_TWEET_LENGTH) for element in batch])
-            batch_y = np.array([[element['vader']] for element in batch])
+            batch_x = np.array([pad(element['sanitized_text'], MAX_TWEET_LENGTH) for element in batch])
+            batch_y = np.array([[element['sentiment']] for element in batch])
 
             validation_sample = set(list(np.random.choice(len(TESTING_SET), size=[validation_size], replace=False)))
-            validation_x = np.array([pad(element['message'], MAX_TWEET_LENGTH) for element in [TESTING_SET[i] for i in validation_sample]])
-            validation_y = np.array([[element['vader']] for element in [TESTING_SET[i] for i in validation_sample]])
+            validation_x = np.array([pad(element['sanitized_text'], MAX_TWEET_LENGTH) for element in [TESTING_SET[i] for i in validation_sample]])
+            validation_y = np.array([[element['sentiment']] for element in [TESTING_SET[i] for i in validation_sample]])
             TRAINING_SET = np.roll(TRAINING_SET, -batch_size, axis=0)
             I += 1
             yield {'train_x':  batch_x,

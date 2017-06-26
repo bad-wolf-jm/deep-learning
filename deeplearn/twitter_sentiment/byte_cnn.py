@@ -17,7 +17,7 @@ class ByteCNN(BaseModel):
         self.input_width = 140
         self.input_depth = 256
         self.encoded_input_depth = 8
-        self.categories = 2
+        self.categories = 3
         self.byte_encoder = CategoricalEncoder.instance_from_pickle('weights.pkl')
         self._variables = {}
 
