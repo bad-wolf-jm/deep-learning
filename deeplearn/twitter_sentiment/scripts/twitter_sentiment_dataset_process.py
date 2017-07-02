@@ -2,6 +2,7 @@ import zipfile
 import os
 import html
 import pymysql
+import numpy as np
 
 LENGTH_CUTOFF = 10
 
@@ -12,7 +13,7 @@ bar = foo.open('twitter-binary-sentiment-classification-clean.csv')
 
 connection = pymysql.connect(host='localhost',
                              user='root',
-                             password='root',
+                             password='',
                              db='sentiment_analysis_data',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
@@ -41,6 +42,7 @@ def tokenize(text):
 with connection.cursor() as cursor:
     first_line = True
     insert_batch = []
+    num_tweets = 0
     for index, line in enumerate(bar):
         if first_line:
             first_line = False
@@ -55,18 +57,30 @@ with connection.cursor() as cursor:
         if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= 140:
             tweet = addslashes(tweet)
             sanitized_tweet = tokenize(tweet)
-            sql = "INSERT INTO twitter_sentiment_dataset (id, sentiment, text, sanitized_text) VALUES ({id}, {sentiment}, '{text}', '{sanitized_tweet}')"
+            sql = "INSERT INTO twitter_binary_classification (id, test_row, sentiment, text, sanitized_text) VALUES ({id}, 0, {sentiment}, '{text}', '{sanitized_tweet}')"
             sql = sql.format(id=index, sentiment=int(sent), text=tweet, sanitized_tweet = sanitized_tweet)
             insert_batch.append(sql)
             print(tweet[:140])
-        if len(insert_batch) > 50000:
+            num_tweets += 1
+        if len(insert_batch) > 250000:
             for inst in insert_batch:
-                print(inst[:150])
+                print(inst[:250])
                 cursor.execute(inst)
             connection.commit()
             insert_batch = []
+        #if index == 1000:
+        #    break
     for inst in insert_batch:
-        print(inst[:150])
+        print(inst[:250])
         cursor.execute(inst)
     connection.commit()
     insert_batch = []
+
+    train_size = int(0.9 * num_tweets)
+    test_size = num_tweets -  train_size
+    test_index_numbers = set(list(np.random.choice(num_tweets, size=[test_size], replace=False)))
+    for i in test_index_numbers:
+        sql = """UPDATE twitter_binary_classification SET test_row=1 WHERE id={}""".format(i)
+        print(sql)
+        cursor.execute(sql)
+    connection.commit()
