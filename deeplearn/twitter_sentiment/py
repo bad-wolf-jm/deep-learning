@@ -1,0 +1,3 @@
+#!/bin/bash
+echo $CWD
+source ~/python/python3/bin/activate && echo `python --version` && python -m "$@"
