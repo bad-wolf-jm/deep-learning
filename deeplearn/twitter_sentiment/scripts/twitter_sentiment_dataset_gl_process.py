@@ -55,16 +55,6 @@ with feed_connection.cursor() as feed_cursor:
         first_line = True
         insert_batch = []
         for index, line in enumerate(data):
-            #if first_line:
-            #    first_line = False
-            #    continue
-            #str_line = line['message'] #line.decode('utf-8')
-            #sent, tweet = str_line.split('\t')
-            #tweet = tweet[:-1]
-            #tweet = html.unescape(tweet)
-            #if tweet[0] == '"' and tweet[-1] == '"':
-            #    while tweet[0] == '"' and tweet[-1] == '"':
-            #        tweet = tweet[1:-1]
             tweet = line['message']
             vader        = line['vader']
             sentiwordnet = line['sentiwordnet']

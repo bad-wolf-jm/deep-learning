@@ -67,6 +67,7 @@ connection = pymysql.connect(host=flags.host,
 
 def generate_batches(window_size = 1, batch_size = 10, epochs = None):
     with connection.cursor() as cursor:
+
         epoch = 1
         while True:
             start_id = 0

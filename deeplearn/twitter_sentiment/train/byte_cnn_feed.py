@@ -2,7 +2,7 @@ import zmq
 import argparse
 import pymysql
 import numpy as np
-from stream import DataStreamer
+from train.stream import DataStreamer
 
 
 flags = argparse.ArgumentParser()

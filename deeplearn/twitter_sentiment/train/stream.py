@@ -23,12 +23,9 @@ class DataReceiver(threading.Thread):
         while self._running:
             try:
                 x = self._socket.recv_json()
-                #print(x)
                 action = x.get('action', None)
-                #print (action)
                 if action is not None:
                     callback = self._action_handlers.get(action, None)
-                    #print(self._action_handlers, callback)
                     if callback is not None:
                         try:
                             return_value = callback(**x.get('payload', None))

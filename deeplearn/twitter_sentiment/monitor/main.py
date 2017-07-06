@@ -1,10 +1,11 @@
 import sys
 import os
 import traceback
-from multiprocessing import freeze_support
+#from multiprocessing import freeze_support
 #from pydjay.core.keyboard import key_map
-
+#sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 sys.path.insert(0, os.path.dirname(__file__))
+print sys.path
 
 if __name__ == '__main__':
     #freeze_support()
@@ -14,9 +15,10 @@ if __name__ == '__main__':
     from kivy.clock import Clock
     from kivy.config import Config
     Config.set('kivy', 'exit_on_escape', '0')
-    from ui.main_screen import MainScreen
+    os.chdir('/home/jalbert/python/deep-learning/deeplearn/twitter_sentiment')
+    from main_screen import MainScreen
 
-    Window.clearcolor = (0.1, 0.1, 0.1, 1)
+    Window.clearcolor = (0,0,0, 1)
     Window.size = (864, 1252)
     bar = MainScreen()
     try:

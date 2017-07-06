@@ -23,7 +23,7 @@ from keras import backend as K
 BATCH_SIZE    = 100
 SEQ_LEN       = 30
 ALPHABET_SIZE = 128
-INTERNAL_SIZE = 512
+INTERNAL_SIZE = 128
 
 
 input_         = Input(shape = [SEQ_LEN], batch_shape = [BATCH_SIZE, SEQ_LEN], dtype='uint8') #[BATCH_SIZE, SEQ_LEN]

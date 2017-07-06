@@ -13,7 +13,7 @@ bar = foo.open('twitter-binary-sentiment-classification-clean.csv')
 
 connection = pymysql.connect(host='localhost',
                              user='root',
-                             password='',
+                             password='root',
                              db='sentiment_analysis_data',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
