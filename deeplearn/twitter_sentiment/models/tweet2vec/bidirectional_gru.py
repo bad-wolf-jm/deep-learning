@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.nn.rnn_cell import GRUCell
 from models.categorical_encoder import CategoricalEncoder
 from models.tf_session import tf_session
 from models.base_model import BaseModel  # , StopTraining
@@ -13,7 +14,7 @@ class Tweet2Vec_BiGRU(BaseModel):
     """
     toplevel_scope = "categorical_encoder"
 
-    def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=64, num_classes=3):
+    def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=64, num_classes=2):
         super(Tweet2Vec_BiGRU, self).__init__()
         self._input_dtype = tf.int32
         self.seq_length = seq_length
@@ -31,8 +32,8 @@ class Tweet2Vec_BiGRU(BaseModel):
 
         # NOTE self._input now has dimension [batch_size, seq_length, char_embedding_size]
         with tf.variable_scope('bidirectional_encoder', reuse=None) as scope:
-            self.forward_gru = tf.nn.rnn_cell.GRUCell(self.hidden_states, activation=None)
-            self.backward_gru = tf.nn.rnn_cell.GRUCell(self.hidden_states, activation=None)
+            self.forward_gru = GRUCell(self.hidden_states, activation=None)
+            self.backward_gru = GRUCell(self.hidden_states, activation=None)
             output, output_states = tf.nn.bidirectional_dynamic_rnn(self.forward_gru, self.backward_gru, x, dtype=tf.float32)
             self.fw_gru_output = tf.reshape(output[0][:, -1:], [-1, self.hidden_states])  # output[0][:,-1:]
             self.bk_gru_output = tf.reshape(output[1][:, -1:], [-1, self.hidden_states])  # output[1][:,-1:]
@@ -74,6 +75,13 @@ class Tweet2Vec_BiGRU(BaseModel):
         batch_time = time.time() - t_1
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
 
+    def validate(self, batch_x, batch_y):
+        t_1 = time.time()
+        feed_dict = {self._input: batch_x, self.output_expected: batch_y}
+        lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        batch_time = time.time() - t_1
+        return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
+
 
 if __name__ == '__main__':
     foo = DataReceiver()
@@ -97,10 +105,12 @@ if __name__ == '__main__':
             return training_values
 
         def validate_on_batch(train_x, train_y):
-            training_values = trainer.validate(np.array(train_x))
+            train_x = [pad(x, 1024) for x in train_x]
+            training_values = trainer.validate(np.array(train_x), np.array(train_y))
             foo = "validate:  Loss = {loss:.4f} --- Accuracy = {accuracy:.4f}".format(**training_values)
             print(foo)
             return training_values
 
         foo.register_action_handler('train', train_on_batch)
+        foo.register_action_handler('validate', validate_on_batch)
         foo.start(False)

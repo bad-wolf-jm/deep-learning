@@ -10,7 +10,6 @@ import pickle
 class StopTraining(Exception):
     pass
 
-
 class BaseModel(object):
     """
     Encode a categorical variable as a vector of dimension `output_dimension`.

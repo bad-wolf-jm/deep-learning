@@ -23,7 +23,7 @@ from kivy.garden import graph
 import widgets
 import clickable_area
 from ssh_connect import SSHConnect
-from train.stream import DataStreamer
+from stream.sender import DataStreamer
 #import pydjay.bootstrap
 #from pydjay.core.keyboard import key_map
 Factory.register('Graph', graph.Graph)
@@ -53,6 +53,59 @@ kv_string = """
     TextInput:
         size_hint: 1, 1
         password: root.password
+
+<StatsDisplay@BoxLayout>:
+    orientation : 'vertical'
+    training_color:1,0.2,0,1
+    validation_color:0,1,0.5,1
+    avg_loss: '4.7523'
+    avg_accuracy: '100.0%'
+    canvas:
+        Color:
+            rgba: 0,0,0,.5
+        Rectangle:
+            size:self.size
+            pos:self.pos
+    padding:[5,5,5,5]
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: 1,1
+        Label:
+            size_hint: 1,1
+            text: 'Training:'
+            bold: False
+            color: root.training_color
+            halign: 'left'
+            valign: 'middle'
+            text_size: self.size
+        Label:
+            size_hint: 1,1
+            text: root.avg_loss
+            bold: True
+            color: root.training_color
+            halign: 'right'
+            valign: 'middle'
+            text_size: self.size
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: 1,1
+        Label:
+            size_hint: 1,1
+            text: 'Validation:'
+            bold: False
+            color: root.validation_color
+            halign: 'left'
+            valign: 'middle'
+            text_size: self.size
+        Label:
+            size_hint: .5,1
+            text: root.avg_accuracy
+            bold: True
+            color: root.validation_color
+            halign: 'right'
+            valign: 'middle'
+            text_size: self.size
+
 
 <TrainingStats@Graph>:
     xlabel:''
@@ -85,7 +138,7 @@ kv_string = """
             text_size: self.size
             multiline:True
             markup:True
-            font_size:12
+            font_size:13
             text: "Program will run on 'localhost'"
         Label:
             size_hint: 1,1
@@ -94,17 +147,17 @@ kv_string = """
             text_size: self.size
             multiline:True
             markup:True
-            font_size:12
+            font_size:13
             text: "Root: '~/path/to/cwd'"
-        Label:
-            size_hint: 1,1
-            halign:'left'
-            valign:'middle'
-            text_size: self.size
-            multiline:True
-            markup:True
-            font_size:12
-            text: "Virtualenv: 'None'"
+        #Label:
+        #    size_hint: 1,1
+        #    halign:'left'
+        #    valign:'middle'
+        #    text_size: self.size
+        #    multiline:True
+        #    markup:True
+        #    font_size:12
+        #    text: "Virtualenv: 'None'"
 
 
     ImageButton:
@@ -368,6 +421,10 @@ kv_string = """
                             y_ticks_minor:2
                             ymin:0
                             ymax:100
+                        StatsDisplay:
+                            size_hint: None, None
+                            size: 175, 50
+                            pos_hint: {'right':1.0, 'top':1.0}
 
                 BoxLayout:
                     orientation: 'vertical'
@@ -398,13 +455,19 @@ kv_string = """
                         #size: self.texture_size
                         text_size: self.size
                         text: "ACCURACY"
-                    TrainingStats:
-                        id: accuracy_graph
+                    RelativeLayout:
                         size_hint: 1,1
-                        pos_hint: {'x':0, 'y':0}
-                        ymin:0
-                        ymax:100
-                        y_ticks_major:10
+                        TrainingStats:
+                            id: accuracy_graph
+                            size_hint: 1,1
+                            pos_hint: {'x':0, 'y':0}
+                            ymin:0
+                            ymax:100
+                            y_ticks_major:10
+                        StatsDisplay:
+                            size_hint: None, None
+                            size: 175, 50
+                            pos_hint: {'right':1.0, 'top':1.0}
 
                 Widget:
                     size_hint: 1,1

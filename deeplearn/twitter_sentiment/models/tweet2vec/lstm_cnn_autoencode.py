@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.nn.rnn_cell import LSTMCell, MultiRNNCell, DropoutWrapper
 from models.categorical_encoder import CategoricalEncoder
 from models.tf_session import tf_session
 from models.base_model import BaseModel  # , StopTraining
@@ -19,56 +20,75 @@ class Tweet2Vec_LSTM(BaseModel):
     def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=64, num_classes=3):
         super(Tweet2Vec_LSTM, self).__init__()
         self._input_dtype = tf.int32
-        self.input_width = 256
-        self.input_depth = 64
-        self.seq_length = seq_length
-        self.hidden_states = hidden_states
-        self.embedding_dimension = embedding_dimension
-        self.num_classes = num_classes
-        self.byte_encoder = CategoricalEncoder.instance_from_pickle('weights.pkl')
+        self.max_message_length = 256
+        self.byte_encoding_depth = 256
+        self.convolutional_features = 512
+        self.encoder_internal_size = 64
+        self.decoder_internal_size = 64
+        self.num_decoder_layers = 2
+        self.pooling_sizes = [3, 3]
+        self.pooling_strides = [2, 2]
+        self.window_sizes = [7, 7, 3, 3]
+        self.dropout_keep_probability=0.7
 
     def init_model(self, trainable=False):
-        pkeep = 0.7
-        NLAYERS = 2
-        LSTM_SIZE = 64
-        DECODER_SIZE = 64
-        INTERNALSIZE = 64
-        Hin = tf.placeholder(tf.float32, [None, INTERNALSIZE * NLAYERS], name='Hin')
         with tf.variable_scope('input', reuse=None) as scope:
-            self.input_layer = tf.placeholder('int32', shape=[None, self.input_width], name="INPUT")
-            input_layer = tf.one_hot(self.input_layer, 256)
+            self.input_layer = tf.placeholder('int32', shape=[None, self.max_message_length], name="INPUT")
+            input_layer = tf.one_hot(self.input_layer, self.byte_encoding_depth)
 
         with tf.variable_scope('encoder', reuse=None) as scope:
             with tf.variable_scope('convolution', reuse=None) as scope:
-                conv_1 = self.convolutional_block(input_layer, 256, 512, 'layer_1')
-                pool_1 = self.max_pool_layer(conv_1, 3, 2, 'layer_1')
-                conv_2 = self.convolutional_block(pool_1, NUM_FILTERS, NUM_FILTERS, 'layer_2')
-                pool_2 = self.max_pool_layer(conv_2, 3, 2, scope)
-                conv_3 = self.convolutional_block(pool_2, NUM_FILTERS, NUM_FILTERS, 'layer_3')
-                conv_4 = self.convolutional_block(conv_3, NUM_FILTERS, NUM_FILTERS, 'layer_4')
+                conv_1 = self.convolutional_block(i_tensor=input_layer,
+                                                  i_features=self.byte_encoding_depth,
+                                                  o_features=self.convolutional_features,
+                                                  window_size=self.window_sizes[0],
+                                                  scope='layer_1')
+                pool_1 = self.max_pool_layer(i_tensor=conv_1,
+                                             window_size=self.pooling_sizes[0],
+                                             strides=self.pooling_strides[0],
+                                             scope='layer_1')
+                conv_2 = self.convolutional_block(i_tensor=pool_1,
+                                                  i_features=self.convolutional_features,
+                                                  o_features=self.convolutional_features,
+                                                  window_size=self.window_sizes[1],
+                                                  scope='layer_2')
+                pool_2 = self.max_pool_layer(i_tensor=conv_2,
+                                             window_size=self.pooling_sizes[1],
+                                             strides=self.pooling_strides[1],
+                                             scope=scope)
+                conv_3 = self.convolutional_block(i_tensor=pool_2,
+                                                  i_features=self.convolutional_features,
+                                                  o_features=self.convolutional_features,
+                                                  window_size=self.window_sizes[2],
+                                                  scope='layer_3')
+                conv_4 = self.convolutional_block(i_tensor=conv_3,
+                                                  i_features=self.convolutional_features,
+                                                  o_features=self.convolutional_features,
+                                                  window_size=self.window_sizes[3],
+                                                  scope='layer_4')
 
             with tf.variable_scope('lstm_encoder', reuse=None) as scope:
-                encoding_layer = tf.nn.rnn_cell.BasicLSTMCell(LSTM_SIZE)
+                encoding_layer = LSTMCell(self.encoder_internal_size)
                 Yr, H = tf.nn.dynamic_rnn(encoding_layer, conv_4, dtype=tf.float32)
                 encoded_text=Yr[:, -1, :] #get the last output
                 print('Yr=', encoded_text.get_shape())
 
         with tf.variable_scope('decoder', reuse=None) as scope:
-            encoded_text = tf.concat([encoded_text]*self.input_width, axis=1)
-            encoded_text=tf.reshape(encoded_text, [-1, self.input_width, INTERNALSIZE])
-            cells = [tf.nn.rnn_cell.LSTMCell(DECODER_SIZE, state_is_tuple=True) for _ in range(NLAYERS)]
-            dropcells = [tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=pkeep) for cell in cells]
-            multicell = tf.nn.rnn_cell.MultiRNNCell(dropcells, state_is_tuple=True)
-            multicell = tf.nn.rnn_cell.DropoutWrapper(multicell, output_keep_prob=pkeep)
+            encoded_text = tf.concat([encoded_text]*self.max_message_length, axis=1)
+            encoded_text=tf.reshape(encoded_text, [-1, self.max_message_length, self.decoder_internal_size])
+            cells = [LSTMCell(self.decoder_internal_size, state_is_tuple=True) for _ in range(self.num_decoder_layers)]
+            dropcells = [DropoutWrapper(cell, input_keep_prob=self.dropout_keep_probability) for cell in cells]
+            multicell = MultiRNNCell(dropcells, state_is_tuple=True)
+            multicell = DropoutWrapper(multicell, output_keep_prob=self.dropout_keep_probability)
             Yr, H = tf.nn.dynamic_rnn(multicell, encoded_text, dtype=tf.float32)
-            Yr = tf.reshape(Yr, [-1, INTERNALSIZE])
-            self.final_layer_weights = self.var(input_shape=[INTERNALSIZE, 256], name='layer_1_convolution')
+            Yr = tf.reshape(Yr, [-1, self.decoder_internall_size])
+            self.final_layer_weights = self.var(input_shape=[self.decoder_internal_size, self.byte_encoding_depth], name='layer_1_convolution')
             final_layer = tf.matmul(Yr, self.final_layer_weights)
             self.output_predicted = final_layer
 
-    def convolutional_block(self, i_tensor, i_features, o_features, scope=None):
+    def convolutional_block(self, i_tensor, i_features, o_features, window_size=3, scope=None):
         with tf.variable_scope(scope):
-            kernel = self.var(input_shape=[3, i_features, o_features], name='layer_1_convolution')
+            kernel = self.var(input_shape=[window_size, i_features, o_features], name='layer_1_convolution')
             x = tf.nn.conv1d(i_tensor, kernel, stride=1, padding="SAME")
             conv = tf.nn.relu(x)
             return conv
@@ -86,9 +106,9 @@ class Tweet2Vec_LSTM(BaseModel):
     def build_training_model(self):
         with tf.variable_scope('training', reuse=None) as scope:
             self.build_inference_model(trainable=True)
-            self.output_expected = tf.placeholder(dtype='int32', shape=[None, self.input_width], name="OUTPUT")
-            self.output_expected_oh = tf.one_hot(self.output_expected, 256) #tf.nn.embedding_lookup(self.byte_encoder._encode_weights, self.output_expected)
-            self.output_expected_oh = tf.reshape(self.output_expected_oh, [-1, 256])
+            self.output_expected = tf.placeholder(dtype='int32', shape=[None, self.max_message_length], name="OUTPUT")
+            self.output_expected_oh = tf.one_hot(self.output_expected, self.byte_encoding_depth) #tf.nn.embedding_lookup(self.byte_encoder._encode_weights, self.output_expected)
+            self.output_expected_oh = tf.reshape(self.output_expected_oh, [-1, self.byte_encoding_depth])
             print(self.output_expected_oh.get_shape(), self.output_predicted.get_shape())
             loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.output_predicted, labels=self.output_expected_oh)
             self.train_step = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
