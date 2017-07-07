@@ -12,7 +12,7 @@ import sys
 import signal
 #import sys
 #import pymysql
-from train.stream import DataReceiver
+from stream.receiver import DataReceiver
 
 max_line_length = 0
 LENGTH_CUTOFF = 10

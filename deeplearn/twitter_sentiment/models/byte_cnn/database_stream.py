@@ -2,7 +2,7 @@ import zmq
 import argparse
 import pymysql
 import numpy as np
-from train.stream import DataStreamer
+from stream.sender import DataStreamer
 from config import db, stream
 
 

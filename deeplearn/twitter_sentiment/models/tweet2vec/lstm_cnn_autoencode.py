@@ -3,7 +3,7 @@ import tensorflow as tf
 from models.categorical_encoder import CategoricalEncoder
 from models.tf_session import tf_session
 from models.base_model import BaseModel  # , StopTraining
-from train.stream import DataReceiver
+from stream.receiver import DataReceiver
 import time
 
 EMBEDDING_DIMENSION = 6
@@ -37,16 +37,16 @@ class Tweet2Vec_LSTM(BaseModel):
 
         with tf.variable_scope('encoder', reuse=None) as scope:
             with tf.variable_scope('convolution', reuse=None) as scope:
-                conv_1 = self.convolutional_block(self._input, EMBEDDING_DIMENSION, NUM_FILTERS)  # tf.nn.conv1d(input_layer, num_filters, 7, convolution=convops)
+                conv_1 = self.convolutional_block(self._input, EMBEDDING_DIMENSION, NUM_FILTERS)
                 pool_1 = self.max_pool_layer(conv_1, 3, 1)
-                conv_2 = self.convolutional_block(pool_1, NUM_FILTERS, 7)  # tf.nn.conv1d(input_layer, num_filters, 7, convolution=convops)
+                conv_2 = self.convolutional_block(pool_1, NUM_FILTERS, 7)
                 pool_2 = self.max_pool_layer(conv_2, 3, 1)
                 conv_3 = self.convolutional_block(pool_2, NUM_FILTERS, 3)
-                conv_4 = self.convolutional_block(conv_3, NUM_FILTERS, 3)  # tf.nn.conv1d(conv_3, NUM_FILTERS, 3)
+                conv_4 = self.convolutional_block(conv_3, NUM_FILTERS, 3)
 
             with tf.variable_scope('lstm_encoder', reuse=None) as scope:
-                encoding_layer = tf.nn.rnn.BasicLSTMCell(LSTM_SIZE)  # LSTM(conv_4, encoder_size, no_return_seq=True, name='encoder')
-                Yr, H = tf.nn.dynamic_rnn(encoding_layer, conv_4, dtype=tf.float32, initial_state=Hin)  # l_in_rep = Repeat(encoding_layer, n=max_chars)
+                encoding_layer = tf.nn.rnn.BasicLSTMCell(LSTM_SIZE)
+                Yr, H = tf.nn.dynamic_rnn(encoding_layer, conv_4, dtype=tf.float32, initial_state=Hin)
 
         with tf.variable_scope('decoder', reuse=None) as scope:
             cells = [tf.nn.rnn.LSTMCell(DECODER_SIZE) for _ in range(NLAYERS)]

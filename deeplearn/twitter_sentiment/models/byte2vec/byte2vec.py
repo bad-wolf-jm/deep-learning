@@ -3,7 +3,7 @@ import tensorflow as tf
 import sys
 from models.tf_session import tf_session
 from models.base_model import BaseModel, StopTraining
-from train.stream import DataReceiver
+from stream.receiver import DataReceiver
 import time
 
 

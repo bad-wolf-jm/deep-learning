@@ -5,7 +5,7 @@ import numpy as np
 import random
 import time
 import collections
-from train.stream import DataStreamer
+from stream.sender import DataStreamer
 from config import db, stream
 
 flags = argparse.ArgumentParser()
