@@ -29,7 +29,7 @@ class Tweet2Vec_LSTM(BaseModel):
         self.pooling_sizes = [3, 3]
         self.pooling_strides = [2, 2]
         self.window_sizes = [7, 7, 3, 3]
-        self.dropout_keep_probability=0.7
+        self.dropout_keep_probability = 0.7
 
     def init_model(self, trainable=False):
         with tf.variable_scope('input', reuse=None) as scope:
@@ -70,12 +70,12 @@ class Tweet2Vec_LSTM(BaseModel):
             with tf.variable_scope('lstm_encoder', reuse=None) as scope:
                 encoding_layer = LSTMCell(self.encoder_internal_size)
                 Yr, H = tf.nn.dynamic_rnn(encoding_layer, conv_4, dtype=tf.float32)
-                encoded_text=Yr[:, -1, :] #get the last output
+                encoded_text = Yr[:, -1, :]  # get the last output
                 print('Yr=', encoded_text.get_shape())
 
         with tf.variable_scope('decoder', reuse=None) as scope:
-            encoded_text = tf.concat([encoded_text]*self.max_message_length, axis=1)
-            encoded_text=tf.reshape(encoded_text, [-1, self.max_message_length, self.decoder_internal_size])
+            encoded_text = tf.concat([encoded_text] * self.max_message_length, axis=1)
+            encoded_text = tf.reshape(encoded_text, [-1, self.max_message_length, self.decoder_internal_size])
             cells = [LSTMCell(self.decoder_internal_size, state_is_tuple=True) for _ in range(self.num_decoder_layers)]
             dropcells = [DropoutWrapper(cell, input_keep_prob=self.dropout_keep_probability) for cell in cells]
             multicell = MultiRNNCell(dropcells, state_is_tuple=True)
@@ -107,14 +107,11 @@ class Tweet2Vec_LSTM(BaseModel):
         with tf.variable_scope('training', reuse=None) as scope:
             self.build_inference_model(trainable=True)
             self.output_expected = tf.placeholder(dtype='int32', shape=[None, self.max_message_length], name="OUTPUT")
-            self.output_expected_oh = tf.one_hot(self.output_expected, self.byte_encoding_depth) #tf.nn.embedding_lookup(self.byte_encoder._encode_weights, self.output_expected)
+            self.output_expected_oh = tf.one_hot(self.output_expected, self.byte_encoding_depth)  # tf.nn.embedding_lookup(self.byte_encoder._encode_weights, self.output_expected)
             self.output_expected_oh = tf.reshape(self.output_expected_oh, [-1, self.byte_encoding_depth])
-            print(self.output_expected_oh.get_shape(), self.output_predicted.get_shape())
             loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.output_predicted, labels=self.output_expected_oh)
             self.train_step = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
             self.predicted_value = tf.argmax(self.output_predicted, 1)
-            print(self.predicted_value.get_shape())
-            #print(self.true_value.get_shape())
             self.true_value = tf.reshape(self.output_expected, [-1])
             self.batch_loss = tf.reduce_mean(loss, axis=0)
             self.batch_accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.cast(self.true_value, tf.uint8), tf.cast(self.predicted_value, tf.uint8)), tf.float32))
@@ -133,10 +130,18 @@ class Tweet2Vec_LSTM(BaseModel):
         batch_time = time.time() - t_1
         pre = np.reshape(pre, [-1, 256])
         for i, x in enumerate(batch_x):
-            input_ = [chr(t) if 0<t<128 else '.' for t in x]
-            output_ = [chr(t) if 0<t<128 else '.' for t in pre[i]]
-            print("".join(input_[:128]), "".join(output_[:128])) #(x[:128], '---', pre[:128])
+            input_ = [chr(t) if 0 < t < 128 else '.' for t in x]
+            output_ = [chr(t) if 0 < t < 128 else '.' for t in pre[i]]
+            print("".join(input_[:128]), "".join(output_[:128]))  # (x[:128], '---', pre[:128])
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
+
+    def generate_line(self, probabilities):  # model, num_lines, max_chars_ler_line, **args):
+        line = []
+        for byte_probabilities in probabilities:
+            byte = np.random.multinomial(1, char_probabilities, 1).argmax()
+            line.append(byte)
+        output_ = [chr(t) if 0 < t < 128 else '.' for t in pre[i]]
+        return "".join(input_[:128]), "".join(output_[:128])
 
 
 if __name__ == '__main__':

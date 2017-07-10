@@ -4,8 +4,8 @@ import traceback
 from kivy.event import EventDispatcher
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty
 from kivy.core.window import Window
-import pydjay.core.keyboard
-from pydjay.bootstrap import play_queue, session_manager, playback_manager
+#import pydjay.core.keyboard
+#from pydjay.bootstrap import play_queue, session_manager, playback_manager
 
 
 class TrackListBehaviour(EventDispatcher):

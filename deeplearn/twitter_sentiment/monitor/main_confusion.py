@@ -19,12 +19,12 @@ if __name__ == '__main__':
     os.chdir('/Users/jihemme/python/DJ/deep-learning/deeplearn/twitter_sentiment')
     #from main_screen import MainScreen
     #from stats_graph import TrainingStatsBox
-    from stats_display import MainScreen
+    from confusion_matrix import ConfusionMatrix
 
     Window.clearcolor = (0,0,0, 1)
     Window.size = (864, 752)
     #bar = TrainingStatsBox()
-    bar = MainScreen()
+    bar =  ConfusionMatrix()
 
     try:
         runTouchApp(bar)

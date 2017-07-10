@@ -1,7 +1,7 @@
 db_name = 'sentiment_analysis_data'
 db_host = '127.0.0.1'
 db_user = 'root'
-db_password = 'root'
+db_password = ''
 db_charset = 'utf8mb4'
 db_shuffle_rows = False
 
@@ -30,4 +30,4 @@ def fill_arg_parser(parser):
     parser.add_argument('-S', '--shuffle-rows', dest='shuffle_rows',
                         type=bool,
                         default=db_shuffle_rows,
-                        help='The training database password')
+                        help='If this option is present, the rows of the database will be shuffled')

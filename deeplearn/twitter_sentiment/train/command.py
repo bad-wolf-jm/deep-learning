@@ -23,7 +23,7 @@ class RPCServer(threading.Thread):
                 command = json.loads(command)
             except zmq.Again as e:
                 continue
-                pass  # time.sleep(0.01)
+                pass
             except Exception, details:
                 print details
                 break

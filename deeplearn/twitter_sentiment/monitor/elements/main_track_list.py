@@ -4,7 +4,7 @@ from kivy.lang import Builder
 from kivy.properties import BooleanProperty, ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 
-import pydjay.bootstrap
+#import pydjay.bootstrap
 from behaviors.long_press_button import LongPressButtonBehaviour
 from behaviors.track_list_behaviour import TrackListBehaviour
 from elements import large_track_list, widgets

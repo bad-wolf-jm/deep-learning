@@ -5,9 +5,10 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.factory import Factory
 
 from list_view import RecycleView, RecycleAdapter
-from pydjay.ui.elements import list_view
-from default_track_list_item import DefaultTrackItemView
-from track_data import TrackData
+import list_view
+#from default_track_list_item import DefaultTrackItemView
+from simple_detailed_list_item import SimpleDetailedListItem as DefaultTrackItemView
+#from track_data import TrackData
 
 
 kv_string = """

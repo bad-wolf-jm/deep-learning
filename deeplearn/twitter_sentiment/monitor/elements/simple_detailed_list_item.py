@@ -24,11 +24,11 @@ from kivy.factory import Factory
 
 #from utils import seconds_to_human_readable
 from clickable_area import ImageButton
-from pydjay.ui.behaviors.long_press_button import LongPressButtonBehaviour
+#from pydjay.ui.behaviors.long_press_button import LongPressButtonBehaviour
 
 from kivy.graphics import *
 
-from track_list_item_base import TrackListItemBase
+from list_item_base import ListItemBase
 
 kv_string_item = """
 <SimpleDetailedListItem>:
@@ -164,7 +164,7 @@ kv_string_item = """
 """
 
 
-class SimpleDetailedListItem(TrackListItemBase):
+class SimpleDetailedListItem(ListItemBase):
     pass
 
 

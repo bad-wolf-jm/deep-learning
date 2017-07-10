@@ -55,8 +55,8 @@ kv_string = """
         password: root.password
 
 <StatsDisplay@BoxLayout>:
-    orientation : 'vertical'
-    training_color:1,0.2,0,1
+    orientation: 'vertical'
+    training_color: 1,0.2,0,1
     validation_color:0,1,0.5,1
     avg_loss: '4.7523'
     avg_accuracy: '100.0%'
@@ -149,16 +149,6 @@ kv_string = """
             markup:True
             font_size:13
             text: "Root: '~/path/to/cwd'"
-        #Label:
-        #    size_hint: 1,1
-        #    halign:'left'
-        #    valign:'middle'
-        #    text_size: self.size
-        #    multiline:True
-        #    markup:True
-        #    font_size:12
-        #    text: "Virtualenv: 'None'"
-
 
     ImageButton:
         size_hint: None, 1
