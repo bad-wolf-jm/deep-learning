@@ -126,12 +126,13 @@ class MainScreen(FloatLayout):
                                                      'payload': {"min_batch_index": self._min_displayed_batch_index,
                                                                  'max_batch_index': None}})
         train_data = train_data.get('return', None)
+        #print (train_data)
         validation_data = validation_data.get('return', None)
-        self.loss_graph.extend_graph(train_data['losses'], validation_data['losses'])
-        self.accuracy_graph.extend_graph([[i, 100*j] for i,j in train_data['accuracies']], [[i, 100*j] for i,j in validation_data['accuracies']])
+        self.loss_graph.extend_graph(train_data['loss'], validation_data['loss'])
+        self.accuracy_graph.extend_graph([[i, 100*j] for i,j in train_data['accuracy']], [[i, 100*j] for i,j in validation_data['accuracy']])
 
-        if len(train_data['accuracies']) > 0:
-            self._min_displayed_batch_index = train_data['accuracies'][-1][0] + 1
+        if len(train_data['accuracy']) > 0:
+            self._min_displayed_batch_index = train_data['accuracy'][-1][0] + 1
 
     def _post_init(self, *args):
         self.start_monitor()

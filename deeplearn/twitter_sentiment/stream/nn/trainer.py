@@ -35,10 +35,10 @@ class TrainingSupervisor(object):
         return d
 
     def get_train_summary(self, min_batch_index=None, max_batch_index=None):
-        return self.get_summary('train', min_batch_index, max_batch_index)
+        return self.summary.get_summary('train', min_batch_index, max_batch_index)
 
     def get_validation_summary(self, min_batch_index=None, max_batch_index=None):
-        return self.get_summary('validation', min_batch_index, max_batch_index)
+        return self.summary.get_summary('validation', min_batch_index, max_batch_index)
 
     def run_training(self):
         with tf_session() as session:
