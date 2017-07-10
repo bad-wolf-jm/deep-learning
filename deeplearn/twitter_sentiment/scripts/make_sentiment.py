@@ -14,11 +14,11 @@ connection = pymysql.connect(host='localhost',
                              cursorclass=pymysql.cursors.DictCursor)
 
 feed_connection = pymysql.connect(host='10.137.11.91',
-                             user='jalbert',
-                             password='gameloft2017',
-                             db='tren_games',
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
+                                  user='jalbert',
+                                  password='gameloft2017',
+                                  db='tren_games',
+                                  charset='utf8mb4',
+                                  cursorclass=pymysql.cursors.DictCursor)
 
 
 tables = ['amazon__reviews',
@@ -55,6 +55,7 @@ def tokenize(text):
                 sanitized_words.append(w)
     return ' '.join(sanitized_words)
 
+
 sql = """SELECT message, vader, sentiwordnet FROM {table} WHERE lang='en'"""
 index = 0
 with feed_connection.cursor() as feed_cursor:
@@ -67,17 +68,16 @@ with feed_connection.cursor() as feed_cursor:
             first_line = True
             insert_batch = []
             for _, line in enumerate(data):
-                tweet        = line['message']
-                vader        = line['vader']
+                tweet = line['message']
+                vader = line['vader']
                 sentiwordnet = line['sentiwordnet']
-                sent    = vader
+                sent = vader
                 if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= 512:
                     tweet_stats = {'char_length': len(tweet),
                                    'byte_length': len(tweet.encode('utf8'))}
                     sanitized_tweet = tokenize(tweet)
                     sanitized_tweet_stats = {'char_length': len(sanitized_tweet),
                                              'byte_length': len(sanitized_tweet.encode('utf8'))}
-
 
                     tweet = addslashes(tweet)
                     sanitized_tweet = addslashes(sanitized_tweet)
@@ -90,7 +90,7 @@ with feed_connection.cursor() as feed_cursor:
                                     {sanitized_char_length}, {sanitized_byte_length})"""
                     sql = sql.format(id=index, sentiment=int(sent),
                                      text=tweet,
-                                     sanitized_tweet = sanitized_tweet,
+                                     sanitized_tweet=sanitized_tweet,
                                      char_length=tweet_stats['char_length'],
                                      byte_length=tweet_stats['byte_length'],
                                      sanitized_char_length=sanitized_tweet_stats['char_length'],

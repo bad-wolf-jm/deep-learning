@@ -17,11 +17,11 @@ connection = pymysql.connect(host='10.137.11.91',
                              cursorclass=pymysql.cursors.DictCursor)
 
 t_connection = pymysql.connect(host='localhost',
-                             user='root',
-                             password='root',
-                             db='sentiment_analysis_data',
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
+                               user='root',
+                               password='root',
+                               db='sentiment_analysis_data',
+                               charset='utf8mb4',
+                               cursorclass=pymysql.cursors.DictCursor)
 
 tables = ['amazon__reviews',
           'facebook__comments',
@@ -37,6 +37,8 @@ tables = ['amazon__reviews',
           'youtubeapi__comments']
 
 sql_statements = []
+
+
 def addslashes(s):
     if s == None:
         return ''
@@ -47,7 +49,7 @@ def addslashes(s):
 total_size = 0
 msg_count = 1
 
-#if False:
+# if False:
 with connection.cursor() as cursor:
     for table in tables:
         sql = "SELECT message FROM {table}".format(table=table)
@@ -101,7 +103,7 @@ with t_connection.cursor() as cursor:
 with t_connection.cursor() as cursor:
     sql = "SELECT text FROM byte2vec__training_strings"
     cursor.execute(sql)
-    byte_frequencies = {i:0 for i in range(256)}
+    byte_frequencies = {i: 0 for i in range(256)}
     while True:
         data = cursor.fetchmany(1000)
         for row in data:
@@ -121,12 +123,12 @@ with t_connection.cursor() as cursor:
     Z = sum([math.pow(x, 0.75) for x in byte_frequencies.values()])
     for byte in byte_frequencies:
         occurence_probability = float(byte_frequencies[byte]) / N
-        unigram_probability   = math.pow(byte_frequencies[byte], 0.75) / Z
+        unigram_probability = math.pow(byte_frequencies[byte], 0.75) / Z
         keep_probability = 1
         if occurence_probability != 0:
-            keep_probability  = min((math.sqrt(occurence_probability / 0.001) + 1) * (0.001 / occurence_probability),1)
-        byte_insert_data[byte] = {'byte':byte,
-                                  'frequency':byte_frequencies[byte],
+            keep_probability = min((math.sqrt(occurence_probability / 0.001) + 1) * (0.001 / occurence_probability), 1)
+        byte_insert_data[byte] = {'byte': byte,
+                                  'frequency': byte_frequencies[byte],
                                   'probability': occurence_probability,
                                   'keep_probability': keep_probability,
                                   'unigram_probability': unigram_probability}
