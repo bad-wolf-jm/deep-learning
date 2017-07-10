@@ -1,11 +1,12 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.nn.rnn_cell import LSTMCell, MultiRNNCell, DropoutWrapper
+#from tensorflow.nn.rnn_cell import LSTMCell, MultiRNNCell, DropoutWrapper
 from models.categorical_encoder import CategoricalEncoder
 from models.tf_session import tf_session
 from models.base_model import BaseModel  # , StopTraining
 from stream.receiver import DataReceiver
 import time
+import string
 
 EMBEDDING_DIMENSION = 6
 NUM_FILTERS = 512
@@ -68,7 +69,7 @@ class Tweet2Vec_LSTM(BaseModel):
                                                   scope='layer_4')
 
             with tf.variable_scope('lstm_encoder', reuse=None) as scope:
-                encoding_layer = LSTMCell(self.encoder_internal_size)
+                encoding_layer = tf.nn.rnn_cell.LSTMCell(self.encoder_internal_size)
                 Yr, H = tf.nn.dynamic_rnn(encoding_layer, conv_4, dtype=tf.float32)
                 encoded_text = Yr[:, -1, :]  # get the last output
                 print('Yr=', encoded_text.get_shape())
@@ -76,12 +77,12 @@ class Tweet2Vec_LSTM(BaseModel):
         with tf.variable_scope('decoder', reuse=None) as scope:
             encoded_text = tf.concat([encoded_text] * self.max_message_length, axis=1)
             encoded_text = tf.reshape(encoded_text, [-1, self.max_message_length, self.decoder_internal_size])
-            cells = [LSTMCell(self.decoder_internal_size, state_is_tuple=True) for _ in range(self.num_decoder_layers)]
-            dropcells = [DropoutWrapper(cell, input_keep_prob=self.dropout_keep_probability) for cell in cells]
-            multicell = MultiRNNCell(dropcells, state_is_tuple=True)
-            multicell = DropoutWrapper(multicell, output_keep_prob=self.dropout_keep_probability)
+            cells = [tf.nn.rnn_cell.LSTMCell(self.decoder_internal_size, state_is_tuple=True) for _ in range(self.num_decoder_layers)]
+            dropcells = [tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=self.dropout_keep_probability) for cell in cells]
+            multicell = tf.nn.rnn_cell.MultiRNNCell(dropcells, state_is_tuple=True)
+            multicell = tf.nn.rnn_cell.DropoutWrapper(multicell, output_keep_prob=self.dropout_keep_probability)
             Yr, H = tf.nn.dynamic_rnn(multicell, encoded_text, dtype=tf.float32)
-            Yr = tf.reshape(Yr, [-1, self.decoder_internall_size])
+            Yr = tf.reshape(Yr, [-1, self.decoder_internal_size])
             self.final_layer_weights = self.var(input_shape=[self.decoder_internal_size, self.byte_encoding_depth], name='layer_1_convolution')
             final_layer = tf.matmul(Yr, self.final_layer_weights)
             self.output_predicted = final_layer
@@ -126,22 +127,26 @@ class Tweet2Vec_LSTM(BaseModel):
     def validate(self, batch_x, batch_y):
         t_1 = time.time()
         feed_dict = {self.input_layer: batch_x, self.output_expected: batch_y}
-        lo, acc, pre = tf_session().run([self.batch_loss, self.batch_accuracy, self.predicted_value], feed_dict=feed_dict)
+        xxx = tf.nn.softmax(self.output_predicted)
+        lo, acc, pre_o, pre = tf_session().run([self.batch_loss, self.batch_accuracy, xxx, self.predicted_value], feed_dict=feed_dict)
         batch_time = time.time() - t_1
-        pre = np.reshape(pre, [-1, 256])
+        pre = np.reshape(pre, [-1, self.max_message_length])
+        pre_o = np.reshape(pre_o, [-1, self.max_message_length, self.byte_encoding_depth])
         for i, x in enumerate(batch_x):
             input_ = [chr(t) if 0 < t < 128 else '.' for t in x]
             output_ = [chr(t) if 0 < t < 128 else '.' for t in pre[i]]
             print("".join(input_[:128]), "".join(output_[:128]))  # (x[:128], '---', pre[:128])
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
 
-    def generate_line(self, probabilities):  # model, num_lines, max_chars_ler_line, **args):
+    def generate_line(self, probabilities):
         line = []
         for byte_probabilities in probabilities:
-            byte = np.random.multinomial(1, char_probabilities, 1).argmax()
+            probs = byte_probabilities / byte_probabilities.sum()
+            byte = np.random.multinomial(1, probs, 1).argmax()
             line.append(byte)
-        output_ = [chr(t) if 0 < t < 128 else '.' for t in pre[i]]
-        return "".join(input_[:128]), "".join(output_[:128])
+        output_ = [chr(t) if 0 < t < 128 else '.' for t in line]
+        output_ = [x if x in string.printable else '.' for x in output_]
+        return "".join(output_[:128])
 
 
 if __name__ == '__main__':
@@ -160,14 +165,16 @@ if __name__ == '__main__':
 
         def train_on_batch(train_x, train_y):
             train_x = [pad(x, 256) for x in train_x]
-            training_values = trainer.train(np.array(train_x), np.array(train_x))
+            train_y = [pad(x, 256) for x in train_y]
+            training_values = trainer.train(np.array(train_x), np.array(train_y))
             foo = "train:  Loss = {loss:.4f} --- Accuracy = {accuracy:.4f}".format(**training_values)
             print(foo)
             return training_values
 
         def validate_on_batch(train_x, train_y):
             train_x = [pad(x, 256) for x in train_x]
-            training_values = trainer.validate(np.array(train_x), np.array(train_x))
+            train_y = [pad(x, 256) for x in train_y]
+            training_values = trainer.validate(np.array(train_x), np.array(train_y))
             foo = "validate:  Loss = {loss:.4f} --- Accuracy = {accuracy:.4f}".format(**training_values)
             print(foo)
             return training_values

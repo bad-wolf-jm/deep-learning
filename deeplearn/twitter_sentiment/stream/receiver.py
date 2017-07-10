@@ -15,7 +15,7 @@ class DataReceiver(threading.Thread):
         self._running = False
         self._context = zmq.Context()
         self._socket = self._context.socket(zmq.REP)
-        self._socket.bind("tcp://{host}:{port}".format(host = self._host, port=self._port))
+        self._socket.bind("tcp://{host}:{port}".format(host=self._host, port=self._port))
 
         self._action_handlers = {}
 
@@ -24,19 +24,21 @@ class DataReceiver(threading.Thread):
             try:
                 x = self._socket.recv_json()
                 action = x.get('action', None)
+                #print (action)
                 if action is not None:
                     callback = self._action_handlers.get(action, None)
                     if callback is not None:
                         try:
                             return_value = callback(**x.get('payload', None))
-                            self._socket.send_json({'status':'ok', 'return':return_value})
+                            print(return_value)
+                            self._socket.send_json({'status': 'ok', 'return': return_value})
                         except Exception as e:
                             print(e)
-                            self._socket.send_json({'status': 'error'})
+                            self._socket.send_json({'status': 'error', 'return': str(e)})
                     else:
-                        self._socket.send_json({'status':'ok', 'return':None})
+                        self._socket.send_json({'status': 'ok', 'return': None})
                 else:
-                    self._socket.send_json({'status':'ok', 'return':None})
+                    self._socket.send_json({'status': 'ok', 'return': None})
 
             except Exception as details:
                 print ("ERROR", details)

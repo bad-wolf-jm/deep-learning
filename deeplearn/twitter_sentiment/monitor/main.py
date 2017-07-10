@@ -15,8 +15,8 @@ if __name__ == '__main__':
     from kivy.clock import Clock
     from kivy.config import Config
     Config.set('kivy', 'exit_on_escape', '0')
-    #os.chdir('/home/jalbert/python/deep-learning/deeplearn/twitter_sentiment')
-    os.chdir('/Users/jihemme/python/DJ/deep-learning/deeplearn/twitter_sentiment')
+    os.chdir('/home/jalbert/python/deep-learning/deeplearn/twitter_sentiment')
+    #os.chdir('/Users/jihemme/python/DJ/deep-learning/deeplearn/twitter_sentiment')
     #from main_screen import MainScreen
     #from stats_graph import TrainingStatsBox
     from stats_display import MainScreen

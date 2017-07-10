@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.nn.rnn_cell import GRUCell
 from models.categorical_encoder import CategoricalEncoder
 from models.tf_session import tf_session
-from models.base_model import BaseModel  # , StopTraining
+from models.base_model import BaseModel
 from stream.receiver import DataReceiver
 import time
 
@@ -35,8 +35,8 @@ class Tweet2Vec_BiGRU(BaseModel):
             self.forward_gru = GRUCell(self.hidden_states, activation=None)
             self.backward_gru = GRUCell(self.hidden_states, activation=None)
             output, output_states = tf.nn.bidirectional_dynamic_rnn(self.forward_gru, self.backward_gru, x, dtype=tf.float32)
-            self.fw_gru_output = tf.reshape(output[0][:, -1:], [-1, self.hidden_states])  # output[0][:,-1:]
-            self.bk_gru_output = tf.reshape(output[1][:, -1:], [-1, self.hidden_states])  # output[1][:,-1:]
+            self.fw_gru_output = tf.reshape(output[0][:, -1:], [-1, self.hidden_states])
+            self.bk_gru_output = tf.reshape(output[1][:, -1:], [-1, self.hidden_states])
             self.fw_gru_output_state = output_states[0]
             self.bk_gru_output_state = output_states[1]
 

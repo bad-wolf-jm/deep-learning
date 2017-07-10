@@ -2,9 +2,10 @@ import time
 from train.summary import TrainingSummary
 from stream.sender import DataStreamer
 
+
 class TrainingDataStreamer(object):
     def __init__(self, validation_interval=None, summary_span=None):
-        super(TrainingDataStream).__init__()
+        super(TrainingDataStreamer).__init__()
         self.validation_interval = validation_interval
         self.summary = TrainingSummary(summary_span=summary_span,
                                        fields=['loss',
@@ -23,6 +24,7 @@ class TrainingDataStreamer(object):
                               'payload': {'train_x': data['train_x'],
                                           'train_y': data['train_y']}})
         batch_total_time = time.time() - t_0
+        #print(vals)
         vals = vals['return']
         y = vals['time']
         travel_time = batch_total_time - y

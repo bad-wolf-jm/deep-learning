@@ -1,10 +1,10 @@
-from collection import deque
+from collections import deque
 import numpy as np
 
 
 class StreamSummary(object):
-    def __init__(self, summary_span=None, fields = None):
-        super(TrainingSummary, self).__init__()
+    def __init__(self, summary_span=None, fields=None):
+        super(StreamSummary, self).__init__()
         self.current_step = 0
         self._fields = fields
         self._data = {}
@@ -15,7 +15,7 @@ class StreamSummary(object):
     def add(self, index=0, **kwargs):
         self.current_step = index
         for field_name in kwargs:
-            self._data[field_name].append([index, accuracy])
+            self._data[field_name].append([index, kwargs[field_name]])
 
     def get(self, fields=None, min_batch_index=None, max_batch_index=None):
         fields = fields or self._fields
@@ -32,60 +32,6 @@ class StreamSummary(object):
 
     def stats(self, fields=None, backlog=None):
         fields = fields or self._fields
-        backlog = backlog or len(self.losses)
-        return_value = {}
-        for f in fields:
-            list_ = getattr(self, f)
-            if len(list_) > 0:
-                return_value[f] = {'mean': np.mean(list_),
-                                   'standard_deviation': np.std(list_),
-                                   'max': max(list_),
-                                   'min': min(list_)}
-            else:
-                return_value[f] = {'mean': np.nan,
-                                   'standard_deviation': np.nan,
-                                   'max': np.nan,
-                                   'min': np.nan}
-        return return_value
-
-
-
-class StreamSummary(object):
-    def __init__(self, summary_span=None, fields = None):
-        super(TrainingSummary, self).__init__()
-        self.current_step = 0
-        self._fields = fields
-        self._data = {}
-        if self._fields is not None:
-            for field in self._fields:
-                self._data[field] = deque(maxlen=summary_span)
-
-
-        #self.losses = deque(maxlen=summary_span)
-        #self.accuracies = deque(maxlen=summary_span)
-        #self.times = deque(maxlen=summary_span)
-
-    def add(self, index=0, loss=0, accuracy=0, time=0, **kwargs):
-        self.current_step = index
-        self.losses.append([index, loss])
-        self.accuracies.append([index, accuracy])
-        self.time.append([index, time])
-
-    def get(self, fields=None, min_batch_index=None, max_batch_index=None):
-        fields = fields or ['losses', 'accuracies', 'times']
-        min_batch_index = min_batch_index or 0
-        max_batch_index = max_batch_index or max([x[0] for x in self.losses])
-        return_value = {}
-        for f in fields:
-            list_ = getattr(self, f)
-            if len(list_) > 0:
-                return_value[f] = [x for x in list_ if x[0] >= min_batch_index and x[0] <= max_batch_index]
-            else:
-                return_value[f] = []
-        return return_value
-
-    def stats(self, fields=None, backlog=None):
-        fields = fields or ['losses', 'accuracies', 'times']
         backlog = backlog or len(self.losses)
         return_value = {}
         for f in fields:
@@ -104,15 +50,16 @@ class StreamSummary(object):
 
 
 class TrainingSummary(object):
-    def __init__(self,  summary_span=None):
+    def __init__(self, summary_span=None, fields=None):
         super(TrainingSummary, self).__init__()
-        self.train_sumary = StreamSummary(summary_span)
-        self.validation_sumary = StreamSummary(summary_span)
+        self.train_summary = StreamSummary(summary_span, fields)
+        self.validation_summary = StreamSummary(summary_span, fields)
 
-    def add_to_summary(self, summary, index=0, loss=0, accuracy=0, time=0):
+    def add_to_summary(self, summary, index=0, **kwargs):
         summary_name = summary + '_summary'
         summary = getattr(self, summary_name)
-        summary.add(index=index, loss=loss, accuracy=accuracy, time=time)
+        #print (kwargs)
+        summary.add(index=index, **kwargs)
 
     def get_summary(self, summary, fields=None, min_batch_index=None, max_batch_index=None):
         summary_name = summary + '_summary'
