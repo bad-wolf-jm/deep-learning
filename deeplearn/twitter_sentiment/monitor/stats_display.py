@@ -1,5 +1,6 @@
 """ Application's main screen."""
 import time
+import math
 #from kivy.factory import Factory
 from kivy.clock import Clock
 from kivy.lang import Builder
@@ -37,6 +38,7 @@ kv_string = """
     size_hint: 1,1
     accuracy_graph: accuracy_graph
     loss_graph: loss_graph
+    progress_box: progress_box
 
     Widget:
         canvas:
@@ -70,6 +72,7 @@ kv_string = """
             padding:[10,10,10,10]
 
             TrainingProgressBox:
+                id:progress_box
                 size_hint:1,None
                 height:55
 
@@ -103,7 +106,7 @@ class MainScreen(FloatLayout):
         self._monitor_thread.join()
 
     def _training_data_stream(self):
-        self._graph_feed = DataStreamer(port=99887)
+        self._graph_feed = DataStreamer(port=9977)
         while self._monitor_training:
             self._update_graph()
             time.sleep(1)
@@ -127,6 +130,7 @@ class MainScreen(FloatLayout):
                                                                  'max_batch_index': None}})
         train_data = train_data.get('return', None)
         #print (train_data)
+        self.progress_box.update(train_data)
         validation_data = validation_data.get('return', None)
         self.loss_graph.extend_graph(train_data['loss'], validation_data['loss'])
         self.accuracy_graph.extend_graph([[i, 100*j] for i,j in train_data['accuracy']], [[i, 100*j] for i,j in validation_data['accuracy']])
