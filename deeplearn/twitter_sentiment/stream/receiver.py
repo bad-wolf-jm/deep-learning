@@ -1,8 +1,9 @@
 import zmq
 #import json
+import sys
 import threading
 import time
-
+import traceback
 
 class DataReceiver(threading.Thread):
     """docstring for RPCServer."""
@@ -30,10 +31,17 @@ class DataReceiver(threading.Thread):
                     if callback is not None:
                         try:
                             return_value = callback(**x.get('payload', None))
-                            print(return_value)
+                            #print('ret_val', return_value)
                             self._socket.send_json({'status': 'ok', 'return': return_value})
                         except Exception as e:
-                            print(e)
+                            print('error', e)
+                            exc_type, exc_value, exc_traceback = sys.exc_info()
+                            print ('-' * 60)
+                            traceback.print_exc(file=sys.stdout)
+                            print ('-' * 60)
+                            sys.exit(1)
+                            #print (details)
+
                             self._socket.send_json({'status': 'error', 'return': str(e)})
                     else:
                         self._socket.send_json({'status': 'ok', 'return': None})

@@ -1,6 +1,6 @@
 # stream data
 from stream.nn.streamer import TrainingDataStreamer
-from models.byte_cnn.sentiment import generate_batches, flags, count_rows
+from stream.data_gen.sentiment import generate_batches, flags, count_rows
 #
 #
 #import zmq

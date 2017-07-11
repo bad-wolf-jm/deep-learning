@@ -87,7 +87,7 @@ class Byte2Vec(BaseModel):
             context = context_bytes[index]
             i += 1 if context in nearest else 0
         batch_time = time.time() - t_1
-        return {'similarity': lo[0]}
+        return {'loss': 0, 'accuracy': 0, 'time': batch_time, 'similarity': lo[0]}
 
 if __name__ == '__main__':
     foo = DataReceiver()
