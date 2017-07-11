@@ -1,5 +1,5 @@
 #from convolutional_model_1 import model
-from models.rnn_classifier.bidirectional_gru import Tweet2Vec_BiGRU
+from models.byte2vec.byte2vec import Byte2Vec
 from models.tf_session import tf_session
 import tensorflow as tf
 #import os
@@ -20,27 +20,54 @@ max_line_length = 0
 LENGTH_CUTOFF = 10
 MAX_TWEET_LENGTH = 1024
 
-class TrainRNNClassifier(TrainingSupervisor):
+#def train_on_batch(train_x, train_y):
+#    query = [x[0] for x in train_x]
+#    context = [x[1] for x in train_x]
+#    training_values = trainer.train(np.array(query), np.array(context), np.array(train_y))
+#    foo = "Loss = {loss:.4f} --- Accuracy = {accuracy:.4f}".format(**training_values)
+#    return training_values
+#
+#def validate_on_batch(train_x, train_y):
+#    training_values = trainer.validate(np.array(train_x))
+#    foo = training_values
+#    return training_values
+#
+#
+#
+class TrainByte2Vec(TrainingSupervisor):
     def train_step(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-        batch_y = np.array([element for element in train_y])
-        d = self.model.train(batch_x, batch_y)
-        print(d)
-        return d
+        query = [x[0] for x in train_x]
+        context = [x[1] for x in train_x]
+        training_values = self.model.train(np.array(query), np.array(context), np.array(train_y))
+        foo = "Loss = {loss:.4f} --- Accuracy = {accuracy:.4f}".format(**training_values)
+        print (foo)
+        return training_values
+#
+#
+#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
+#        batch_y = np.array([element for element in train_y])
+#        d = self.model.train(batch_x, batch_y)
+#        print(d)
+#        return d
 
     def validation_step(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-        batch_y = np.array([element for element in train_y])
-        d = self.model.validate(batch_x, batch_y)
-        return d
+        training_values = self.model.validate(np.array(train_x))
+        foo = training_values
+        #print(foo)
+        return training_values
+
+#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
+#        #batch_y = np.array([element for element in train_y])
+#        d = self.model.validate(batch_x, batch_y)
+#        return d
 
     def pad(self, array, length):
         array = list(array[:length])
         array += [0] * (length - len(array))
         return array
 
-model = Tweet2Vec_BiGRU()
+model = Byte2Vec()
 model.build_training_model()
 model.initialize()
-foo = TrainRNNClassifier(model)
+foo = TrainByte2Vec(model)
 foo.run_training()

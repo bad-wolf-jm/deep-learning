@@ -13,6 +13,7 @@ class DataReceiver(threading.Thread):
         self._name = name
         self._port = port
         self._host = bind
+        #self.daemon = True
         self._running = False
         self._context = zmq.Context()
         self._socket = self._context.socket(zmq.REP)
@@ -31,7 +32,6 @@ class DataReceiver(threading.Thread):
                     if callback is not None:
                         try:
                             return_value = callback(**x.get('payload', None))
-                            #print('ret_val', return_value)
                             self._socket.send_json({'status': 'ok', 'return': return_value})
                         except Exception as e:
                             print('error', e)
@@ -40,8 +40,6 @@ class DataReceiver(threading.Thread):
                             traceback.print_exc(file=sys.stdout)
                             print ('-' * 60)
                             sys.exit(1)
-                            #print (details)
-
                             self._socket.send_json({'status': 'error', 'return': str(e)})
                     else:
                         self._socket.send_json({'status': 'ok', 'return': None})
@@ -50,7 +48,7 @@ class DataReceiver(threading.Thread):
 
             except Exception as details:
                 print ("ERROR", details)
-        self.__socket.close()
+        self._socket.close()
 
     def register_action_handler(self, action, fnc):
         self._action_handlers[action] = fnc

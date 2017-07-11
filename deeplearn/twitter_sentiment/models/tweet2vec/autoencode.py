@@ -54,18 +54,7 @@ def get_batch(cursor_, batch_size=100, starting_id=0, record_count=None):
             bytes_ = [ord(x) for x in tweet if 0 < ord(x) < 256]
             batch.append({'text': bytes_, 'sentiment': bytes_})
         batch_x = [element['text'] for element in batch]
-        #batch_y = [[sentiment_map[element['sentiment']]] for element in batch]
         return [max_id, batch_x, batch_x]
-
-
-#def get_ids(self, dataset=0):
-#    with connection.cursor() as cursor:
-#        c = "SELECT id from twitter_binary_classification WHERE test_row={dataset}"
-#        c = c.format(dataset=dataset)
-#        cursor.execute(c)
-#        ids = [x['id'] for x in cursor.fetchall()]
-#        return ids
-
 
 def count_rows(min_id=0, max_id=None):
     with connection.cursor() as cursor:
@@ -78,7 +67,6 @@ def count_rows(min_id=0, max_id=None):
         cursor.execute(c)
         N = cursor.fetchone()['N']
         return N
-
 
 def generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
     with connection.cursor() as cursor:
@@ -115,25 +103,3 @@ def generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
                        'total_epochs':  epochs}
                 offset = o
             epoch += 1
-
-
-#host, port = flags.stream_to.split(':')
-#port = int(port)
-##streamer = DataStreamer(host=host, port=port)
-##
-#N = count_rows()
-#test = N // 100
-#
-#batch_generator = generate_batches(min_id=test + 1, batch_size=flags.batch_size, epochs=flags.epochs)
-#validation_iterator = generate_batches(min_id=0, max_id=test, batch_size=flags.validation_size, epochs=None)
-#
-#for x in batch_generator:#
-#    print (len(x['train_x']), len(x['train_y']), x['batch_number'], x['epoch_number'], x['batch_index'], x['total_batches'])
-#    streamer.send({'action': 'train',
-#                   'payload': {'train_x': x['train_x'],
-#                               'train_y': x['train_y']}})
-#    if x['batch_index'] % flags.validation_interval == 0:
-#        validation_data = next(validation_iterator)
-#        streamer.send({'action': 'validate',
-#                       'payload': {'train_x': validation_data['train_x'],
-#                                   'train_y': validation_data['train_y']}})

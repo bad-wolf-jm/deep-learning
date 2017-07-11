@@ -1,6 +1,7 @@
 """ Application's main screen."""
 import time
 import math
+import sys
 #from kivy.factory import Factory
 from kivy.clock import Clock
 from kivy.lang import Builder
@@ -34,6 +35,7 @@ import progress_graph
 
 
 kv_string = """
+#:import sys sys
 <MainScreen>:
     size_hint: 1,1
     accuracy_graph: accuracy_graph
@@ -71,6 +73,24 @@ kv_string = """
             spacing: 10
             padding:[10,10,10,10]
 
+            BoxLayout:
+                size_hint: 1, None
+                height:50
+                orientation: 'horizontal'
+                spacing: 10
+                Label:
+                    size_hint: None, 1
+                    width:75
+                    text: 'Monitor:'
+                TextInput:
+                    size_hint: 1,None
+                    height: 35
+                    pos_hint: {'center_y':.5}
+                Button:
+                    size_hint: None, 1
+                    width: 100
+                    text: 'Start monitor'
+
             TrainingProgressBox:
                 id:progress_box
                 size_hint:1,None
@@ -86,6 +106,11 @@ kv_string = """
                 title: "ACCURACY"
                 is_percentage: True
                 size_hint:1,1
+        Button:
+            size_hint: None, None
+            width: 150
+            height:50
+            text: 'Quit'
 """
 
 class MainScreen(FloatLayout):
@@ -102,6 +127,8 @@ class MainScreen(FloatLayout):
         self._monitor_thread.start()
 
     def stop_monitor(self):
+        print('Stopping Monitor')
+        self._graph_feed.disconnect()
         self._monitor_training = False
         self._monitor_thread.join()
 

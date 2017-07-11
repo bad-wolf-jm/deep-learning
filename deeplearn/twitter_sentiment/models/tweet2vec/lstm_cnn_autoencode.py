@@ -21,11 +21,11 @@ class Tweet2Vec_LSTM(BaseModel):
     def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=64, num_classes=3):
         super(Tweet2Vec_LSTM, self).__init__()
         self._input_dtype = tf.int32
-        self.max_message_length = 256
+        self.max_message_length = 512
         self.byte_encoding_depth = 256
-        self.convolutional_features = 512
-        self.encoder_internal_size = 64
-        self.decoder_internal_size = 64
+        self.convolutional_features = 256
+        self.encoder_internal_size = 128
+        self.decoder_internal_size = 128
         self.num_decoder_layers = 2
         self.pooling_sizes = [3, 3]
         self.pooling_strides = [2, 2]

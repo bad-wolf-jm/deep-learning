@@ -61,7 +61,7 @@ def shuffle(ar1, ar2):
 
 def generate_windows(epochs=None, window_size=5):
     with connection.cursor() as cursor:
-        sql = "SELECT text FROM byte2vec__training_strings LIMIT 100"
+        sql = "SELECT text FROM byte2vec__training_strings"
         padding = [0] * window_size
         epoch = 1
         while True:

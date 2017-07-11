@@ -1,6 +1,6 @@
 # stream data
 from stream.nn.streamer import TrainingDataStreamer
-from stream.data_gen.sentiment import generate_batches, flags, count_rows
+from models.tweet2vec.autoencode import generate_batches, flags, count_rows
 #
 #
 #import zmq
@@ -11,6 +11,7 @@ from config import db, stream
 
 
 host, port = flags.stream_to.split(':')
+print (host, port)
 port = int(port)
 streamer = TrainingDataStreamer(validation_interval=flags.validation_interval, summary_span=None)
 

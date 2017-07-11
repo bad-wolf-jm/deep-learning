@@ -50,7 +50,7 @@ class TrainingSupervisor(object):
 
     def run_training(self):
         with tf_session() as session:
-            foo = DataReceiver()
+            foo = DataReceiver(bind='*')
             bar = DataReceiver(port=99887)
             session.run(tf.global_variables_initializer())
             foo.register_action_handler('train', self.train_on_batch)

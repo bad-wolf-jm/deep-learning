@@ -108,6 +108,7 @@ def generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
                 yield {'train_x':  batch_x,
                        'train_y':  batch_y,
                        'batch_number':  batch,
+                       'batches_per_epoch':  batches_per_epoch,
                        'epoch_number':  epoch,
                        'batch_index':   I,
                        'total_batches': total_num_batches,
