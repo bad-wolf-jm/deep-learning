@@ -18,4 +18,8 @@ N = count_rows()
 test = N // 100
 batch_generator = generate_batches(min_id=test + 1, batch_size=flags.batch_size, epochs=flags.epochs)
 validation_iterator = generate_batches(min_id=0, max_id=test, batch_size=flags.validation_size, epochs=None)
-streamer.stream(batch_generator, validation_iterator, host=host, port=port)
+#streamer.stream(batch_generator, validation_iterator, host=host, port=port)
+try:
+    streamer.stream(batch_generator, validation_iterator, host=host, port=port)
+except KeyboardInterrupt:
+    streamer.streamer.shutdown()

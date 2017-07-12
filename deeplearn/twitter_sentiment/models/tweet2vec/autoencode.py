@@ -59,9 +59,9 @@ def get_batch(cursor_, batch_size=100, starting_id=0, record_count=None):
 def count_rows(min_id=0, max_id=None):
     with connection.cursor() as cursor:
         if max_id is not None:
-            c = "SELECT COUNT(id) as N from trinary_sentiment_dataset WHERE shuffle_id BETWEEN {min_id} AND {max_id}"
+            c = "SELECT COUNT(id) as N from byte2vec__training_strings WHERE shuffle_id BETWEEN {min_id} AND {max_id}"
         else:
-            c = "SELECT COUNT(id) as N from trinary_sentiment_dataset WHERE shuffle_id >= {min_id}"
+            c = "SELECT COUNT(id) as N from byte2vec__training_strings WHERE shuffle_id >= {min_id}"
 
         c = c.format(min_id=min_id, max_id=max_id)
         cursor.execute(c)
@@ -70,14 +70,14 @@ def count_rows(min_id=0, max_id=None):
 
 def generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
     with connection.cursor() as cursor:
-        if max_id is not None:
-            c = "SELECT COUNT(id) as N from trinary_sentiment_dataset WHERE shuffle_id BETWEEN {min_id} AND {max_id}"
-        else:
-            c = "SELECT COUNT(id) as N from trinary_sentiment_dataset WHERE shuffle_id >= {min_id}"
-
-        c = c.format(min_id=min_id, max_id=max_id)
-        cursor.execute(c)
-        N = cursor.fetchone()['N']
+        #if max_id is not None:
+        #    c = "SELECT COUNT(id) as N from  byte2vec__training_strings WHERE shuffle_id BETWEEN {min_id} AND {max_id}"
+        #else:
+        #    c = "SELECT COUNT(id) as N from  byte2vec__training_strings WHERE shuffle_id >= {min_id}"
+        #
+        #        c = c.format(min_id=min_id, max_id=max_id)
+        #        cursor.execute(c)
+        N = count_rows(min_id, max_id)
         max_id = max_id or N
         total = None
         total_num_batches = None
@@ -85,21 +85,56 @@ def generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
             total = N * epochs
             total_num_batches = total // batch_size
         batches_per_epoch = N // batch_size
-        I = 0
+        I = 1
         epoch = 1
         while True:
-            offset = min_id
-            validation_offset = 0
-            for batch in range(batches_per_epoch):
-                o, batch_x, batch_y = get_batch(cursor, starting_id=offset, batch_size=batch_size, record_count=N)
-                I += 1
-                yield {'train_x':  batch_x,
-                       'train_y':  batch_y,
-                       'batch_number':  batch,
+            if max_id is not None:
+                c = "SELECT id, shuffle_id, text from byte2vec__training_strings WHERE shuffle_id BETWEEN {min_id} AND {max_id}"
+            else:
+                c = "SELECT id, shuffle_id, text from byte2vec__training_strings WHERE shuffle_id >= {min_id}"
+            c = c.format(min_id=min_id, max_id=max_id)
+            print('Fetching Epoch')
+            cursor.execute(c)
+            batch_fetch = cursor.fetchmany(1000)
+            batch_no = 1
+            while len(batch_fetch) > 0:
+                #while len(batch_fetch) >= batch_size:
+                print(len(batch_fetch))
+                data = batch_fetch[:batch_size]
+                batch = []
+                for line in data:
+                    tweet = line['text']
+                    bytes_ = [ord(x) for x in tweet if 0 < ord(x) < 256]
+                    batch.append(bytes_)
+                #batch_x = [element['text'] for element in batch]
+                yield {'train_x':  batch,
+                       'train_y':  batch,
+                       'batch_number':  batch_no,
                        'batches_per_epoch': batches_per_epoch,
                        'epoch_number':  epoch,
                        'batch_index':   I,
                        'total_batches': total_num_batches,
                        'total_epochs':  epochs}
-                offset = o
+                I += 1
+                batch_no += 1
+                batch_fetch = batch_fetch[batch_size:]
+                if len(batch_fetch) < batch_size:
+                    batch_fetch.extend(cursor.fetchmany(1000))
+
+#                offset = min_id
+#                validation_offset = 0
+#                for batch in range(batches_per_epoch):
+#                    o, batch_x, batch_y = get_batch(cursor, starting_id=offset, batch_size=batch_size, record_count=N)
+#                    I += 1
+#                    yield {'train_x':  batch_x,
+#                           'train_y':  batch_y,
+#                           'batch_number':  batch,
+#                           'batches_per_epoch': batches_per_epoch,
+#                           'epoch_number':  epoch,
+#                           'batch_index':   I,
+#                           'total_batches': total_num_batches,
+#                           'total_epochs':  epochs}
+#                    offset = o
             epoch += 1
+            if (epochs is not None) and (epoch > epochs):
+                break

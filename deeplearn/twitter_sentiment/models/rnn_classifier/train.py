@@ -43,4 +43,17 @@ model = Tweet2Vec_BiGRU()
 model.build_training_model()
 model.initialize()
 foo = TrainRNNClassifier(model)
-foo.run_training()
+#foo.run_training()
+def save_before_exiting(*a):
+    path = foo.save_model_image()
+    foo.shutdown()
+    print('\rProcess terminated, model saved as', path)
+
+signal.signal(signal.SIGTERM, save_before_exiting)
+
+try:
+    foo.run_training()
+except KeyboardInterrupt:
+    save_before_exiting()
+    foo.shutdown()
+    sys.exit(0)

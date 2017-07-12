@@ -18,4 +18,8 @@ streamer = TrainingDataStreamer(validation_interval=flags.validation_interval, s
 #test = N // 100
 batch_generator = generate_batches(batch_size=flags.batch_size, epochs=flags.epochs, noise_ratio=10, window_size=5, num_skips=2)
 #validation_iterator = generate_batches(min_id=0, max_id=test, batch_size=flags.validation_size, epochs=None)
-streamer.stream(batch_generator, host=host, port=port)
+#streamer.stream(batch_generator, host=host, port=port)
+try:
+    streamer.stream(batch_generator, host=host, port=port)
+except KeyboardInterrupt:
+    streamer.streamer.shutdown()

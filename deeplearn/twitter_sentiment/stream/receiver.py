@@ -13,7 +13,7 @@ class DataReceiver(threading.Thread):
         self._name = name
         self._port = port
         self._host = bind
-        #self.daemon = True
+        self.daemon = True
         self._running = False
         self._context = zmq.Context()
         self._socket = self._context.socket(zmq.REP)
@@ -24,7 +24,7 @@ class DataReceiver(threading.Thread):
     def run(self):
         while self._running:
             try:
-                x = self._socket.recv_json()
+                x = self._socket.recv_json(flags=zmq.NOBLOCK)
                 action = x.get('action', None)
                 #print (action)
                 if action is not None:
@@ -46,9 +46,16 @@ class DataReceiver(threading.Thread):
                 else:
                     self._socket.send_json({'status': 'ok', 'return': None})
 
+            except zmq.error.Again as e:
+                time.sleep(0.001)
+                #print('Y')
             except Exception as details:
-                print ("ERROR", details)
+                print ("ERROR", type(details))
+                #raise
+            #print('X ')
         self._socket.close()
+        #self._context.shutdown()
+        #print('EXITING')
 
     def register_action_handler(self, action, fnc):
         self._action_handlers[action] = fnc
@@ -61,4 +68,7 @@ class DataReceiver(threading.Thread):
             threading.Thread.start(self)
 
     def stop(self):
+        self._running = False
+
+    def shutdown(self):
         self._running = False

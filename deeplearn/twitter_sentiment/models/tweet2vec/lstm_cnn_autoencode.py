@@ -24,8 +24,8 @@ class Tweet2Vec_LSTM(BaseModel):
         self.max_message_length = 512
         self.byte_encoding_depth = 256
         self.convolutional_features = 256
-        self.encoder_internal_size = 128
-        self.decoder_internal_size = 128
+        self.encoder_internal_size = 32
+        self.decoder_internal_size = 32
         self.num_decoder_layers = 2
         self.pooling_sizes = [3, 3]
         self.pooling_strides = [2, 2]
@@ -108,7 +108,7 @@ class Tweet2Vec_LSTM(BaseModel):
         with tf.variable_scope('training', reuse=None) as scope:
             self.build_inference_model(trainable=True)
             self.output_expected = tf.placeholder(dtype='int32', shape=[None, self.max_message_length], name="OUTPUT")
-            self.output_expected_oh = tf.one_hot(self.output_expected, self.byte_encoding_depth)  # tf.nn.embedding_lookup(self.byte_encoder._encode_weights, self.output_expected)
+            self.output_expected_oh = tf.one_hot(self.output_expected, self.byte_encoding_depth)
             self.output_expected_oh = tf.reshape(self.output_expected_oh, [-1, self.byte_encoding_depth])
             loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.output_predicted, labels=self.output_expected_oh)
             self.train_step = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
@@ -119,24 +119,49 @@ class Tweet2Vec_LSTM(BaseModel):
 
     def train(self, batch_x, batch_y):
         t_1 = time.time()
-        feed_dict = {self.input_layer: batch_x, self.output_expected: batch_y}
-        _, lo, acc = tf_session().run([self.train_step, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        feed_dict = {self.input_layer: batch_x,
+                     self.output_expected: batch_y}
+        _, lo, pred, truth = tf_session().run([self.train_step, self.batch_loss, self.predicted_value, self.true_value], feed_dict=feed_dict)
         batch_time = time.time() - t_1
-        return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
+        pred = np.reshape(pred, [-1, self.max_message_length])
+        truth = np.reshape(truth, [-1, self.max_message_length])
+        accuracy = 0
+        total = 0
+        for p_line, t_line in zip(pred, truth):
+            char_pairs = [(x, y) for x,y in zip(p_line, t_line) if x != 0 or y != 0]
+            num = sum([1 for x,y in char_pairs if x == y])
+            accuracy += num
+            total += len(char_pairs)
+
+        return {'loss': float(lo), 'accuracy': float(accuracy)/total, 'time': batch_time}
 
     def validate(self, batch_x, batch_y):
         t_1 = time.time()
         feed_dict = {self.input_layer: batch_x, self.output_expected: batch_y}
         xxx = tf.nn.softmax(self.output_predicted)
-        lo, acc, pre_o, pre = tf_session().run([self.batch_loss, self.batch_accuracy, xxx, self.predicted_value], feed_dict=feed_dict)
+        lo, acc, pre_o, pre, true = tf_session().run([self.batch_loss, self.batch_accuracy, xxx, self.predicted_value, self.true_value], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         pre = np.reshape(pre, [-1, self.max_message_length])
         pre_o = np.reshape(pre_o, [-1, self.max_message_length, self.byte_encoding_depth])
         for i, x in enumerate(batch_x):
             input_ = [chr(t) if 0 < t < 128 else '.' for t in x]
             output_ = [chr(t) if 0 < t < 128 else '.' for t in pre[i]]
-            print("".join(input_[:128]), "".join(output_[:128]))  # (x[:128], '---', pre[:128])
-        return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
+            input_line = "".join(input_)
+            output_line = "".join(output_)
+            input_line = input_line.replace('\n',' ').replace('\t', ' ').replace('\c', ' ')
+            output_line = output_line.replace('\n',' ').replace('\t', ' ').replace('\c', ' ')
+            print(input_line[:100], output_line[:100])
+
+        pred = pre
+        truth = np.reshape(truth, [-1, self.max_message_length])
+        accuracy = 0
+        total = 0
+        for p_line, t_line in zip(pred, truth):
+            char_pairs = [(x, y) for x,y in zip(p_line, t_line) if x != 0 or y != 0]
+            num = sum([1 for x,y in char_pairs if x == y])
+            accuracy += num
+            total += len(char_pairs)
+        return {'loss': float(lo), 'accuracy': float(accuracy)/total, 'time': batch_time}
 
     def generate_line(self, probabilities):
         line = []

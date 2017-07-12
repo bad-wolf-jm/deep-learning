@@ -20,7 +20,7 @@ max_line_length = 0
 LENGTH_CUTOFF = 10
 MAX_TWEET_LENGTH = 512
 
-class TrainRNNClassifier(TrainingSupervisor):
+class TrainAutoencoder(TrainingSupervisor):
     def train_step(self, train_x, train_y):
         batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
         batch_y = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_y])
@@ -42,5 +42,18 @@ class TrainRNNClassifier(TrainingSupervisor):
 model = Tweet2Vec_LSTM()
 model.build_training_model()
 model.initialize()
-foo = TrainRNNClassifier(model)
-foo.run_training()
+foo = TrainAutoencoder(model)
+
+def save_before_exiting(*a):
+    path = foo.save_model_image()
+    foo.shutdown()
+    print('\rProcess terminated, model saved as', path)
+
+signal.signal(signal.SIGTERM, save_before_exiting)
+
+try:
+    foo.run_training()
+except KeyboardInterrupt:
+    save_before_exiting()
+    foo.shutdown()
+    sys.exit(0)

@@ -3,6 +3,7 @@ import zmq
 import threading
 import time
 
+
 class DataStreamer(threading.Thread):
     """docstring for RPCServer."""
 
@@ -13,14 +14,27 @@ class DataStreamer(threading.Thread):
         self._host = host
         self._context = zmq.Context()
         self._socket = self._context.socket(zmq.REQ)
-        self._socket.connect("tcp://{host}:{port}".format(host = self._host, port=self._port))
+        self._socket.connect("tcp://{host}:{port}".format(host=self._host, port=self._port))
+        #print('connected')
 
     def send(self, data_packet):
         try:
-            self._socket.send_json(data_packet)
+            sent = False
+            while not sent:
+                try:
+                    self._socket.send_json(data_packet, flags=zmq.NOBLOCK)
+                    sent = True
+                except zmq.error.Again:
+                    time.sleep(0.05)
             bar = self._socket.recv_json()
             return bar
-        except:
-            print('ERROR')
+        except Exception as e:
+            print('ERROR', e)
+            raise
+
     def disconnect(self):
+        #print('disconnecting socket')
         self._socket.close()
+
+    def shutdown(self):
+        self.disconnect()

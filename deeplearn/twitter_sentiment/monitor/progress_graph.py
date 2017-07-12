@@ -103,6 +103,7 @@ class TrainingProgressBox(RelativeLayout):
         self._batch_times = []
         self._average_batch_time = None
         self._remaining_batches = 0
+        self._force_change_remaining_time = 25
 
     def extend_graph(self, training=None, validation=None):
         if training is not None:
@@ -118,7 +119,7 @@ class TrainingProgressBox(RelativeLayout):
         pass
 
     def update(self, data):
-        print data.keys()
+        #print data.keys()
         #print data['batch_number'], data['batches_per_epoch']
         epoch_percent = float(data['batch_number']) / float(data['batches_per_epoch'])
         epoch_percent *= 100
@@ -131,11 +132,21 @@ class TrainingProgressBox(RelativeLayout):
         self._average_batch_time = np.mean([x[1] for x in self._batch_times[-50:]])
         self._remaining_batches = data['total_batches'] - data['batch_index']
         t = self._remaining_batches * self._average_batch_time
+        _old_remaining_time = self._remaining_time
         self._remaining_time = min(self._remaining_time, t) if self._remaining_time is not None else t
+        if self._remaining_time == _old_remaining_time:
+            self._force_change_remaining_time -= 1
+            print self._force_change_remaining_time
+        else:
+            print self._remaining_time, _old_remaining_time
+            self._force_change_remaining_time = 25
+        if self._force_change_remaining_time == 0:
+            self._remaining_time = t
+            self._force_change_remaining_time = 25
         self.epoch_progress = epoch_progress
         t = datetime.timedelta(seconds=self._remaining_time)
         self.remaining_time = str(t)
-        print self._average_batch_time, self._remaining_batches, self._remaining_time
+        #print self._average_batch_time, self._remaining_batches, self._remaining_time
         self.batch_index=data['batch_index']
         self.total_batches=data['total_batches']
 

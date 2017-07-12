@@ -41,7 +41,7 @@ def save_before_exiting(*a):
     sys.exit(0)
 
 
-signal.signal(signal.SIGTERM, save_before_exiting)
+
 
 
 max_line_length = 0

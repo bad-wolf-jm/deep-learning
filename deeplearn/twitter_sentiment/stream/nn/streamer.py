@@ -32,16 +32,17 @@ class TrainingDataStreamer(object):
                               'payload': {'train_x': data['train_x'],
                                           'train_y': data['train_y']}})
         batch_total_time = time.time() - t_0
-        vals = vals['return']
-        y = vals['time']
-        travel_time = batch_total_time - y
-        self.summary.add_to_summary(summary,
-                                    self.batch_index,
-                                    loss=vals['loss'],
-                                    accuracy=vals['accuracy'],
-                                    batch_time=batch_total_time,
-                                    training_time=vals['time'],
-                                    travel_time=travel_time)
+        if vals is not None:
+            vals = vals['return']
+            y = vals['time']
+            travel_time = batch_total_time - y
+            self.summary.add_to_summary(summary,
+                                        self.batch_index,
+                                        loss=vals['loss'],
+                                        accuracy=vals['accuracy'],
+                                        batch_time=batch_total_time,
+                                        training_time=vals['time'],
+                                        travel_time=travel_time)
 
     def get_train_summary(self, min_batch_index=None, max_batch_index=None):
         x = self.summary.get_summary('train',
@@ -70,17 +71,20 @@ class TrainingDataStreamer(object):
         self._total_batches = training_batch.get('total_batches', None)
 
     def stream(self, training_data_generator, validation_data_generator=None, host=None, port=None):
-        streamer = DataStreamer(host=host, post=port)
-        bar = DataReceiver(port=9977)
-        bar.register_action_handler('get_train_batch_data', self.get_train_summary)
-        bar.register_action_handler('get_validation_batch_data', self.get_validation_summary)
-        bar.start(True)
+        self.streamer = DataStreamer(host=host, post=port)
+        self.bar = DataReceiver(port=9977)
+        self.bar.register_action_handler('get_train_batch_data', self.get_train_summary)
+        self.bar.register_action_handler('get_validation_batch_data', self.get_validation_summary)
+        self.bar.start(True)
         validation_iterator = validation_data_generator or self.__default_validation_iterator()
         for training_batch in training_data_generator:
             self._update_progress_info(training_batch)
-            self.send_to_streamer(streamer, 'train', training_batch, 'train')
+            self.send_to_streamer(self.streamer, 'train', training_batch, 'train')
             self.batch_index += 1
             if training_batch['batch_index'] % self.validation_interval == 0:
                 validation_batch = next(validation_iterator)
                 if validation_batch is not None:
-                    self.send_to_streamer(streamer, 'validate', validation_batch, 'validation')
+                    self.send_to_streamer(self.streamer, 'validate', validation_batch, 'validation')
+
+    def shutdown(self):
+        pass
