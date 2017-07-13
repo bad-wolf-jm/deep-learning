@@ -7,22 +7,21 @@ class EmailNotification:
 
     @staticmethod
     def sendEmail(text, subject=None):
-        sender = 'jm.albert@gmail.com'
-        recipients = ['jean-martin.albert@gameloft.com', 'jm.albert@gmail.com']
-        subject = 'TEST PYTHON SEND MAIL'
+        sender = 'jean-martin.albert@gameloft.com'
+        recipients = ['jm.albert@gmail.com']
+        subject = subject
         msg = MIMEMultipart()
         msg.preamble = subject
         msg.add_header("From", sender)
         msg.add_header("Subject", subject)
         msg.add_header("To", ", ".join(recipients))
-
-        msg.attach(MIMEText(text, 'plain'))
+        msg.attach(MIMEText(text, 'html'))
 
         try:
             p = Popen(["/usr/sbin/sendmail", "-t"], stdin=PIPE)
-            p.communicate(msg.as_string())
+            p.communicate(msg.as_string().encode('utf-8'))
         except Exception as e:
-            print(e)
+            print('ERROR', e)
 
 #    @staticmethod
 #    def getTraceback():

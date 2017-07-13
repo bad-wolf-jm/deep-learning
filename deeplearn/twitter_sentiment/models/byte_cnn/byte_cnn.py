@@ -134,3 +134,12 @@ class ByteCNN(BaseModel):
         print(t_v)
         print(p_v)
         return {'loss': lo, 'accuracy': acc}
+
+    def test(self, batch_x, batch_y):
+        feed_dict = {self._input: batch_x, self._output: batch_y}
+        t_v, p_v, lo, acc = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        batch_strings = []
+        for line in batch_x:
+            l = bytes([x for x in line if x != 0]).decode('utf8', 'ignore')
+            batch_strings.append(l)
+        return {'loss': lo, 'accuracy': acc, 'time':0, 'output':zip(batch_strings, t_v, p_v)}

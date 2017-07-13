@@ -139,7 +139,7 @@ class Tweet2Vec_LSTM(BaseModel):
         t_1 = time.time()
         feed_dict = {self.input_layer: batch_x, self.output_expected: batch_y}
         xxx = tf.nn.softmax(self.output_predicted)
-        lo, acc, pre_o, pre, true = tf_session().run([self.batch_loss, self.batch_accuracy, xxx, self.predicted_value, self.true_value], feed_dict=feed_dict)
+        lo, acc, pre_o, pre, truth = tf_session().run([self.batch_loss, self.batch_accuracy, xxx, self.predicted_value, self.true_value], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         pre = np.reshape(pre, [-1, self.max_message_length])
         pre_o = np.reshape(pre_o, [-1, self.max_message_length, self.byte_encoding_depth])

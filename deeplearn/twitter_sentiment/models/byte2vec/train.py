@@ -13,7 +13,7 @@ import signal
 #import sys
 #import pymysql
 from stream.receiver import DataReceiver
-from stream.nn.trainer import TrainingSupervisor
+from train.supervisor import TrainingSupervisor
 
 
 max_line_length = 0
@@ -34,6 +34,34 @@ MAX_TWEET_LENGTH = 1024
 #
 #
 #
+
+from stream.nn.streamer import TrainingDataStreamer
+from models.byte2vec.skipgram import generate_batches, flags
+#
+#
+#import zmq
+import argparse
+#import pymysql
+import numpy as np
+from config import db, stream
+
+
+#host, port = flags.stream_to.split(':')
+#port = int(port)
+#streamer = TrainingDataStreamer(validation_interval=flags.validation_interval, summary_span=None)
+
+#N = count_rows()
+#test = N // 100
+batch_generator = generate_batches(batch_size=flags.batch_size, epochs=flags.epochs, noise_ratio=10, window_size=5, num_skips=2)
+#validation_iterator = generate_batches(min_id=0, max_id=test, batch_size=flags.validation_size, epochs=None)
+#streamer.stream(batch_generator, host=host, port=port)
+#try:
+#    streamer.stream(batch_generator, host=host, port=port)
+#except KeyboardInterrupt:
+#    streamer.streamer.shutdown()
+
+
+
 class TrainByte2Vec(TrainingSupervisor):
     def train_step(self, train_x, train_y):
         query = [x[0] for x in train_x]
@@ -56,6 +84,12 @@ class TrainByte2Vec(TrainingSupervisor):
         #print(foo)
         return training_values
 
+    def test_model(self, train_x, train_y):
+        training_values = self.model.validate(np.array(train_x))
+        foo = training_values
+        #print(foo)
+        return training_values
+
 #        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
 #        #batch_y = np.array([element for element in train_y])
 #        d = self.model.validate(batch_x, batch_y)
@@ -69,7 +103,7 @@ class TrainByte2Vec(TrainingSupervisor):
 model = Byte2Vec()
 model.build_training_model()
 model.initialize()
-foo = TrainByte2Vec(model)
+foo = TrainByte2Vec(model, flags.validation_interval)
 #foo.run_training()
 
 def save_before_exiting(*a):
@@ -80,7 +114,7 @@ def save_before_exiting(*a):
 signal.signal(signal.SIGTERM, save_before_exiting)
 
 try:
-    foo.run_training()
+    foo.run_training(batch_generator)
 except KeyboardInterrupt:
     save_before_exiting()
     foo.shutdown()

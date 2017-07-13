@@ -135,30 +135,30 @@ def generate_batches(batch_size=10, epochs=None, noise_ratio=10, window_size=5, 
             labels = labels[batch_size:]
 
 
-host, port = flags.stream_to.split(':')
-port = int(port)
-streamer = DataStreamer(host=host, port=port)
-
-batch_generator = generate_batches(batch_size=flags.batch_size, epochs=flags.epochs, noise_ratio=flags.noise_ratio, num_skips=flags.num_skips)
-validation_iterator = generate_batches(batch_size=flags.validation_size, epochs=None, noise_ratio=1, num_skips=2)
-
-batch_train_times = collections.deque(maxlen=500)
-validation_times = collections.deque(maxlen=500)
-train_travel_times = collections.deque(maxlen=500)
-
-
-for x in batch_generator:
-    print (len(x['train_x']), len(x['train_y']), x['batch_number'], x['epoch_number'], x['batch_index'], x['total_batches'], np.mean(batch_train_times), np.mean(train_travel_times))
-    t_0 = time.time()
-    vals = streamer.send({'action': 'train', 'payload': {'train_x': x['train_x'], 'train_y': x['train_y']}})
-    batch_train_time = time.time() - t_0
-    batch_train_times.append(batch_train_time)
-    y = vals['return']['time']
-    travel_time = batch_train_time - y
-    train_travel_times.append(travel_time)
-    if x['batch_index'] % flags.validation_interval == 0:
-        t_1 = time.time()
-        validation_data = next(validation_iterator)
-        streamer.send({'action': 'validate', 'payload': {'train_x': validation_data['train_x'], 'train_y': validation_data['train_y']}})
-        validation_time = time.time() - t_1
-        validation_times.append(batch_train_time)
+#host, port = flags.stream_to.split(':')
+#port = int(port)
+#streamer = DataStreamer(host=host, port=port)
+#
+#batch_generator = generate_batches(batch_size=flags.batch_size, epochs=flags.epochs, noise_ratio=flags.noise_ratio, num_skips=flags.num_skips)
+#validation_iterator = generate_batches(batch_size=flags.validation_size, epochs=None, noise_ratio=1, num_skips=2)
+##
+#batch_train_times = collections.deque(maxlen=500)
+#validation_times = collections.deque(maxlen=500)
+#train_travel_times = collections.deque(maxlen=500)
+#
+#
+#for x in batch_generator:
+#    print (len(x['train_x']), len(x['train_y']), x['batch_number'], x['epoch_number'], x['batch_index'], x['total_batches'], np.mean(batch_train_times), np.mean(train_travel_times))
+#    t_0 = time.time()
+#    vals = streamer.send({'action': 'train', 'payload': {'train_x': x['train_x'], 'train_y': x['train_y']}})
+#    batch_train_time = time.time() - t_0
+#    batch_train_times.append(batch_train_time)
+#    y = vals['return']['time']
+#    travel_time = batch_train_time - y
+#    train_travel_times.append(travel_time)
+#    if x['batch_index'] % flags.validation_interval == 0:
+#        t_1 = time.time()
+#        validation_data = next(validation_iterator)
+#        streamer.send({'action': 'validate', 'payload': {'train_x': validation_data['train_x'], 'train_y': validation_data['train_y']}})
+#        validation_time = time.time() - t_1
+#        validation_times.append(batch_train_time)

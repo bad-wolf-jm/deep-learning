@@ -1,12 +1,15 @@
 import time
+import os
+import tensorflow as tf
+from models.tf_session import tf_session
 from train.summary import TrainingSummary
 from stream.sender import DataStreamer
 from stream.receiver import DataReceiver
 
 
 class TrainingSupervisor(object):
-    def __init__(self, validation_interval=None, summary_span=None):
-        super(TrainingDataStreamer).__init__()
+    def __init__(self, model, validation_interval=None, test_interval = None, summary_span=None):
+        super(TrainingSupervisor).__init__()
         self.model = model
         self.batch_index = 0
         self.checkpoint_interval = 250
@@ -16,12 +19,10 @@ class TrainingSupervisor(object):
         self.checkpoint_root = _r
         if not os.path.exists(self.checkpoint_root):
             os.makedirs(self.checkpoint_root)
-        self.summary = TrainingSummary(summary_span=None,
-                                       fields=['loss', 'accuracy', 'time'])
-
-
+        self.summary = TrainingSummary(summary_span=None, fields=['loss', 'accuracy', 'time'])
 
         self.validation_interval = validation_interval
+        self.test_interval = validation_interval
         self.batch_index = 0
         self._epoch_number = None
         self._total_epochs = None
@@ -29,7 +30,7 @@ class TrainingSupervisor(object):
         self._batches_per_epoch = None
         self._batch_index = None
         self._total_batches = None
-        self.summary = TrainingSummary(summary_span=summary_span, fields=['loss', 'accuracy', 'time'])
+        #self.summary = TrainingSummary(summary_span=summary_span, fields=['loss', 'accuracy', 'time'])
 
     def __default_validation_iterator(self):
         while True:
@@ -56,11 +57,27 @@ class TrainingSupervisor(object):
         return d
 
     def test_on_batch(self, train_x, train_y):
-        d = self.test_models(train_x, train_y)
+        d = self.test_model(train_x, train_y)
         d = {'accuracy': float(d['accuracy']),
              'loss': float(d['loss']),
              'time': float(d['time'])}
         return d
+
+    def get_epoch_percent(self):
+        epoch_percent = float(self._batch_number) / float(self._batches_per_epoch)
+        epoch_percent *= 100
+        epoch_percent = int(math.floor(epoch_percent))
+        return epoch_percent
+
+    def get_remaining_time(self):
+        x = self.summary.get_stats('train', fields=['time'], backlog=10)
+        x = x['time']['mean']
+        remaining_batches = self._total_batches - self._batch_index
+        print (remaining_batches, x)
+        return datetime.timedelta(seconds=remaining_batches * x)
+
+    def get_elapsed_time(self):
+        return datetime.timedelta(seconds=time.time() - self._training_start_time)
 
     def get_train_summary(self, min_batch_index=None, max_batch_index=None):
         x = self.summary.get_summary('train', min_batch_index=min_batch_index, max_batch_index=max_batch_index)
@@ -84,27 +101,27 @@ class TrainingSupervisor(object):
         self._batch_index = training_batch.get('batch_index', None)
         self._total_batches = training_batch.get('total_batches', None)
 
-    def run_training(self, training_data_generator, validation_data_generator=None, resume_from_checkpoint = None):
+    def run_training(self, training_data_generator, validation_data_generator=None, resume_from_checkpoint=None):
         validation_iterator = validation_data_generator or self.__default_validation_iterator()
         tf_session().run(tf.global_variables_initializer())
         if resume_from_checkpoint is not None:
-            _p = os.path.join(self.checkpoint_root, resume_from_checkpoint+'.chkpt')
+            _p = os.path.join(self.checkpoint_root, resume_from_checkpoint + '.chkpt')
             if os.path.exists(_p):
                 saver = tf.train.Saver()
                 saver.restore(tf_session(), _p)
-
+        self._training_start_time = time.time()
         for training_batch in training_data_generator:
             self._update_progress_info(training_batch)
-            self.train_on_batch(train_x = training_batch['train_x'], train_y = training_batch['train_y'])
+            self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
             self.batch_index += 1
             if training_batch['batch_index'] % self.validation_interval == 0:
                 validation_batch = next(validation_iterator)
                 if validation_batch is not None:
-                    self.validate_on_batch(train_x = validation_batch['train_x'], train_y = validatation_batch['train_y'])
+                    self.validate_on_batch(train_x=validation_batch['train_x'], train_y=validation_batch['train_y'])
             if training_batch['batch_index'] % self.test_interval == 0:
                 validation_batch = next(validation_iterator)
                 if validation_batch is not None:
-                    self.test_on_batch(train_x = validation_batch['train_x'], train_y = validatation_batch['train_y'])
+                    self.test_on_batch(train_x=validation_batch['train_x'], train_y=validation_batch['train_y'])
 
     def save_model_as(self, file_name):
         saver = tf.train.Saver()
@@ -115,9 +132,6 @@ class TrainingSupervisor(object):
 
     def save_model_image(self, *a):
         return self.save_model_as('restore-model-image.chkpt')
-
-
-
 
     def shutdown(self):
         pass

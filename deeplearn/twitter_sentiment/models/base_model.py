@@ -75,3 +75,10 @@ class BaseModel(object):
         lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': lo, 'accuracy': acc,  'time': batch_time}
+
+#    def test(self, batch_x, batch_y):
+#        t_1 = time.time()
+#        feed_dict = {self._input: batch_x, self._output: batch_y}
+#        lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+#        batch_time = time.time() - t_1
+#        return {'loss': lo, 'accuracy': acc,  'time': batch_time}

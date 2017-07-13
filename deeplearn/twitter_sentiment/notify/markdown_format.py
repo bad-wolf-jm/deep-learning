@@ -99,4 +99,6 @@ message.attach(MIMEText(html_content, 'html'))
 open('/tmp/preview.eml', 'w').write(message.as_string())
 os.system('open -a Mail /tmp/preview.eml')
 #else:
-print message.as_string()
+f = open('foo.html', 'w')
+
+f.write(message.as_string())
