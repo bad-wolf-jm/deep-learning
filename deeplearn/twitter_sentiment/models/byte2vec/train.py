@@ -20,14 +20,14 @@ max_line_length = 0
 LENGTH_CUTOFF = 10
 MAX_TWEET_LENGTH = 1024
 
-#def train_on_batch(train_x, train_y):
+# def train_on_batch(train_x, train_y):
 #    query = [x[0] for x in train_x]
 #    context = [x[1] for x in train_x]
 #    training_values = trainer.train(np.array(query), np.array(context), np.array(train_y))
 #    foo = "Loss = {loss:.4f} --- Accuracy = {accuracy:.4f}".format(**training_values)
 #    return training_values
 #
-#def validate_on_batch(train_x, train_y):
+# def validate_on_batch(train_x, train_y):
 #    training_values = trainer.validate(np.array(train_x))
 #    foo = training_values
 #    return training_values
@@ -55,11 +55,10 @@ from config import db, stream
 batch_generator = generate_batches(batch_size=flags.batch_size, epochs=flags.epochs, noise_ratio=10, window_size=5, num_skips=2)
 #validation_iterator = generate_batches(min_id=0, max_id=test, batch_size=flags.validation_size, epochs=None)
 #streamer.stream(batch_generator, host=host, port=port)
-#try:
+# try:
 #    streamer.stream(batch_generator, host=host, port=port)
-#except KeyboardInterrupt:
+# except KeyboardInterrupt:
 #    streamer.streamer.shutdown()
-
 
 
 class TrainByte2Vec(TrainingSupervisor):
@@ -81,13 +80,13 @@ class TrainByte2Vec(TrainingSupervisor):
     def validation_step(self, train_x, train_y):
         training_values = self.model.validate(np.array(train_x))
         foo = training_values
-        #print(foo)
+        # print(foo)
         return training_values
 
     def test_model(self, train_x, train_y):
         training_values = self.model.validate(np.array(train_x))
         foo = training_values
-        #print(foo)
+        # print(foo)
         return training_values
 
 #        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
@@ -100,16 +99,19 @@ class TrainByte2Vec(TrainingSupervisor):
         array += [0] * (length - len(array))
         return array
 
+
 model = Byte2Vec()
 model.build_training_model()
 model.initialize()
 foo = TrainByte2Vec(model, flags.validation_interval)
-#foo.run_training()
+# foo.run_training()
+
 
 def save_before_exiting(*a):
     path = foo.save_model_image()
     foo.shutdown()
     print('\rProcess terminated, model saved as', path)
+
 
 signal.signal(signal.SIGTERM, save_before_exiting)
 

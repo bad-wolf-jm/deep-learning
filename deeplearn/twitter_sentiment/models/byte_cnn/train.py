@@ -79,18 +79,14 @@ class TrainByteCNN(TrainingSupervisor):
         output_.write("<p></p>")
         output_.write(format_table(rows, ['Text', 'Truth', 'Predicted'], ['left', 'right', 'right'], sizes=[70, 15, 15], row_colors=colors))
         output_.write('</body></html>')
+        ou = open('foo.html', 'w')
+        ou.write(output_.getvalue())
         return d
 
     def pad(self, array, length):
         array = list(array[:length])
         array += [0] * (length - len(array))
         return array
-
-
-model = ByteCNN()
-model.build_training_model()
-model.initialize()
-foo = TrainByteCNN(model, flags.validation_interval)
 
 
 def save_before_exiting(*a):
@@ -101,9 +97,20 @@ def save_before_exiting(*a):
 
 signal.signal(signal.SIGTERM, save_before_exiting)
 
-try:
-    foo.run_training(batch_generator, validation_iterator)  # , resume_from_checkpoint='restore-model-image')
-except KeyboardInterrupt:
-    save_before_exiting()
-    foo.shutdown()
-    sys.exit(0)
+
+def start_training():  # if __name__ == '__main__':
+    model = ByteCNN()
+    model.build_training_model()
+    model.initialize()
+    foo = TrainByteCNN(model, flags.validation_interval)
+
+    try:
+        foo.run_training(batch_generator, validation_iterator)  # , resume_from_checkpoint='restore-model-image')
+    except KeyboardInterrupt:
+        save_before_exiting()
+        foo.shutdown()
+        sys.exit(0)
+    print('done')
+
+
+start_training()

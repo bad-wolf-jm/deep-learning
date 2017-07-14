@@ -2,8 +2,8 @@ import zmq
 import argparse
 import pymysql
 import numpy as np
-from stream.sender import DataStreamer
 from config import db, stream
+from train.dbi import DBConnection
 
 
 flags = argparse.ArgumentParser()
@@ -14,103 +14,29 @@ flags.add_argument('-n', '--min-length',  dest='length_cutoff', type=int, defaul
 flags.add_argument('-m', '--max-length',  dest='max_length', type=int, default=140, help='The maximum length of a tweet to send to the training server')
 flags = flags.parse_args()
 
-connection = pymysql.connect(host=flags.host,
-                             user=flags.user,
-                             password=flags.password,
-                             db=flags.database,
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
-
-
-sentiment_map = {0: 0, 1: 1, -1: 2}
-
-
-def get_batch(cursor_, batch_size=100, starting_id=0, record_count=None):
-    with connection.cursor() as cursor:
-        data = []
-        remaining = batch_size
-        while remaining > 0:
-            ids = ','.join([str(i) for i in range(starting_id, starting_id + remaining)])
-
-            sql = """SELECT id, shuffle_id, sentiment, sanitized_text
-                     FROM trinary_sentiment_dataset WHERE
-                     shuffle_id BETWEEN {start_id} AND {end_id}"""
-            sql = sql.format(start_id=starting_id, end_id=starting_id + remaining)
-            cursor.execute(sql)
-            query_data = cursor.fetchall()
-            if len(query_data) == 0:
-                starting_id += remaining
-                starting_id %= record_count
-            max_id = max([x['shuffle_id'] for x in query_data])
-            data.extend(query_data)
-            starting_id = max_id
-            remaining -= len(query_data)
-
-        data = data[:batch_size]
-        max_id = max([x['shuffle_id'] for x in data])
-        batch = []
-        for line in data:
-            tweet = line['sanitized_text']
-            bytes_ = [ord(x) for x in tweet if 0 < ord(x) < 256]
-            batch.append({'sanitized_text': bytes_, 'sentiment': line['sentiment']})
-        batch_x = [element['sanitized_text'] for element in batch]
-        batch_y = [[sentiment_map[element['sentiment']]] for element in batch]
-        return [max_id, batch_x, batch_y]
-
-
-def get_ids(self, dataset=0):
-    with connection.cursor() as cursor:
-        c = "SELECT id from twitter_binary_classification WHERE test_row={dataset}"
-        c = c.format(dataset=dataset)
-        cursor.execute(c)
-        ids = [x['id'] for x in cursor.fetchall()]
-        return ids
+db_connection = DBConnection(host=flags.host, user=flags.user, password=flags.password)
+db_connection.connect('sentiment_analysis_data')
 
 
 def count_rows(min_id=0, max_id=None):
-    with connection.cursor() as cursor:
-        if max_id is not None:
-            c = "SELECT COUNT(id) as N from trinary_sentiment_dataset WHERE shuffle_id BETWEEN {min_id} AND {max_id}"
-        else:
-            c = "SELECT COUNT(id) as N from trinary_sentiment_dataset WHERE shuffle_id >= {min_id}"
-
-        c = c.format(min_id=min_id, max_id=max_id)
-        cursor.execute(c)
-        N = cursor.fetchone()['N']
-        return N
+    return db_connection.count_rows('trinary_sentiment_dataset', 'shuffle_id', min_id, max_id)
 
 
 def generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
-    with connection.cursor() as cursor:
-        if max_id is not None:
-            c = "SELECT COUNT(id) as N from trinary_sentiment_dataset WHERE shuffle_id BETWEEN {min_id} AND {max_id}"
-        else:
-            c = "SELECT COUNT(id) as N from trinary_sentiment_dataset WHERE shuffle_id >= {min_id}"
-
-        c = c.format(min_id=min_id, max_id=max_id)
-        cursor.execute(c)
-        N = cursor.fetchone()['N']
-        max_id = max_id or N
-        total = None
-        total_num_batches = None
-        if epochs is not None:
-            total = N * epochs
-            total_num_batches = total // batch_size
-        batches_per_epoch = N // batch_size
-        I = 0
-        epoch = 1
-        while True:
-            offset = min_id
-            for batch in range(batches_per_epoch):
-                o, batch_x, batch_y = get_batch(cursor, starting_id=offset, batch_size=batch_size, record_count=N)
-                I += 1
-                yield {'train_x':  batch_x,
-                       'train_y':  batch_y,
-                       'batch_number':  batch,
-                       'batches_per_epoch':  batches_per_epoch,
-                       'epoch_number':  epoch,
-                       'batch_index':   I,
-                       'total_batches': total_num_batches,
-                       'total_epochs':  epochs}
-                offset = o
-            epoch += 1
+    gen = db_connection.batches('trinary_sentiment_dataset', 'shuffle_id', ['sanitized_text', 'sentiment'], batch_size=batch_size, epochs=epochs)
+    sentiment_map = {0: 0, 1: 1, -1: 2}
+    for b in iter(gen):
+        batch_x = []
+        batch_y = []
+        for row in b:
+            bytes_ = [ord(x) for x in row['sanitized_text'] if 0 < ord(x) < 256]
+            batch_x.append(bytes_)
+            batch_y.append([sentiment_map[row['sentiment']]])
+        yield {'train_x': batch_x,
+               'train_y': batch_y,
+               'batch_number': gen.current_epoch_batch_number,
+               'batches_per_epoch': gen.batches_per_epoch,
+               'epoch_number': gen.current_epoch_number,
+               'batch_index': gen.current_global_batch_number,
+               'total_batches': gen.total_number_of_batches,
+               'total_epochs': gen.number_of_epochs}

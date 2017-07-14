@@ -1,14 +1,14 @@
 import time
 import os
 import tensorflow as tf
-import datetime
-import math
 from models.tf_session import tf_session
 from train.summary import TrainingSummary
+#from stream.sender import DataStreamer
+#from stream.receiver import DataReceiver
 
 
 class TrainingSupervisor(object):
-    def __init__(self, model, validation_interval=None, test_interval=None, summary_span=None):
+    def __init__(self, model, validation_interval=None, test_interval = None, summary_span=None):
         super(TrainingSupervisor).__init__()
         self.model = model
         self.batch_index = 0
@@ -30,6 +30,7 @@ class TrainingSupervisor(object):
         self._batches_per_epoch = None
         self._batch_index = None
         self._total_batches = None
+        #self.summary = TrainingSummary(summary_span=summary_span, fields=['loss', 'accuracy', 'time'])
 
     def __default_validation_iterator(self):
         while True:

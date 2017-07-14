@@ -6,19 +6,19 @@ from train.supervisor import TrainingSupervisor
 from models.tweet2vec.autoencode import generate_batches, flags, count_rows
 
 
-host, port = flags.stream_to.split(':')
-print (host, port)
-port = int(port)
-streamer = TrainingDataStreamer(validation_interval=flags.validation_interval, summary_span=None)
+#host, port = flags.stream_to.split(':')
+#print (host, port)
+#port = int(port)
+#streamer = TrainingDataStreamer(validation_interval=flags.validation_interval, summary_span=None)
 
 N = count_rows()
 test = N // 100
-batch_generator = generate_batches(min_id=test + 1, batch_size=flags.batch_size, epochs=flags.epochs)
+batch_generator = generate_batches(min_id=test + 1, max_id=test + 2000, batch_size=flags.batch_size, epochs=500)
 validation_iterator = generate_batches(min_id=0, max_id=test, batch_size=flags.validation_size, epochs=None)
 
 max_line_length = 0
 LENGTH_CUTOFF = 10
-MAX_TWEET_LENGTH = 512
+MAX_TWEET_LENGTH = 64
 
 
 class TrainAutoencoder(TrainingSupervisor):

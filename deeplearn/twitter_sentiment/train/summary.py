@@ -1,5 +1,6 @@
 from collections import deque
 import numpy as np
+import datetime
 
 
 class StreamSummary(object):
@@ -8,6 +9,7 @@ class StreamSummary(object):
         self.current_step = 0
         self._fields = fields
         self._data = {}
+        self._created_at = datetime.datetime.today()
         if self._fields is not None:
             for field in self._fields:
                 self._data[field] = deque(maxlen=summary_span)
@@ -15,7 +17,8 @@ class StreamSummary(object):
     def add(self, index=0, **kwargs):
         self.current_step = index
         for field_name in kwargs:
-            self._data[field_name].append([index, kwargs[field_name]])
+            timestamp = datetime.datetime.today() - self._created_at
+            self._data[field_name].append([timestamp, kwargs[field_name]])
 
     def get(self, fields=None, min_batch_index=None, max_batch_index=None):
         fields = fields or self._fields

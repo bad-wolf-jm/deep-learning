@@ -3,7 +3,7 @@ import pymysql
 
 class DBIterator(object):
     def __init__(self, batch_generator):
-        super(DBConnection, self).__init__(self)
+        super(DBIterator, self).__init__()
         self._batch_generator = batch_generator
         self.columns = None
         self.batches_per_epoch = None
@@ -15,15 +15,17 @@ class DBIterator(object):
 
     def __iter__(self):
         for item in self._batch_generator:
-            self.current_epoch_number = item['epoch']
+            self.current_epoch_number = item['epoch_number']
             self.current_epoch_batch_number = item['batch_number']
             self.current_global_batch_number = item['batch_index']
+            #print (item)
             yield item['batch']
+
 
 
 class DBConnection(object):
     def __init__(self, host='localhost', user='root', password='root'):
-        super(DBConnection, self).__init__(self)
+        super(DBConnection, self).__init__()
         self._host = host
         self._username = user
         self._password = password
@@ -33,7 +35,7 @@ class DBConnection(object):
     def connect(self, database_name):
         self._database_name = database_name
         self._connection = pymysql.connect(host=self._host,
-                                           user=self._user,
+                                           user=self._username,
                                            password=self._password,
                                            db=self._database_name,
                                            charset='utf8mb4',
@@ -62,8 +64,9 @@ class DBConnection(object):
             data = []
             remaining = batch_size
             while remaining > 0:
-                select_columns = ', '.join(select_columns) or "*"
-                sql = "SELECT {select_columns} FROM {table} WHERE {index_column} BETWEEN {start_id} AND {end_id}"
+
+                select_columns = ', '.join([index_column] + select_columns) or "*"
+                sql = "SELECT {select_columns} FROM {table_name} WHERE {index_column} BETWEEN {start_id} AND {end_id}"
                 sql = sql.format(select_columns=select_columns,
                                  table_name=table_name,
                                  index_column=index_column,
@@ -83,15 +86,18 @@ class DBConnection(object):
             max_id = max([x[index_column] for x in data])
             return [max_id, batch]
 
-    def _generate_all_batches(self, table_name, index_column, select_columns=None,  min_id=None, max_id=None, batch_size=10, epochs=None):
+    def _generate_all_batches(self, table_name, index_column, select_columns=None,  min_id=None, max_id=None, batch_size=10, epochs=None, batches_per_epoch=None, record_count=None):
         I = 0
         epoch = 1
-        while (epochs is None) or (epoch > epochs):
-            offset = min_id
+        #print(table_name, index_column, select_columns, min_id, max_id, batch_size, epochs, batches_per_epoch, record_count)
+        #print((epochs is None) or (epoch > epochs))
+        while (epochs is None) or (epoch <= epochs):
+            offset = min_id or 0
             for batch in range(batches_per_epoch):
-                o, batch = self._get_batch(cursor, starting_id=offset, batch_size=batch_size, record_count=N)
+                o, batch_d = self._get_batch(table_name, index_column, select_columns,  starting_id=offset, batch_size=batch_size, record_count=record_count)
                 I += 1
-                yield {'batch': batch,
+                #print (I)
+                yield {'batch': batch_d,
                        'batch_number': batch,
                        'epoch_number': epoch,
                        'batch_index': I}
@@ -109,10 +115,25 @@ class DBConnection(object):
         batches_per_epoch = N // batch_size
         I = 0
         epoch = 1
-        generator = self._generate_all_batches(table_name, index_column, select_columns=select_columns,  min_id=min_id, max_id=max_id, batch_size, epochs)
+        generator = self._generate_all_batches(table_name, index_column,
+                                               select_columns=select_columns,
+                                               min_id=min_id, max_id=max_id,
+                                               batch_size=batch_size,
+                                               epochs=epochs,
+                                               record_count=N,
+                                               batches_per_epoch=batches_per_epoch)
         iterator = DBIterator(generator)
         iterator.columns = select_columns
         iterator.batches_per_epoch = batches_per_epoch
         iterator.total_number_of_batches = total_num_batches
         iterator.number_of_epochs = epochs
         return iterator
+
+if __name__ == '__main__':
+    db = DBConnection(host='localhost', user='root', password='root')
+    db.connect(database_name='sentiment_analysis_data')
+
+    gen = db.batches('trinary_sentiment_dataset', 'id', ['sanitized_text'], batch_size=1000, epochs=5)
+    for b in iter(gen):
+        for t in b:
+            print (gen.current_epoch_number, gen.current_epoch_batch_number, gen.batches_per_epoch, t['sanitized_text'][:100])

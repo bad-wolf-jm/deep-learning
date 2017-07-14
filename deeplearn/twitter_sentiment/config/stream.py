@@ -1,7 +1,7 @@
 stream_dest = '127.0.0.1:9999'
-stream_batch_size = 5
+stream_batch_size = 50
 stream_validation_size = 50
-stream_validation_interval = 1
+stream_validation_interval = 50
 stream_epochs = 5
 
 

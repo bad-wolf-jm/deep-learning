@@ -59,6 +59,7 @@ def shuffle(ar1, ar2):
     ar2 = [ar2[i] for i in perm]
     return ar1, ar2
 
+
 def generate_windows(epochs=None, window_size=5):
     with connection.cursor() as cursor:
         sql = "SELECT text FROM byte2vec__training_strings"
@@ -147,7 +148,7 @@ def generate_batches(batch_size=10, epochs=None, noise_ratio=10, window_size=5, 
 #train_travel_times = collections.deque(maxlen=500)
 #
 #
-#for x in batch_generator:
+# for x in batch_generator:
 #    print (len(x['train_x']), len(x['train_y']), x['batch_number'], x['epoch_number'], x['batch_index'], x['total_batches'], np.mean(batch_train_times), np.mean(train_travel_times))
 #    t_0 = time.time()
 #    vals = streamer.send({'action': 'train', 'payload': {'train_x': x['train_x'], 'train_y': x['train_y']}})

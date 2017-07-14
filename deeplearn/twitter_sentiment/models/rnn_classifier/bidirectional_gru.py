@@ -1,10 +1,8 @@
 import numpy as np
 import tensorflow as tf
-#from tensorflow.nn.rnn_cell import GRUCell
 from models.categorical_encoder import CategoricalEncoder
 from models.tf_session import tf_session
 from models.base_model import BaseModel
-from stream.receiver import DataReceiver
 import time
 
 
