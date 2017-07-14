@@ -101,7 +101,6 @@ def generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
         epoch = 1
         while True:
             offset = min_id
-            validation_offset = 0
             for batch in range(batches_per_epoch):
                 o, batch_x, batch_y = get_batch(cursor, starting_id=offset, batch_size=batch_size, record_count=N)
                 I += 1
@@ -115,25 +114,3 @@ def generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
                        'total_epochs':  epochs}
                 offset = o
             epoch += 1
-
-
-#host, port = flags.stream_to.split(':')
-#port = int(port)
-##streamer = DataStreamer(host=host, port=port)
-##
-#N = count_rows()
-#test = N // 100
-#
-#batch_generator = generate_batches(min_id=test + 1, batch_size=flags.batch_size, epochs=flags.epochs)
-#validation_iterator = generate_batches(min_id=0, max_id=test, batch_size=flags.validation_size, epochs=None)
-#
-#for x in batch_generator:#
-#    print (len(x['train_x']), len(x['train_y']), x['batch_number'], x['epoch_number'], x['batch_index'], x['total_batches'])
-#    streamer.send({'action': 'train',
-#                   'payload': {'train_x': x['train_x'],
-#                               'train_y': x['train_y']}})
-#    if x['batch_index'] % flags.validation_interval == 0:
-#        validation_data = next(validation_iterator)
-#        streamer.send({'action': 'validate',
-#                       'payload': {'train_x': validation_data['train_x'],
-#                                   'train_y': validation_data['train_y']}})

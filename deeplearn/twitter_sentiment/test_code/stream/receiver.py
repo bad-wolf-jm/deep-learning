@@ -5,6 +5,7 @@ import threading
 import time
 import traceback
 
+
 class DataReceiver(threading.Thread):
     """docstring for RPCServer."""
 
@@ -26,7 +27,6 @@ class DataReceiver(threading.Thread):
             try:
                 x = self._socket.recv_json(flags=zmq.NOBLOCK)
                 action = x.get('action', None)
-                #print (action)
                 if action is not None:
                     callback = self._action_handlers.get(action, None)
                     if callback is not None:
@@ -48,14 +48,9 @@ class DataReceiver(threading.Thread):
 
             except zmq.error.Again as e:
                 time.sleep(0.001)
-                #print('Y')
             except Exception as details:
                 print ("ERROR", type(details))
-                #raise
-            #print('X ')
         self._socket.close()
-        #self._context.shutdown()
-        #print('EXITING')
 
     def register_action_handler(self, action, fnc):
         self._action_handlers[action] = fnc

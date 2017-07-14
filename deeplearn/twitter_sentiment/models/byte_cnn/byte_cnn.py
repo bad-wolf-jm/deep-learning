@@ -142,4 +142,4 @@ class ByteCNN(BaseModel):
         for line in batch_x:
             l = bytes([x for x in line if x != 0]).decode('utf8', 'ignore')
             batch_strings.append(l)
-        return {'loss': lo, 'accuracy': acc, 'time':0, 'output':zip(batch_strings, t_v, p_v)}
+        return {'loss': lo, 'accuracy': acc, 'time': 0, 'output': zip(batch_strings, t_v, p_v)}

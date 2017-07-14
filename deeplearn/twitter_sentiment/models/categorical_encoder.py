@@ -1,11 +1,8 @@
 import numpy as np
 import tensorflow as tf
-#import time
-#import os
 import sys
 from models.tf_session import tf_session
 from models.base_model import BaseModel, StopTraining
-#import pickle
 
 
 class CategoricalEncoder(BaseModel):
@@ -73,7 +70,6 @@ class CategoricalEncoder(BaseModel):
 
 
 if __name__ == '__main__':
-
     if len(sys.argv) > 0:
         command = sys.argv[1]
         if command == 'train':

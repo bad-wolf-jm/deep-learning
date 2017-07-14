@@ -49,7 +49,6 @@ def addslashes(s):
 total_size = 0
 msg_count = 1
 
-# if False:
 with connection.cursor() as cursor:
     for table in tables:
         sql = "SELECT message FROM {table}".format(table=table)

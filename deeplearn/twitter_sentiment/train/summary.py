@@ -20,10 +20,10 @@ class StreamSummary(object):
     def get(self, fields=None, min_batch_index=None, max_batch_index=None):
         fields = fields or self._fields
         min_batch_index = min_batch_index or 0
-        max_batch_index = max_batch_index or self.current_step  # max([x[0] for x in self.losses])
+        max_batch_index = max_batch_index or self.current_step
         return_value = {}
         for f in fields:
-            list_ = self._data[f]  # getattr(self, f)
+            list_ = self._data[f]
             if len(list_) > 0:
                 return_value[f] = [x for x in list_ if x[0] >= min_batch_index and x[0] <= max_batch_index]
             else:
@@ -32,10 +32,9 @@ class StreamSummary(object):
 
     def stats(self, fields=None, backlog=None):
         fields = fields or self._fields
-        #backlog = backlog or len(self._data[self._data.keys()])
         return_value = {}
         for f in fields:
-            list_ = self._data[f]  # getattr(self, f)
+            list_ = self._data[f]
             if len(list_) > 0:
                 #print (list_)
                 list_ = [x[1] for x in list_]

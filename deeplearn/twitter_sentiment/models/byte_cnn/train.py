@@ -1,38 +1,13 @@
 #from convolutional_model_1 import model
 from models.byte_cnn.byte_cnn import ByteCNN
-from models.tf_session import tf_session
-import tensorflow as tf
-#import os
-#import glob
 import numpy as np
-import math
-#import html
-#import time
 import sys
-import time
-#import zipfile
 import signal
-import datetime
-#import sys
-#import pymysql
-from stream.receiver import DataReceiver
 from train.supervisor import TrainingSupervisor
-from stream.nn.streamer import TrainingDataStreamer
 from models.byte_cnn.sentiment import generate_batches, flags, count_rows
 import io
-#
-#
-
-#import zmq
-#import argparse
-#import pymysql
-import numpy as np
-from config import db, stream
 from notify.format import format_table, format_confusion_matrix
 from notify.send_mail import EmailNotification
-#host, port = flags.stream_to.split(':')
-#port = int(port)
-#streamer = TrainingDataStreamer(validation_interval=flags.validation_interval, summary_span=None)
 
 N = count_rows()
 test = N // 100
@@ -58,12 +33,11 @@ class TrainByteCNN(TrainingSupervisor):
         d = self.model.validate(batch_x, batch_y)
         return d
 
-
     def test_model(self, train_x, train_y):
         batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
         batch_y = np.array([element for element in train_y])
         d = self.model.test(batch_x, batch_y)
-        output_ = io.StringIO() #open('foo.html', 'w')
+        output_ = io.StringIO()
         output_.write('<html><body>')
         output_.write('<style>{s}</style>'.format(s=open('notify/style.css').read()))
 
@@ -104,11 +78,7 @@ class TrainByteCNN(TrainingSupervisor):
                                               ))
         output_.write("<p></p>")
         output_.write(format_table(rows, ['Text', 'Truth', 'Predicted'], ['left', 'right', 'right'], sizes=[70, 15, 15], row_colors=colors))
-        #print(output_.getvalue())
         output_.write('</body></html>')
-
-        #EmailNotification.sendEmail(output_.getvalue(), subject="Training Statistics for {}".format(type(self.model).__name__))
-        #sys.exit(0)
         return d
 
     def pad(self, array, length):
