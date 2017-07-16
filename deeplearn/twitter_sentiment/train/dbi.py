@@ -47,13 +47,13 @@ class DBConnection(object):
                 c = "SELECT COUNT({index_column}) as N from {table_name}"
                 c = c.format(table_name=table_name, index_column=index_column)
             elif min_id is None and max_id is not None:
-                c = "SELECT COUNT({index_column}) as N from {table_name} WHERE shuffle_id < {max_id}"
+                c = "SELECT COUNT({index_column}) as N from {table_name} WHERE {index_column} < {max_id}"
                 c = c.format(table_name=table_name, index_column=index_column, max_id=max_id)
             elif min_id is not None and max_id is None:
-                c = "SELECT COUNT({index_column}) as N from {table_name} WHERE shuffle_id >= {min_id}"
+                c = "SELECT COUNT({index_column}) as N from {table_name} WHERE {index_column} >= {min_id}"
                 c = c.format(table_name=table_name, index_column=index_column, min_id=min_id)
             else:
-                c = "SELECT COUNT({index_column}) as N from {table_name} WHERE shuffle_id BETWEEN {min_id} AND {max_id}"
+                c = "SELECT COUNT({index_column}) as N from {table_name} WHERE {index_column} BETWEEN {min_id} AND {max_id}"
                 c = c.format(table_name=table_name, index_column=index_column, max_id=max_id, min_id=min_id)
             cursor.execute(c)
             N = cursor.fetchone()['N']
@@ -63,9 +63,8 @@ class DBConnection(object):
         with self._connection.cursor() as cursor:
             data = []
             remaining = batch_size
+            select_columns = ', '.join([index_column] + select_columns) or "*"
             while remaining > 0:
-
-                select_columns = ', '.join([index_column] + select_columns) or "*"
                 sql = "SELECT {select_columns} FROM {table_name} WHERE {index_column} BETWEEN {start_id} AND {end_id}"
                 sql = sql.format(select_columns=select_columns,
                                  table_name=table_name,
@@ -89,14 +88,11 @@ class DBConnection(object):
     def _generate_all_batches(self, table_name, index_column, select_columns=None,  min_id=None, max_id=None, batch_size=10, epochs=None, batches_per_epoch=None, record_count=None):
         I = 0
         epoch = 1
-        #print(table_name, index_column, select_columns, min_id, max_id, batch_size, epochs, batches_per_epoch, record_count)
-        #print((epochs is None) or (epoch > epochs))
         while (epochs is None) or (epoch <= epochs):
             offset = min_id or 0
             for batch in range(batches_per_epoch):
                 o, batch_d = self._get_batch(table_name, index_column, select_columns,  starting_id=offset, batch_size=batch_size, record_count=record_count)
                 I += 1
-                #print (I)
                 yield {'batch': batch_d,
                        'batch_number': batch,
                        'epoch_number': epoch,

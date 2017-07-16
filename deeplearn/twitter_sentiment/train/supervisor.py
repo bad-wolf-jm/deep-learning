@@ -1,14 +1,16 @@
 import time
 import os
+import math
 import tensorflow as tf
 from models.tf_session import tf_session
 from train.summary import TrainingSummary
+import datetime
 #from stream.sender import DataStreamer
 #from stream.receiver import DataReceiver
 
 
 class TrainingSupervisor(object):
-    def __init__(self, model, validation_interval=None, test_interval = None, summary_span=None):
+    def __init__(self, model, validation_interval=None, test_interval=None, summary_span=None):
         super(TrainingSupervisor).__init__()
         self.model = model
         self.batch_index = 0
@@ -30,7 +32,73 @@ class TrainingSupervisor(object):
         self._batches_per_epoch = None
         self._batch_index = None
         self._total_batches = None
-        #self.summary = TrainingSummary(summary_span=summary_span, fields=['loss', 'accuracy', 'time'])
+
+    @property
+    def batch_number(self):
+        return self._batch_number
+
+    @property
+    def global_batch_index(self):
+        return self._total_batches
+
+    @property
+    def batches_per_epoch(self):
+        return self._batches_per_epoch
+
+    @property
+    def epoch_number(self):
+        return self._epoch_number
+
+    @property
+    def number_of_epochs(self):
+        return self._total_epochs
+
+    @property
+    def batch_time(self):
+        x = self.summary.get_stats('train', fields=['time'], backlog=10)
+        x = x['time']['mean']
+        return datetime.timedelta(seconds=x)
+
+    @property
+    def epoch_time(self):
+        x = self.summary.get_stats('train', fields=['time'], backlog=10)
+        x = x['time']['mean']
+        return datetime.timedelta(seconds=self.batches_per_epoch * x)
+
+    @property
+    def elapsed_time(self):
+        return datetime.timedelta(seconds=time.time() - self._training_start_time)
+
+    @property
+    def remaining_time(self):
+        x = self.summary.get_stats('train', fields=['time'], backlog=10)
+        x = x['time']['mean']
+        remaining_batches = self._total_batches - self._batch_index
+        return datetime.timedelta(seconds=remaining_batches * x)
+
+    @property
+    def epoch_percent(self):
+        epoch_percent = float(self._batch_number) / float(self._batches_per_epoch)
+        epoch_percent *= 100
+        return epoch_percent
+
+    @property
+    def training_percent(self):
+        epoch_percent = float(self._batch_index) / float(self._total_batches)
+        epoch_percent *= 100
+        return epoch_percent
+
+    def get_average_training_loss(self, time_period=None):
+        return self.summary.get_stats('train', fields=['loss'], backlog=time_period)['loss']['mean']
+
+    def get_average_training_accuracy(self, time_period=None):
+        return self.summary.get_stats('train', fields=['accuracy'], backlog=time_period)['accuracy']['mean']
+
+    def get_average_validation_loss(self, time_period=None):
+        return self.summary.get_stats('validation', fields=['loss'], backlog=time_period)['loss']['mean']
+
+    def get_average_validation_accuracy(self, time_period=None):
+        return self.summary.get_stats('validation', fields=['accuracy'], backlog=time_period)['accuracy']['mean']
 
     def __default_validation_iterator(self):
         while True:
@@ -63,35 +131,31 @@ class TrainingSupervisor(object):
              'time': float(d['time'])}
         return d
 
-    def get_epoch_percent(self):
-        epoch_percent = float(self._batch_number) / float(self._batches_per_epoch)
-        epoch_percent *= 100
-        epoch_percent = int(math.floor(epoch_percent))
-        return epoch_percent
+    # def get_train_summary(self, min_batch_index=None, max_batch_index=None):
+    #    x = self.summary.get_summary('train', min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+    #    x['epoch_number'] = self._epoch_number
+    #    x['total_epochs'] = self._total_epochs
+    #    x['batch_number'] = self._batch_number
+    #    x['batches_per_epoch'] = self._batches_per_epoch
+    #    x['batch_index'] = self._batch_index
+    #    x['total_batches'] = self._total_batches
+    #    return x
 
-    def get_remaining_time(self):
-        x = self.summary.get_stats('train', fields=['time'], backlog=10)
-        x = x['time']['mean']
-        remaining_batches = self._total_batches - self._batch_index
-        print (remaining_batches, x)
-        return datetime.timedelta(seconds=remaining_batches * x)
+    # def get_validation_summary(self, min_batch_index=None, max_batch_index=None):
+    #    x = self.summary.get_summary('validation', min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+    #    return x
 
-    def get_elapsed_time(self):
-        return datetime.timedelta(seconds=time.time() - self._training_start_time)
+    def get_loss_summary(self, min_batch_index=None, max_batch_index=None):
+        x = self.summary.get_summary('train', fields=['loss'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+        y = self.summary.get_summary('validation', fields=['loss'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+        return {'train': x['loss'],
+                'validation': y['loss']}
 
-    def get_train_summary(self, min_batch_index=None, max_batch_index=None):
-        x = self.summary.get_summary('train', min_batch_index=min_batch_index, max_batch_index=max_batch_index)
-        x['epoch_number'] = self._epoch_number
-        x['total_epochs'] = self._total_epochs
-        x['batch_number'] = self._batch_number
-        x['batches_per_epoch'] = self._batches_per_epoch
-        x['batch_index'] = self._batch_index
-        x['total_batches'] = self._total_batches
-        return x
-
-    def get_validation_summary(self, min_batch_index=None, max_batch_index=None):
-        x = self.summary.get_summary('validation', min_batch_index=min_batch_index, max_batch_index=max_batch_index)
-        return x
+    def get_accuracy_summary(self, min_batch_index=None, max_batch_index=None):
+        x = self.summary.get_summary('train', fields=['accuracy'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+        y = self.summary.get_summary('validation', fields=['accuracy'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+        return {'train': x['accuracy'],
+                'validation': y['accuracy']}
 
     def _update_progress_info(self, training_batch):
         self._epoch_number = training_batch.get('epoch_number', None)

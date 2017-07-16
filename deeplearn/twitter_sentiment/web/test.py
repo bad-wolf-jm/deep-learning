@@ -19,11 +19,9 @@ def call_loop():
     global i
     i += 1
 
-#foo = task.LoopingCall(call_loop)
-#foo.start(0)
 thr = Thread(target=train.start_training)
 thr.start()
-print('training_started')
+#print('training_started')
 #print(os.path.expanduser('~/deep-learning/python/deeplearn/twitter_sentiment/foo.html'))
 f = File(os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment'))
 

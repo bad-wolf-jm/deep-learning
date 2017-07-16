@@ -1,4 +1,3 @@
-#from convolutional_model_1 import model
 from models.byte_cnn.byte_cnn import ByteCNN
 import numpy as np
 import sys
@@ -56,9 +55,9 @@ class TrainByteCNN(TrainingSupervisor):
         <td>REMAINING TIME:</td></tr><tr><td></td><td>{elapsed_time}</td><td>{remaining_time}</td></tr></table>"""
         time = time.format(epoch_no=self._epoch_number,
                            num_epochs=self._total_epochs,
-                           epoch_progress=self.get_epoch_percent(),
-                           elapsed_time=self.get_elapsed_time(),
-                           remaining_time=self.get_remaining_time())
+                           epoch_progress=self.epoch_percent,
+                           elapsed_time=self.elapsed_time,
+                           remaining_time=self.remaining_time)
         output_.write(time)
         output_.write("<p></p>")
         output_.write("<p></p>")
@@ -89,6 +88,8 @@ class TrainByteCNN(TrainingSupervisor):
         return array
 
 
+    #def start_threaded_training
+
 def save_before_exiting(*a):
     path = foo.save_model_image()
     foo.shutdown()
@@ -98,14 +99,17 @@ def save_before_exiting(*a):
 signal.signal(signal.SIGTERM, save_before_exiting)
 
 
-def start_training():  # if __name__ == '__main__':
+supervisor = None
+
+def start_training():
+    global supervisor
     model = ByteCNN()
     model.build_training_model()
     model.initialize()
     foo = TrainByteCNN(model, flags.validation_interval)
-
+    supervisor = foo
     try:
-        foo.run_training(batch_generator, validation_iterator)  # , resume_from_checkpoint='restore-model-image')
+        foo.run_training(batch_generator, validation_iterator)
     except KeyboardInterrupt:
         save_before_exiting()
         foo.shutdown()
@@ -113,4 +117,4 @@ def start_training():  # if __name__ == '__main__':
     print('done')
 
 
-start_training()
+#start_training()

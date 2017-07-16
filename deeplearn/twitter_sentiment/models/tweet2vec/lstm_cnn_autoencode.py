@@ -19,7 +19,7 @@ class Tweet2Vec_LSTM(BaseModel):
     def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=64, num_classes=3):
         super(Tweet2Vec_LSTM, self).__init__()
         self._input_dtype = tf.int32
-        self.max_message_length = 64
+        self.max_message_length = 16
 
         self.byte_encoding_depth = 256
         self.convolutional_features = 256
@@ -142,11 +142,9 @@ class Tweet2Vec_LSTM(BaseModel):
         batch_time = time.time() - t_1
         pre = np.reshape(pre, [-1, self.max_message_length])
         pre_o = np.reshape(pre_o, [-1, self.max_message_length, self.byte_encoding_depth])
-        # for b in pre_o:
-        #    print(sum(b[:-1]))
+
         for i, x in enumerate(batch_x):
             input_ = [chr(t) if 0 < t < 128 else '.' for t in x]
-            #output_ = self.generate_line(pre_o[i])
             output_ = [chr(t) if 0 < t < 128 else '.' for t in pre[i]]
             input_line = "".join(input_)
             output_line = "".join(output_)
@@ -167,17 +165,11 @@ class Tweet2Vec_LSTM(BaseModel):
 
     def generate_line(self, probabilities):
         line = []
-        # print(probabilities.shape)
         for byte_probabilities in probabilities:
-            # if byte_probabilities[:-1].sum() >= 1:
-            #        print (byte_probabilities[:-1].sum(), byte_probabilities.sum(), byte_probabilities)
             probs = np.reshape(byte_probabilities, [1, 256])  # / byte_probabilities.sum()
-            # print(byte_probabilities.shape)
             try:
                 byte = np.random.multinomial(1, list(probs[0]), 1).argmax()
             except Exception as e:
-                # print probs[]
-                print ('error', probs.shape, e,  sum(list(probs[0])),  sum(list(probs[0])[:-1]))
                 byte = 0
             line.append(byte)
         output_ = [chr(t) if 0 < t < 128 else '.' for t in line]

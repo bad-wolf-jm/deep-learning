@@ -1,0 +1,248 @@
+<html><body><style>/*
+table a:link {
+	color: #666;
+	font-weight: bold;
+	text-decoration:none;
+}
+table a:visited {
+	color: #999999;
+	font-weight:bold;
+	text-decoration:none;
+}
+table a:active,
+table a:hover {
+	color: #bd5a35;
+	text-decoration:underline;
+}
+table {
+	font-family:Arial, Helvetica, sans-serif;
+	color:#666;
+	font-size:12px;
+	text-shadow: 1px 1px 0px #fff;
+	background:#eaebec;
+	margin:20px;
+	border:#ccc 1px solid;
+
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+
+	-moz-box-shadow: 0 1px 2px #d1d1d1;
+	-webkit-box-shadow: 0 1px 2px #d1d1d1;
+	box-shadow: 0 1px 2px #d1d1d1;
+}
+table th {
+	padding:21px 25px 22px 25px;
+	border-top:1px solid #fafafa;
+	border-bottom:1px solid #e0e0e0;
+
+	background: #ededed;
+	background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#ebebeb));
+	background: -moz-linear-gradient(top,  #ededed,  #ebebeb);
+}
+table th:first-child {
+	text-align: left;
+	padding-left:20px;
+}
+table tr:first-child th:first-child {
+	-moz-border-radius-topleft:3px;
+	-webkit-border-top-left-radius:3px;
+	border-top-left-radius:3px;
+}
+table tr:first-child th:last-child {
+	-moz-border-radius-topright:3px;
+	-webkit-border-top-right-radius:3px;
+	border-top-right-radius:3px;
+}
+table tr {
+	text-align: center;
+	padding-left:20px;
+}
+table td:first-child {
+	text-align: left;
+	padding-left:20px;
+	border-left: 0;
+}
+table td {
+	padding:18px;
+	border-top: 1px solid #ffffff;
+	border-bottom:1px solid #e0e0e0;
+	border-left: 1px solid #e0e0e0;
+
+	background: #fafafa;
+	background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
+	background: -moz-linear-gradient(top,  #fbfbfb,  #fafafa);
+}
+table tr.even td {
+	background: #f6f6f6;
+	background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#f6f6f6));
+	background: -moz-linear-gradient(top,  #f8f8f8,  #f6f6f6);
+}
+table tr:last-child td {
+	border-bottom:0;
+}
+table tr:last-child td:first-child {
+	-moz-border-radius-bottomleft:3px;
+	-webkit-border-bottom-left-radius:3px;
+	border-bottom-left-radius:3px;
+}
+table tr:last-child td:last-child {
+	-moz-border-radius-bottomright:3px;
+	-webkit-border-bottom-right-radius:3px;
+	border-bottom-right-radius:3px;
+}
+table tr:hover td {
+	background: #f2f2f2;
+	background: -webkit-gradient(linear, left top, left bottom, from(#f2f2f2), to(#f0f0f0));
+	background: -moz-linear-gradient(top,  #f2f2f2,  #f0f0f0);
+}
+
+*/
+
+h1{
+  font-size: 30px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 15px;
+}
+table{
+  width:100%;
+  table-layout: fixed;
+  border-collapse: True;
+  border-spacing: 0px;
+}
+.tbl-header{
+  background-color: rgba(55,55,55,0.8);
+ }
+.tbl-content{
+  height:300px;
+  overflow-x:auto;
+  margin-top: 0px;
+  border: 1px solid rgba(55,55,55,0.8);
+}
+th{
+  padding: 20px 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  color: #000;
+  text-transform: uppercase;
+  border-bottom: solid 3px rgba(55,55,55,0.8);
+  border-top: solid 3px rgba(55,55,55,0.8);
+
+}
+td{
+  padding: 7px;
+  text-align: left;
+  vertical-align:middle;
+  font-weight: 300;
+  font-size: 11px;
+  color: #000;
+  border-bottom: solid 1px rgba(55,55,55,0.4);
+}
+
+
+/* demo styles */
+
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700);
+body{
+  background: -webkit-linear-gradient(left, #ffffff, #ffffff);
+  background: linear-gradient(to right, #ffffff, #ffffff);
+  font-family: 'Roboto', sans-serif;
+}
+section{
+  margin: 50px;
+}
+
+
+/* follow me template */
+.made-with-love {
+  margin-top: 40px;
+  padding: 10px;
+  clear: left;
+  text-align: center;
+  font-size: 10px;
+  font-family: arial;
+  color: #fff;
+}
+.made-with-love i {
+  font-style: normal;
+  color: #F50057;
+  font-size: 14px;
+  position: relative;
+  top: 2px;
+}
+.made-with-love a {
+  color: #fff;
+  text-decoration: none;
+}
+.made-with-love a:hover {
+  text-decoration: underline;
+}
+
+
+/* for custom scrollbar for webkit browser*/
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+</style><table><tr><td>Epoch 1 of 5 (17.84%) complete</td>
+        <td>ELAPSED TIME:</td>
+        <td>REMAINING TIME:</td></tr><tr><td></td><td>1:39:01.584944</td><td>1 day, 11:52:26.533939</td></tr></table><p></p><p></p><table><tr><td><b>LOSS:</b> 8.9808</td><td style='text-align: right'><b>ACCURACY:</b> 50.00%</td></tr></table><p></p><table style="width:100%; border: 3px solid black;"><td style="border: .5px solid black;"></td><td style="border: .5px solid black; text-align:center"><b>NEGATIVE</b></td><td style="border: .5px solid black; text-align:center"><b>NEUTRAL</b></td><td style="border: .5px solid black; text-align:center"><b>POSITIVE</b></td><tr><td style="border: .5px solid black;"><b>NEGATIVE</b></td><td style="border: .5px solid black; text-align:center">21</td><td style="border: .5px solid black; text-align:center">5</td><td style="border: .5px solid black; text-align:center">0</td></tr><tr><td style="border: .5px solid black;"><b>NEUTRAL</b></td><td style="border: .5px solid black; text-align:center">20</td><td style="border: .5px solid black; text-align:center">4</td><td style="border: .5px solid black; text-align:center">0</td></tr><tr><td style="border: .5px solid black;"><b>POSITIVE</b></td><td style="border: .5px solid black; text-align:center">0</td><td style="border: .5px solid black; text-align:center">0</td><td style="border: .5px solid black; text-align:center">0</td></tr></table><p></p><table  style="width:100%"><tr style='background-color: rgba(0, 0, 0, 0);;'><th style='text-align: left; width: 70%'>Text</th><th style='text-align: right; width: 15%'>Truth</th><th style='text-align: right; width: 15%'>Predicted</th></tr><tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> noooo waaayy!!!!!!!! buster, could you please do that somewhere else? remember when we saw elliott from et?! haa! miss you </td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEUTRAL</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> not gonna lie I think you're delusional JK.</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> face hurtin and I think I'm high.... sittin in this studio session!  i don't even smoke....yuck son! LOL. I'm good how u?</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEUTRAL</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> me too!! When I say I wanna go to the movies by myself.. My friends look at me weird  is something wrong with that?</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> very good! savor the flavor of El Puerto. Dont be a piggy</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> Yeah I tried Turkey egg & Cheese before. Jose made it for me. I swore I told him turkey bacon! I was tight when I bit it.</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> very funny but not as funny as our friends made it out to be. Maybe I set my expectations too high.</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER>  Haha !! XD Are you such a menace ?</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEUTRAL</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> weemo, whats yer blog again? chuck us a link </td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> Yeah? Sucks  Go see Mary?</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> I though I was one of ur favorite people</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> gay prom...i guess we will just have to be bored tonight  oh well</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER>  cookies, you should make some. unless they are already at hand then you should eat some. That is what i do. cookie+me = better</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> yeah hot flashes...burning up then super fing cold. it is driving me insane</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> WHAAAAATTT?? I just tried texting you but realized maybe you don't have your phone either. ARE YOU OK? oh my gosh!!!</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> Not sure. Interested in public policy. So something public-y. And policy-y.</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER>  Sorry to hear that</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEUTRAL</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> you're sick? nooo</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> yes, it is the panthers I want to connect with!  sadly alumtweet doesn't recognize middle schools </td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> aww, but i wanna know  hmph.</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> please dont walk away.</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER>  not much here talking to my friend @<USER> and enjoying the nice weather.. you?</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> *laughs* I sure hope not. But we might need all that.</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> Yeah let's not bring it up again, good thing twitter limits the arguments from getting too profound </td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> PTs.... interesting choice.  Although, I fully support you frequenting every bar you can...  Acclimation is key!  </td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEUTRAL</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> ARE YOU SERIOUS. HOWWW DID YOU NOT KNOW. Emily... Oh well, we are seeing each other very very very soon, so it's fine. </td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> and when we came out of the water, her face was all bloody. </td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> Good luck getting facetime!</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> Yes he is! He did it Friday night</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> I didn't get either of your "are you working" tweets...but no, I'm not.,  I'm going to B&N later, but I'm home for now. </td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEUTRAL</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> ah....shit. like raining ALL THE TIME?? noooo  im going tomoro morning!!!</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> btw youre from australia? thats really cool. ive been there, love it! </td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> i think bea has broken her thumbs, im bored and she didnt reply to my text </td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> ha! did you go to south knoll with me or something? i wonder what i looked like, ive always taken such horrible pictures </td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> Hey You...  cold? me too.. (#jessicaveronica)</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> wow,that must be sooo cool </td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> It  w a s  a portrait of a good friend of mine, but I managed to mess it up last night. *sniff* </td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> Aw you in Japan...and you are originally from Edinburgh? (im a warm so far?) lol Penny finally drops...haha</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> I know, feel bad enough about that   </td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEUTRAL</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> haha im gonna follow my dreams now  well...ur dream haha im still reading over it for the 90th time  :p</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEUTRAL</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> Just watching the logies  wbuu</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER>  were you freaking out when you saw it  if so we had the same reaction ;P</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> haha. yeh i saw that.. i screamed at the ending when i saw jacob loll i cant wait for the movie!!</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> I just like how Cassadee Pope treats her fans</td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> I know what the cups are for! And that was a clever idea! I didn't get the priveledge of catching one though</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> i saw you guys in concert on 4/25 you were amazing!! i almost caught ur guitar pick but the guy beside me caught it</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> I want see u guys but warped tour is the next day and ATL is two days before...my dad wont let me go</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEUTRAL</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> I'm gonna miss you at Bamboozle  wish I could go...</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(255, 0, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> instead of sugar, use splenda! </td><td style='text-align: right; width: 15%'>NEUTRAL</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr>
+<tr style='background-color: rgba(0, 255, 0, 0.3);;'><td style='text-align: left; width: 70%'>@<USER> lucky!!!  and near the sea too! :O seeing you tonight again =]</td><td style='text-align: right; width: 15%'>NEGATIVE</td><td style='text-align: right; width: 15%'>NEGATIVE</td></tr></table></body></html>

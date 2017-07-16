@@ -79,36 +79,3 @@ class Tweet2Vec_BiGRU(BaseModel):
         lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
-
-
-#if __name__ == '__main__':
-#    foo = DataReceiver()
-#
-#    def pad(array, length):
-#        array = list(array[:length])
-#        array += [0] * (length - len(array))
-#        return array
-#
-#    with tf_session() as session:
-#        trainer = Tweet2Vec_BiGRU()
-#        trainer.build_training_model()
-#        session.run(tf.global_variables_initializer())
-#        print ('DONE')
-#
-#        def train_on_batch(train_x, train_y):
-#            train_x = [pad(x, 1024) for x in train_x]
-#            training_values = trainer.train(np.array(train_x), np.array(train_y))
-#            foo = "train:  Loss = {loss:.4f} --- Accuracy = {accuracy:.4f}".format(**training_values)
-#            print(foo)
-#            return training_values
-#
-#        def validate_on_batch(train_x, train_y):
-#            train_x = [pad(x, 1024) for x in train_x]
-#            training_values = trainer.validate(np.array(train_x), np.array(train_y))
-#            foo = "validate:  Loss = {loss:.4f} --- Accuracy = {accuracy:.4f}".format(**training_values)
-#            print(foo)
-#            return training_values
-#
-#        foo.register_action_handler('train', train_on_batch)
-#        foo.register_action_handler('validate', validate_on_batch)
-#        foo.start(False)

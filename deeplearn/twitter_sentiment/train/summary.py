@@ -16,14 +16,18 @@ class StreamSummary(object):
 
     def add(self, index=0, **kwargs):
         self.current_step = index
+        timestamp = (datetime.datetime.today() - self._created_at).total_seconds()
         for field_name in kwargs:
-            timestamp = datetime.datetime.today() - self._created_at
             self._data[field_name].append([timestamp, kwargs[field_name]])
 
     def get(self, fields=None, min_batch_index=None, max_batch_index=None):
         fields = fields or self._fields
         min_batch_index = min_batch_index or 0
         max_batch_index = max_batch_index or self.current_step
+
+        if min_batch_index is not None and min_batch_index < 0:
+            min_batch_index += max_batch_index
+
         return_value = {}
         for f in fields:
             list_ = self._data[f]
@@ -39,8 +43,9 @@ class StreamSummary(object):
         for f in fields:
             list_ = self._data[f]
             if len(list_) > 0:
-                #print (list_)
                 list_ = [x[1] for x in list_]
+                if backlog is not None:
+                    list_ = list_[-backlog:]
                 return_value[f] = {'mean': np.mean(list_),
                                    'standard_deviation': np.std(list_),
                                    'max': max(list_),
@@ -62,7 +67,6 @@ class TrainingSummary(object):
     def add_to_summary(self, summary, index=0, **kwargs):
         summary_name = summary + '_summary'
         summary = getattr(self, summary_name)
-        #print (kwargs)
         summary.add(index=index, **kwargs)
 
     def get_summary(self, summary, fields=None, min_batch_index=None, max_batch_index=None):
