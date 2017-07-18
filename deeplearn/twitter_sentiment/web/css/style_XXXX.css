@@ -110,7 +110,7 @@ section{
 .progress {
   margin-top: 0px;
   padding: 0px;
-  border: 0px;
+  border: none;
   text-align: center;
   background: rgba(0,0,0,0);
   color: rgba(50,50,50);

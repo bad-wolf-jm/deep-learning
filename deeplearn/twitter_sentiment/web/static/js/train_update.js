@@ -1,40 +1,74 @@
 
-function format_plural(number, unit)
+function format_plural(number, unit, pluralize = true)
 {
-    if (number != 1)
+    if (pluralize && number != 1)
     {
         unit = unit + 's';
     }
-    return `<span style="font-size:25px">${number}</span> <span style="font-size:15px">${unit}</span>`
+    return `<span style="font-size:25px; margin:2px">${number}</span><span style="font-size:15px; margin:2px">${unit}</span>`
 }
 
-function format_seconds_long(t_seconds)
+function parse_seconds_to_time(number_of_seconds)
 {
-    var days = Math.floor(t_seconds / (3600 * 24));
-    var hours = Math.floor((t_seconds % (3600 * 24)) / 3600);
-    var minutes = Math.floor((t_seconds % (3600 * 24) % 3600) / 60);
-    var seconds = Math.floor(((t_seconds % (3600 * 24)) % 3600) % 60);
-
-    d_f = (days != 0) ? format_plural(days, 'day') : "";
-
-    d_f = (days != 0) ? format_plural(days, 'day') : "";
-    h_f = (hours != 0) ? format_plural(hours, 'hour') : "";
-    m_f = (minutes != 0) ? format_plural(minutes,'minute') : "";
-    s_f = (seconds != 0) ? format_plural(seconds, 'second') : "";
-    return `${d_f} ${h_f} ${m_f} ${s_f}`
+  return {
+      days: Math.floor(number_of_seconds / (3600 * 24)),
+      hours: Math.floor((number_of_seconds % (3600 * 24)) / 3600),
+      minutes: Math.floor((number_of_seconds % (3600 * 24) % 3600) / 60),
+      seconds: Math.floor(((number_of_seconds % (3600 * 24)) % 3600) % 60)
+    }
 }
-function format_seconds_short(t_seconds)
-{
-    var days = Math.floor(t_seconds / (3600 * 24));
-    var hours = Math.floor((t_seconds % (3600 * 24)) / 3600);
-    var minutes = Math.floor((t_seconds % (3600 * 24) % 3600) / 60);
-    var seconds = Math.floor(((t_seconds % (3600 * 24)) % 3600) % 60);
 
-    d_f = (days != 0) ? format_plural(days, 'd') : "";
-    h_f = (hours != 0) ? format_plural(hours, 'h') : "";
-    m_f = (minutes != 0) ? format_plural(minutes,'m') : "";
-    s_f = (seconds != 0) ? format_plural(seconds, 's') : "";
-    return `${d_f} ${h_f} ${m_f} ${s_f}`
+
+function format_seconds(t_seconds, units, pluralize=true)
+{
+    var s_f, m_f, h_f, d_f;
+
+    if (t_seconds < 60) {
+      return `${t_seconds}</span><span style="font-size:15px; margin:2px">${units.seconds}</span>`;
+    }
+
+    duration = parse_seconds_to_time(t_seconds);
+    s_f = (duration.seconds != 0) ? format_plural(duration.seconds, units.seconds, pluralize) : "";
+    d_f = (duration.days != 0) ? format_plural(duration.days, units.days, pluralize) : "";
+    if (duration.minutes != 0) {
+      m_f = format_plural(duration.minutes,units.minutes, pluralize);
+    }
+    else {
+      if (duration.seconds != 0 && (duration.hours != 0 || duration.days != 0)) {
+       m_f = format_plural(duration.minutes,units.minutes, pluralize);
+     }
+     else {
+       m_f = "";
+     }
+    }
+
+    if (duration.hours != 0) {
+      h_f = format_plural(duration.hours,units.hours, pluralize);
+    }
+    else {
+      if ((duration.days != 0) && (duration.seconds != 0 || duration.minutes != 0)) {
+       h_f = format_plural(duration.minutes, units.hours, pluralize);
+     }
+     else {
+       h_f = "";
+     }
+    }
+    return `${d_f}${h_f}${m_f}${s_f}`
+}
+
+function format_seconds_long(seconds){
+  return format_seconds(seconds, {seconds:'second',
+                                  minutes:'minute',
+                                  hours:'hour',
+                                  days:'day'}, true)
+}
+
+function format_seconds_short(seconds)
+{
+    return format_seconds(seconds, {seconds:'s',
+                                    minutes:'m',
+                                    hours:'h',
+                                    days:'d'}, false)
 }
 
 function progress_chart_track(inner_radius, outer_radius, color)
@@ -133,6 +167,7 @@ function update_stats()
         );
 }
 
+
 function update_progress()
 {
     $.getJSON('http://localhost:5000/json/training_progress.json',
@@ -145,6 +180,39 @@ function update_progress()
                 $('#total-epochs').text(data.total_epochs);
                 training_progress_chart.series[1].points[0].update(data.percent_epoch_complete);
                 training_progress_chart.series[0].points[0].update(data.percent_training_complete);
+            }
+        );
+
+}
+
+function humanFileSize(bytes) {
+    var thresh = 1024;
+    if(Math.abs(bytes) < thresh) {
+        return `<span style="font-size:20px">${bytes}</s><span style="font-size:12px">B</s>`;
+    }
+    var units = ['kB','MB','GB','TB','PB','EB','ZB','YB']
+    var u = -1;
+    do {
+        bytes /= thresh;
+        ++u;
+    } while(Math.abs(bytes) >= thresh && u < units.length - 1);
+    return `<span style="font-size:20px">${bytes.toFixed(1)}</s><span style="font-size:12px">${units[u]}</span>`;
+}
+
+function format_memory_usage(used, total){
+  return `${humanFileSize(used)}<span style="font-size:20px>">/</span>${humanFileSize(total)}`
+}
+
+
+function update_cpuinfo()
+{
+    $.getJSON('http://localhost:5000/json/system_stats.json',
+            function(data) {
+                cpu_percentage = data.cpu;
+                memory_used = data.memory[0];
+                memory_available = data.memory[1];
+                $('#stats-cpu-usage').html(`${cpu_percentage.toFixed(2)}%`);
+                $('#stats-memory-usage').html(format_memory_usage(memory_used, memory_available));
             }
         );
 

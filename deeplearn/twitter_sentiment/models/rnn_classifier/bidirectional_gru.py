@@ -79,3 +79,14 @@ class Tweet2Vec_BiGRU(BaseModel):
         lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
+
+    def test(self, batch_x, batch_y):
+        t_0 = time.time()
+        feed_dict = {self._input: batch_x, self.output_expected: batch_y}
+        t_v, p_v, lo, acc = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        t = time.time() - t_0
+        batch_strings = []
+        for line in batch_x:
+            l = bytes([x for x in line if x != 0]).decode('utf8', 'ignore')
+            batch_strings.append(l)
+        return {'loss': lo, 'accuracy': acc, 'time': t, 'output': zip(batch_strings, t_v, p_v)}

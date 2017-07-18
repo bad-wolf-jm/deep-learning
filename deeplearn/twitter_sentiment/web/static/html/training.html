@@ -32,37 +32,37 @@
     </div>
 
     <div class="progress" style="height:150px; width:100%;">
-        <div class="progress-item" style="position:relative; height:100%; width:20%; display: inline-block; vertical-align:top">
+        <div class="progress-item" style="position:relative; height:100%; width:19%; display: inline-block; vertical-align:top">
             <div class="progress-meter", id='progress-meter' style="margin:auto; width:100%; height:150px; display: inline-block; vertical-align:top; horizontal-align:middle"></div>
             <div class="progress-text" style="position:absolute; top:0px; width:100px; text-align:center; transform: translate(40%, 200%); font-size:10px"><b>EPOCH</b></br>
                 <div id="epoch-number" style="display: inline">2534</div> of <div id='total-epochs' style="display: inline">5000</div></div>
         </div>
-        <div class="progress-item" style="height:100%; width:20%; display: inline-block; vertical-align:top">
+        <div class="progress-item" style="height:100%; width:19%; display: inline-block; vertical-align:top">
             <div class='stats-title'>Loss</div>
             <table>
                 <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-loss">NAN</td></tr>
                 <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-loss">NAN</td></tr>
             </table>
         </div>
-        <div class="progress-item" style="height:100%; width:20%; display: inline-block">
+        <div class="progress-item" style="height:100%; width:19%; display: inline-block">
             <div class='stats-title'>Accuracy</div>
             <table>
                 <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-accuracy">NAN</td></tr>
                 <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-accuracy">NAN</td></tr>
             </table>
         </div>
-        <div class="progress-item" style="height:100%; width:20%; display: inline-block; vertical-align:top">
+        <div class="progress-item" style="height:100%; width:19%; display: inline-block; vertical-align:top">
             <div class='stats-title'>Time</div>
             <table>
                 <tr><td class="stats-label" style="width:25%">Batch:</td><td class="stats-value" id="stats-batch-time" style="width:75%">NAN</td></tr>
                 <tr><td class="stats-label" style="width:25%">Epoch:</td><td class="stats-value" id="stats-epoch-time" style="width:75%">NAN</td></tr>
             </table>
         </div>
-        <div class="progress-item" style="height:100%; width:18%; display: inline-block; vertical-align:top">
+        <div class="progress-item" style="height:100%; width:19%; display: inline-block; vertical-align:top">
             <div class='stats-title'>System</div>
             <table>
-                <tr><td class="stats-label">CPU:</td><td class="stats-value" id="stats-cpu-usage">NAN</td></tr>
-                <tr><td class="stats-label">Memory:</td><td class="stats-value" id="stats-memory-usage">NAN</td></tr>
+                <tr><td class="stats-label" style="width:20%">CPU:</td><td class="stats-value" id="stats-cpu-usage" style="width:80%">NAN</td></tr>
+                <tr><td class="stats-label" style="width:20%">Memory:</td><td class="stats-value" id="stats-memory-usage" style="width:80%">NAN</td></tr>
             </table>
         </div>
 
@@ -86,8 +86,7 @@
 setInterval(update_stats, 2000);
 setInterval(update_progress, 2000);
 setInterval(update_graphs, 2000);
-
-
+setInterval(update_cpuinfo, 2000);
 
 $(document).ready(
     function ()
@@ -96,6 +95,5 @@ $(document).ready(
         accuracy_graph = make_graph($('#graph').height(), 'acc-graph-content');
     }
 );
-
 </script>
 </html>

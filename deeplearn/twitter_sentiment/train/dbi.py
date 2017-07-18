@@ -18,7 +18,6 @@ class DBIterator(object):
             self.current_epoch_number = item['epoch_number']
             self.current_epoch_batch_number = item['batch_number']
             self.current_global_batch_number = item['batch_index']
-            #print (item)
             yield item['batch']
 
 

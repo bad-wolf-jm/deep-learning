@@ -45,12 +45,12 @@ except ImportError:
     sys.exit(0)
 
 # define arguments
-#parser = argparse.ArgumentParser(description='Format and send markdown-based emails.',
+# parser = argparse.ArgumentParser(description='Format and send markdown-based emails.',
 #                                 formatter_class=argparse.RawDescriptionHelpFormatter,
 #                                 epilog=__doc__)
-#parser.add_argument('-p', '--preview', action='store_true',
+# parser.add_argument('-p', '--preview', action='store_true',
 #                    help='Preview the email in Apple Mail.')
-#parser.add_argument('-s', '--send', action='store_true',
+# parser.add_argument('-s', '--send', action='store_true',
 #                    help='Send the email using your configuration.')
 #args = parser.parse_args()
 
@@ -61,10 +61,10 @@ raw_content = open('test.md').read()
 header_content, markdown_content = raw_content.split('--', 1)
 
 # render the markdown into HTML
-css = open('style.css').read() #subprocess.check_output(['pygmentize', '-S', 'default', '-f', 'html'])
+css = open('style.css').read()  # subprocess.check_output(['pygmentize', '-S', 'default', '-f', 'html'])
 markdown_content = markdown_content.strip()
 html_content = markdown.markdown(markdown_content, ['extra', 'codehilite', 'markdown.extensions.tables', 'admonition'])
-html_content = '<style type="text/css">'+css+'</style>'+html_content
+html_content = '<style type="text/css">' + css + '</style>' + html_content
 
 # create a multipart email message
 message = MIMEMultipart('alternative')
@@ -72,7 +72,8 @@ message = MIMEMultipart('alternative')
 # parse the headers
 headers = {}
 for line in header_content.strip().split('\n'):
-    if not line.strip(): continue
+    if not line.strip():
+        continue
     key, value = line.split(':', 1)
     headers[key.strip()] = value.strip()
 
@@ -85,7 +86,7 @@ message['Subject'] = headers.get('Subject', 'No subject')
 message.attach(MIMEText(markdown_content, 'plain'))
 message.attach(MIMEText(html_content, 'html'))
 
-#if args.send:
+# if args.send:
 #    to = message['To'].split(', ')
 #
 #    with open(os.path.expanduser('~/.markdown-to-email.json'), 'rb') as f:
@@ -95,10 +96,10 @@ message.attach(MIMEText(html_content, 'html'))
 #        server.login(config['username'], config['password'])
 #        server.sendmail(message['From'], to, message.as_string())
 #        server.quit()
-#elif args.preview:
+# elif args.preview:
 open('/tmp/preview.eml', 'w').write(message.as_string())
 os.system('open -a Mail /tmp/preview.eml')
-#else:
+# else:
 f = open('foo.html', 'w')
 
 f.write(message.as_string())

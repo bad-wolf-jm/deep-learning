@@ -33,7 +33,7 @@ class TrainRNNClassifier(TrainingSupervisor):
     def test_model(self, train_x, train_y):
         batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
         batch_y = np.array([element for element in train_y])
-        d = self.model.validate(batch_x, batch_y)
+        d = self.model.test(batch_x, batch_y)
         return d
 
     def pad(self, array, length):
@@ -41,11 +41,6 @@ class TrainRNNClassifier(TrainingSupervisor):
         array += [0] * (length - len(array))
         return array
 
-
-model = Tweet2Vec_BiGRU()
-model.build_training_model()
-model.initialize()
-foo = TrainRNNClassifier(model, flags.validation_interval)
 
 
 def save_before_exiting(*a):
@@ -56,9 +51,24 @@ def save_before_exiting(*a):
 
 signal.signal(signal.SIGTERM, save_before_exiting)
 
-try:
-    foo.run_training(batch_generator, validation_iterator)
-except KeyboardInterrupt:
-    save_before_exiting()
-    foo.shutdown()
-    sys.exit(0)
+
+supervisor = None
+
+def start_training():
+    global supervisor
+    model = Tweet2Vec_BiGRU()
+    model.build_training_model()
+    model.initialize()
+    foo = TrainRNNClassifier(model, flags.validation_interval)
+    supervisor = foo
+    try:
+        foo.run_training(batch_generator, validation_iterator)
+    except KeyboardInterrupt:
+        save_before_exiting()
+        foo.shutdown()
+        sys.exit(0)
+    print('done')
+
+
+if __name__ == '__main__':
+   start_training()

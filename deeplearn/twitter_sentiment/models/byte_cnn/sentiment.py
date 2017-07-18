@@ -14,6 +14,7 @@ flags.add_argument('-n', '--min-length',  dest='length_cutoff', type=int, defaul
 flags.add_argument('-m', '--max-length',  dest='max_length', type=int, default=140, help='The maximum length of a tweet to send to the training server')
 flags = flags.parse_args()
 
+
 db_connection = DBConnection(host=flags.host, user=flags.user, password=flags.password)
 db_connection.connect('sentiment_analysis_data')
 
@@ -23,7 +24,7 @@ def count_rows(min_id=0, max_id=None):
 
 
 def generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
-    gen = db_connection.batches('trinary_sentiment_dataset', 'id', ['sanitized_text', 'sentiment'], batch_size=batch_size, epochs=epochs)
+    gen = db_connection.batches('trinary_sentiment_dataset', 'shuffle_id', ['sanitized_text', 'sentiment'], batch_size=batch_size, epochs=epochs)
     sentiment_map = {0: 0, 1: 1, -1: 2}
     for b in iter(gen):
         batch_x = []
