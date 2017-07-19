@@ -4,12 +4,19 @@ from flask_cors import CORS, cross_origin
 import jinja2
 import json
 import os
+import re
 import random
 from threading import Thread
 import psutil
+import glob
+
 from models.rnn_classifier import train
+
+
 import datetime
+
 from notify.send_mail import EmailNotification
+
 import time
 
 app = Flask(__name__)
@@ -110,8 +117,35 @@ def get_report_page():
     return open(foo[0]).read()
 
 
-#@app.route('/site/report.html')
-#def get_report_page_html():
+@app.route('/site/test_results.html')
+def get_test_result_page_html():
+    foo = train.supervisor.get_test_results()
+
+    #foo = glob.glob('/home/jalbert/.sentiment_analysis/training/ByteCNN/test/*.json')
+
+
+    foo_data = sorted([[x, os.stat(x)] for x in foo], key=lambda x: x[1])
+    list_ = []
+    for file_ in foo_data:
+        file_name = os.path.basename(file_[0])
+        print(file_name)
+        stats = os.stat(file_[0])
+        #file_name, _ = os.path.splitext(file_name)
+        regex = re.compile(r"test-(?P<test_number>\d+)-loss:(?P<loss>\d+(\.\d*)?)-accuracy:(?P<acc>\d+(\.\d*)?).json")
+        metadata = regex.search(file_name)#
+        number = int(metadata.group('test_number'))
+        loss = float(metadata.group('loss'))
+        accuracy = float(metadata.group('acc'))
+        list_.append({'path':file_,
+                      'name':file_name,
+                      'loss':loss,
+                      'accuracy':accuracy,
+                      'time':stats.st_mtime})
+    return render_template('test_result_list.html', result_list=list_)
+
+#if __name__ == '__main__':
+#    get_test_result_page_html()
+#    sys.exit(0)
 #    foo = train.supervisor.get_test_results()
 #    training_progress = json.loads(get_training_progress())
 #    epoch_percent = '{:.2f}'.format(training_progress['percent_epoch_complete'])

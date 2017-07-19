@@ -12,29 +12,33 @@ class Tweet2Vec_BiGRU(BaseModel):
     """
     toplevel_scope = "categorical_encoder"
 
-    def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=64, num_classes=2):
+    def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=512, num_classes=3):
         super(Tweet2Vec_BiGRU, self).__init__()
         self._input_dtype = tf.int32
         self.seq_length = seq_length
         self.hidden_states = hidden_states
         self.embedding_dimension = embedding_dimension
         self.num_classes = num_classes
-        self.byte_encoder = CategoricalEncoder.instance_from_pickle('weights.pkl')
+        #self.byte_encoder = CategoricalEncoder.instance_from_pickle('weights.pkl')
 
     def init_model(self, trainable=False):
         with tf.variable_scope('embedding', reuse=None) as scope:
             self._input = tf.placeholder(dtype=self._input_dtype, shape=[None, self.seq_length], name="INPUT")
             x = tf.reshape(self._input, [-1])
-            x = tf.nn.embedding_lookup(self.byte_encoder._encode_weights, x)
-            x = tf.reshape(x, [-1, 1024, 8])
+            self._one_hot_input = tf.one_hot(x, depth=256, axis=1)
+            x = tf.reshape(self._one_hot_input, [-1, 1024, 256])
 
         # NOTE self._input now has dimension [batch_size, seq_length, char_embedding_size]
         with tf.variable_scope('bidirectional_encoder', reuse=None) as scope:
             self.forward_gru = tf.nn.rnn_cell.GRUCell(self.hidden_states, activation=None)
             self.backward_gru = tf.nn.rnn_cell.GRUCell(self.hidden_states, activation=None)
             output, output_states = tf.nn.bidirectional_dynamic_rnn(self.forward_gru, self.backward_gru, x, dtype=tf.float32)
+
+            #self.fw_gru_output = tf.slice(output[0], [0,-1], [-1, 1])
+            #self.bw_gru_output = tf.slice(output[1], [0,-1], [-1, 1])
             self.fw_gru_output = tf.reshape(output[0][:, -1:], [-1, self.hidden_states])
-            self.bk_gru_output = tf.reshape(output[1][:, -1:], [-1, self.hidden_states])
+            #self.bk_gru_output = tf.reshape(output[1][:, -1:], [-1, self.hidden_states])
+            self.bk_gru_output = tf.reshape(output[1][:, :1], [-1, self.hidden_states])
             self.fw_gru_output_state = output_states[0]
             self.bk_gru_output_state = output_states[1]
 
@@ -58,9 +62,10 @@ class Tweet2Vec_BiGRU(BaseModel):
                                                 trainable=True)
             self.output_predicted = tf.matmul(self.enc_output, self.final_layer_weights)
             self.output_expected = tf.placeholder(dtype=self._input_dtype, shape=[None, 1], name="INPUT")
-            self.output_expected_oh = tf.one_hot(self.output_expected, depth=self.num_classes, axis=-1)  # tf.nn.embedding_lookup(self.byte_encoder._encode_weights, self.output_expected)
+            self.output_expected_oh = tf.one_hot(self.output_expected, depth=self.num_classes, axis=-1)
+            self.output_expected_oh = tf.reshape(self.output_expected_oh, [-1, self.num_classes])
             loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.output_predicted, labels=self.output_expected_oh)
-            self.train_step = tf.train.MomentumOptimizer(learning_rate=0.000001, momentum=0.9).minimize(loss)
+            self.train_step = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
             self.predicted_value = tf.argmax(self.output_predicted, 1)
             self.true_value = tf.reshape(self.output_expected, [-1])
             self.batch_loss = tf.reduce_mean(loss, axis=0)
@@ -83,10 +88,13 @@ class Tweet2Vec_BiGRU(BaseModel):
     def test(self, batch_x, batch_y):
         t_0 = time.time()
         feed_dict = {self._input: batch_x, self.output_expected: batch_y}
-        t_v, p_v, lo, acc = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        t_v, p_v, lo, acc, o_p = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy, tf.nn.softmax(self.output_predicted)], feed_dict=feed_dict)
         t = time.time() - t_0
         batch_strings = []
-        for line in batch_x:
+        for i, line in enumerate(batch_x):
             l = bytes([x for x in line if x != 0]).decode('utf8', 'ignore')
             batch_strings.append(l)
+            #x = l[:50]
+            #p = "."*(50 - len(x))
+            #print(x+p, o_p[i])
         return {'loss': lo, 'accuracy': acc, 'time': t, 'output': zip(batch_strings, t_v, p_v)}
