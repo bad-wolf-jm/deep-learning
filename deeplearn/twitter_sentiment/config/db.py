@@ -1,7 +1,7 @@
 db_name = 'sentiment_analysis_data'
 db_host = '127.0.0.1'
 db_user = 'root'
-db_password = ''
+db_password = 'root'
 db_charset = 'utf8mb4'
 db_shuffle_rows = False
 

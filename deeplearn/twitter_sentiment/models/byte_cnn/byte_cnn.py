@@ -5,76 +5,64 @@ from models.categorical_encoder import CategoricalEncoder
 from models.base_model import BaseModel
 from models.tf_session import tf_session
 
-CNN_LEVEL_0_FEATURES = 64
-CNN_LEVEL_1_FEATURES = 64
-CNN_LEVEL_2_FEATURES = 128
-CNN_LEVEL_3_FEATURES = 256
-CNN_LEVEL_4_FEATURES = 512
+#CNN_LEVEL_0_FEATURES = 64
+#CNN_LEVEL_1_FEATURES = 64
+#CNN_LEVEL_2_FEATURES = 128
+#CNN_LEVEL_3_FEATURES = 256
+#CNN_LEVEL_4_FEATURES = 512
 
 
 class ByteCNN(BaseModel):
-    def __init__(self):
+    def __init__(self, seq_length=140, input_depth=256,
+                 num_categories=5,
+                 level_features=[64, 64, 128, 256, 512],
+                 sub_levels=[2, 2, 2, 2],
+                 classifier_layers=[4096, 2048, 2048]):
         super(ByteCNN, self).__init__()
-        self.input_width = 140
-        self.input_depth = 256
-        self.encoded_input_depth = 8
-        self.categories = 3
-        self.byte_encoder = CategoricalEncoder.instance_from_pickle('weights.pkl')
-        self._variables = {}
+        assert len(sub_levels) == len(level_features) - 1
+        self.input_width = seq_length
+        self.input_depth = input_depth
+        self.num_categories = num_categories
+        self.level_features = level_features
+        self.sub_levels = sub_levels
+        self.classifier_layers = classifier_layers
+        self.conv_block = {}
+        self.conv_output = None
 
     def build_inference_model(self):
         with tf.variable_scope('input'):
             self._input = tf.placeholder('uint8', shape=[None, self.input_width], name="INPUT")
             self._one_hot_input = tf.one_hot(self._input, depth=256, axis=-1)
-            stacked_one_hot = tf.reshape(self._one_hot_input, [-1, self.input_depth])
-            encoded_batch = tf.matmul(stacked_one_hot, self.byte_encoder._encode_weights)
-            #!NOTE input_tensor has shape [batch, input_width, num_input_channels], 8 channels
-            self._input_tensor = tf.reshape(encoded_batch, [-1, self.input_width, self.encoded_input_depth])
+            self._input_tensor = self._one_hot_input
 
         with tf.variable_scope('convolutional_layer_1'):
-            kernel = self.var(input_shape=[5, self.encoded_input_depth, CNN_LEVEL_0_FEATURES], name='layer_1_convolution')
-            #!NOTE: conv bas a shape of [batch, input_width, num_input_channels]
-            self.conv = tf.nn.conv1d(self._input_tensor, kernel, stride=1, padding="SAME")
+            kernel = self.var(input_shape=[5, self.input_depth, self.level_features[0]], name='layer_1_convolution')
+            self.conv_block[0] = tf.nn.conv1d(self._input_tensor, kernel, stride=1, padding="SAME")
 
-        with tf.variable_scope('convolutional_block_1'):
-            c_b = self.convolutional_block(self.conv, CNN_LEVEL_0_FEATURES, CNN_LEVEL_1_FEATURES, scope='L1')
-            c_b = self.convolutional_block(c_b, CNN_LEVEL_1_FEATURES, CNN_LEVEL_1_FEATURES, scope='L2')
-            m_p = self.max_pool_layer(c_b, 2, 2)
-            self.conv_block_1 = m_p
+        for level, num_features in enumerate(self.level_features[:-1]):
+            with tf.variable_scope('convolutional_block_' + str(level + 1)):
+                c_b = self.convolutional_block(self.conv_block[level],
+                                               self.level_features[level],
+                                               self.level_features[level + 1],
+                                               scope='L1')
+                for sub_level in range(self.sub_levels[level] - 1):
+                    c_b = self.convolutional_block(c_b,
+                                                   self.level_features[level + 1],
+                                                   self.level_features[level + 1],
+                                                   scope='L' + str(sub_level + 2))
+                m_p = self.max_pool_layer(c_b, 2, 2)
+                self.conv_block[level + 1] = m_p
+            self.conv_output = m_p
 
-        with tf.variable_scope('convolutional_block_2'):
-            c_b = self.convolutional_block(self.conv_block_1, CNN_LEVEL_1_FEATURES, CNN_LEVEL_2_FEATURES, scope='L1')
-            c_b = self.convolutional_block(c_b, CNN_LEVEL_2_FEATURES, CNN_LEVEL_2_FEATURES, scope='L2')
-            m_p = self.max_pool_layer(c_b, 2, 2)
-            self.conv_block_2 = m_p
+        self.conv_output = tf.reshape(self.conv_output, [-1, self.conv_output.shape[1].value * self.level_features[-1]])
+        FC = tf.contrib.layers.fully_connected
+        with tf.variable_scope("fc_classifier") as scope:
+            x = FC(self.conv_output, self.classifier_layers[0], activation_fn=None)
+            for num_output in self.classifier_layers[1:]:
+                x = FC(x, num_output, activation_fn=None)
 
-        with tf.variable_scope('convolutional_block_3'):
-            c_b = self.convolutional_block(self.conv_block_2, CNN_LEVEL_2_FEATURES, CNN_LEVEL_3_FEATURES, scope='L1')
-            c_b = self.convolutional_block(c_b, CNN_LEVEL_3_FEATURES, CNN_LEVEL_3_FEATURES, scope='L2')
-            m_p = self.max_pool_layer(c_b, 2, 2)
-            self.conv_block_3 = m_p
-
-        with tf.variable_scope('convolutional_block_4'):
-            c_b = self.convolutional_block(self.conv_block_3, CNN_LEVEL_3_FEATURES, CNN_LEVEL_4_FEATURES, scope='L1')
-            c_b = self.convolutional_block(c_b, CNN_LEVEL_4_FEATURES, CNN_LEVEL_4_FEATURES, scope='L2')
-            m_p = self.max_pool_layer(c_b, 2, 2)
-            self.conv_block_4 = m_p
-
-        with tf.variable_scope('fully_connected_layer'):
-            weights = self.var(input_shape=[self.conv_block_4.shape[1].value * CNN_LEVEL_4_FEATURES, 2048], name='projection_1')
-            self.convx = tf.reshape(self.conv_block_4, [-1, self.conv_block_4.shape[1].value * CNN_LEVEL_4_FEATURES])
-            #NOTE [batch_size, 2048]
-            self.decision_layer_1 = tf.nn.relu(tf.matmul(self.convx, weights))
-
-        with tf.variable_scope('fully_connected_layer_2'):
-            weights = self.var(input_shape=[2048, 2048], name='projection_1')
-            #NOTE [batch_size, 2]
-            self.decision_layer_2 = tf.nn.relu(tf.matmul(self.decision_layer_1, weights))
-
-        with tf.variable_scope('fully_connected_layer_3'):
-            weights = self.var(input_shape=[2048, self.categories], name='projection_1')
-            #NOTE [batch_size, 2]
-            self.decision_layer_3 = tf.matmul(self.decision_layer_2, weights)
+        self.decision_output = self.decision_layer_3 = FC(x, self.num_categories, activation_fn=None)
+        print(self.decision_layer_3.get_shape())
 
     def temporal_batch_normalize(self, i_tensor):
         mean, variance = tf.nn.moments(i_tensor, axes=[0, 1])
@@ -120,7 +108,7 @@ class ByteCNN(BaseModel):
         with tf.variable_scope('training_ops'):
             with tf.variable_scope('output'):
                 self._output = tf.placeholder(dtype=tf.uint8, shape=[None, 1], name="OUTPUT")
-                self._one_hot_output = tf.one_hot(self._output, depth=self.categories, axis=-1)
+                self._one_hot_output = tf.one_hot(self._output, depth=self.num_categories, axis=-1)
             loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.decision_layer_3, labels=self._one_hot_output)
             self.train_step = tf.train.MomentumOptimizer(learning_rate=0.000001, momentum=0.9).minimize(loss)
             self.predicted_value = tf.argmax(self.decision_layer_3, 1)

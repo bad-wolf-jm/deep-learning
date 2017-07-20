@@ -100,14 +100,14 @@ training_progress_chart = new Highcharts.Chart({
         endAngle: 360,
               background: [{ // Track for Move
                     outerRadius: '100%',
-                    innerRadius: '90%',
+                    innerRadius: '85%',
                     backgroundColor: Highcharts.Color(Highcharts.getOptions().colors[1])
                         .setOpacity(0.3)
                         .get(),
                     borderWidth: 0
                 }, { // Track for Exercise
-                    outerRadius: '85%',
-                    innerRadius: '75%',
+                    outerRadius: '80%',
+                    innerRadius: '65%',
                     backgroundColor: Highcharts.Color(Highcharts.getOptions().colors[1])
                         .setOpacity(0.3)
                         .get(),
@@ -137,15 +137,15 @@ training_progress_chart = new Highcharts.Chart({
         data: [{
             color: Highcharts.getOptions().colors[9],
             radius: '100%',
-            innerRadius: '90%',
+            innerRadius: '85%',
             y: 0
         }]
     }, {
         name: 'Exercise',
         data: [{
             color: Highcharts.getOptions().colors[1],
-            radius: '85%',
-            innerRadius: '75%',
+            radius: '80%',
+            innerRadius: '65%',
             y: 0
         }]
     }]

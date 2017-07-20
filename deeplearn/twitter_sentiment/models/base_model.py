@@ -21,7 +21,6 @@ class BaseModel(object):
         self._variables = {}
         self.batch_loss = None
         self.batch_accuracy = None
-        print(type(self).__name__)
 
     def build_inference_model(self):
         raise NotImplementedError()

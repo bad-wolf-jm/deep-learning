@@ -31,6 +31,21 @@ def addslashes(s):
 sql_insert_statements = []
 key=0
 
+def tokenize(text):
+    words = text.split(' ')
+    sanitized_words = []
+    for w in words:
+        if w.startswith('@'):
+            sanitized_words.append('@<USER>')
+        else:
+            if w.startswith('http://') or w.startswith('https://'):
+                sanitized_words.append('<URL>')
+            else:
+                sanitized_words.append(w)
+    return ' '.join(sanitized_words)
+
+
+
 query = """SELECT cms_staging__comment.message AS text,
                   cms_staging__comments_flags.flag_id AS flag_id,
                   cms_staging__flag.name AS flag_name,
@@ -40,44 +55,62 @@ query = """SELECT cms_staging__comment.message AS text,
                     INNER JOIN cms_staging__flag ON
                         cms_staging__flag.id = cms_staging__comments_flags.flag_id
            WHERE cms_staging__comments_flags.flag_id between 1 and 5"""
-
+insert_batch = []
 with connection.cursor() as cursor:
     cursor.execute(query)
     entries = cursor.fetchall()
-    for row in entries:
-        print(row)
+    I = 0
+    for index, row in enumerate(entries):
+        tweet = row['text']
+        sent = row['flag_id']
+        if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= 1024:
+            tweet_stats = {'char_length': len(tweet),
+                           'byte_length': len(tweet.encode('utf8'))}
+            sanitized_tweet = tokenize(tweet)
+            sanitized_tweet_stats = {'char_length': len(sanitized_tweet),
+                                     'byte_length': len(sanitized_tweet.encode('utf8'))}
 
-sys.exit(0)
+            tweet = addslashes(tweet)
+            sanitized_tweet = addslashes(sanitized_tweet)
+            sql = """INSERT INTO cms_staging__dataset
+                                    (id, sentiment, text, sanitized_text,
+                                    char_length, byte_length,
+                                    sanitized_char_length, sanitized_byte_length)
+                    VALUES ({id}, {sentiment}, '{text}', '{sanitized_tweet}',
+                            {char_length}, {byte_length},
+                            {sanitized_char_length}, {sanitized_byte_length})"""
+            sql = sql.format(id=I,
+                             sentiment=int(sent),
+                             text=tweet,
+                             sanitized_tweet=sanitized_tweet,
+                             char_length=tweet_stats['char_length'],
+                             byte_length=tweet_stats['byte_length'],
+                             sanitized_char_length=sanitized_tweet_stats['char_length'],
+                             sanitized_byte_length=sanitized_tweet_stats['byte_length'])
+            insert_batch.append(sql)
+            I += 1
+            print(tweet[:256])
+        if len(insert_batch) > 50000:
+            for inst in insert_batch:
+                print(inst[:150])
+                cursor.execute(inst)
+            connection.commit()
+            insert_batch = []
+    for inst in insert_batch:
+        print(inst[:350])
+        cursor.execute(inst)
+    connection.commit()
+    insert_batch = []
 
-for i, g in enumerate(glob.glob(_file)):
-    file_name = os.path.basename(g)
-    id_, gender, age, industry, sign, _ = file_name.split('.')
 
-    print (i, g)
-
-    try:
-        str_ = open(g).read().encode('utf8')
-        bl = etree.fromstring(str_, parser=parser)
-        for entry in bl.iter('post'):
-            sql = """INSERT INTO blog_corpus (id, blogger_id, gender, age, char_length, byte_length, text) VALUES ({id}, {blogger_id}, '{gender}', {age}, {char_length}, {byte_length}, '{text}')"""
-            sql=sql.format(id=key,
-                           blogger_id=id_,
-                           gender=gender,
-                           age=age,
-                           text=addslashes(entry.text),
-                           char_length=len(entry.text),
-                           byte_length=len(entry.text.encode('utf8')))
-            sql_insert_statements.append(sql)
-            key += 1
-            #print(entry.text.strip('\n'))
-    except Exception as e:
-        XX += 1
-        print('------------------', e)
-
-print (XX)
 with connection.cursor() as cursor:
-    for i, stat in enumerate(sql_insert_statements):
-        print(stat[:350].replace('\n', ' '))
-        cursor.execute(stat)
-        print (i, len(sql_insert_statements))
-connection.commit()
+    sql = """SELECT COUNT(id) as N FROM cms_staging__dataset"""
+    cursor.execute(sql)
+    N = cursor.fetchone()['N']
+    shuffle = np.random.permutation(N)
+    for id_, perm_id in enumerate(shuffle):
+        sql = """UPDATE cms_staging__dataset SET shuffle_id={perm_id} WHERE id={id_}"""
+        sql = sql.format(perm_id=perm_id, id_=id_)
+        print(sql)
+        cursor.execute(sql)
+    connection.commit()

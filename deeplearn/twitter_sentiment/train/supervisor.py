@@ -28,7 +28,7 @@ class TrainingSupervisor(object):
         self.validation_interval = validation_interval
         self.checkpoint_interval = checkpoint_interval  # in batches
         self.checkpoint_keep = checkpoint_keep
-        self.test_interval = 1  # test_interval  # in seconds
+        self.test_interval = 1  # test_interval in seconds
         self.test_keep = test_keep
 
         self.checkpoint_root = os.path.join(_model_data_root, 'checkpoints')

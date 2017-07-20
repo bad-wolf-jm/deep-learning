@@ -4,12 +4,16 @@ import numpy as np
 import sys
 import signal
 from train.supervisor import TrainingSupervisor
-from models.rnn_classifier.sentiment import generate_batches, flags, count_rows
+from train.data import sentiment_training_generator, cms_training_generator
+import argparse
+from config import stream
 
-N = count_rows()
-test = N // 100
-batch_generator = generate_batches(min_id=test + 1, batch_size=flags.batch_size, epochs=flags.epochs)
-validation_iterator = generate_batches(min_id=0, max_id=test, batch_size=flags.validation_size, epochs=None)
+flags = argparse.ArgumentParser()
+stream.fill_arg_parser(flags)
+flags.add_argument('-i', '--train-table', dest='train_table', type=str, default='', help='The training input table')
+flags.add_argument('-n', '--min-length',  dest='length_cutoff', type=int, default=10, help='The minimum length of strings to send to the training server')
+flags.add_argument('-m', '--max-length',  dest='max_length', type=int, default=140, help='The maximum length of a tweet to send to the training server')
+flags = flags.parse_args()
 
 max_line_length = 0
 LENGTH_CUTOFF = 10
@@ -42,7 +46,6 @@ class TrainRNNClassifier(TrainingSupervisor):
         return array
 
 
-
 def save_before_exiting(*a):
     path = foo.save_model_image()
     foo.shutdown()
@@ -54,15 +57,18 @@ signal.signal(signal.SIGTERM, save_before_exiting)
 
 supervisor = None
 
+
 def start_training():
     global supervisor
-    model = SimpleGRUClassifierConv()
+    model = SimpleGRUClassifier()
     model.build_training_model()
     model.initialize()
     foo = TrainRNNClassifier(model, flags.validation_interval)
     supervisor = foo
+    data_generator = sentiment_training_generator(batch_size=flags.batch_size, epochs=flags.epochs, validation_size=flags.validation_size)
+
     try:
-        foo.run_training(batch_generator, validation_iterator)
+        foo.run_training(data_generator['train'], data_generator['validation'])  # (batch_generator, validation_iterator)
     except KeyboardInterrupt:
         save_before_exiting()
         foo.shutdown()
@@ -71,4 +77,4 @@ def start_training():
 
 
 if __name__ == '__main__':
-   start_training()
+    start_training()

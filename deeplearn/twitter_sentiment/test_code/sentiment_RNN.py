@@ -18,13 +18,15 @@ flags = flags.parse_args()
 db_connection = DBConnection(host=flags.host, user=flags.user, password=flags.password)
 db_connection.connect('sentiment_analysis_data')
 
+TABLE='trinary_sentiment_dataset'
+#TABLE='cms_staging__dataset'
 
 def count_rows(min_id=0, max_id=None):
-    return db_connection.count_rows('trinary_sentiment_dataset', 'id', min_id, max_id)
+    return db_connection.count_rows(TABLE, 'id', min_id, max_id)
 
 
 def generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
-    gen = db_connection.batches('trinary_sentiment_dataset', 'id', ['sanitized_text', 'sentiment'], batch_size=batch_size, epochs=epochs)
+    gen = db_connection.batches(TABLE, 'id', ['sanitized_text', 'sentiment'], batch_size=batch_size, epochs=epochs)
     sentiment_map = {0: 0, 1: 1, -1: 2}
     for b in iter(gen):
         batch_x = []

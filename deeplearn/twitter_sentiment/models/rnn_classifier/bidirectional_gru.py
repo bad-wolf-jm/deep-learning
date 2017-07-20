@@ -19,7 +19,6 @@ class Tweet2Vec_BiGRU(BaseModel):
         self.hidden_states = hidden_states
         self.embedding_dimension = embedding_dimension
         self.num_classes = num_classes
-        #self.byte_encoder = CategoricalEncoder.instance_from_pickle('weights.pkl')
 
     def init_model(self, trainable=False):
         with tf.variable_scope('embedding', reuse=None) as scope:
@@ -28,16 +27,11 @@ class Tweet2Vec_BiGRU(BaseModel):
             self._one_hot_input = tf.one_hot(x, depth=256, axis=1)
             x = tf.reshape(self._one_hot_input, [-1, 1024, 256])
 
-        # NOTE self._input now has dimension [batch_size, seq_length, char_embedding_size]
         with tf.variable_scope('bidirectional_encoder', reuse=None) as scope:
             self.forward_gru = tf.nn.rnn_cell.GRUCell(self.hidden_states, activation=None)
             self.backward_gru = tf.nn.rnn_cell.GRUCell(self.hidden_states, activation=None)
             output, output_states = tf.nn.bidirectional_dynamic_rnn(self.forward_gru, self.backward_gru, x, dtype=tf.float32)
-
-            #self.fw_gru_output = tf.slice(output[0], [0,-1], [-1, 1])
-            #self.bw_gru_output = tf.slice(output[1], [0,-1], [-1, 1])
             self.fw_gru_output = tf.reshape(output[0][:, -1:], [-1, self.hidden_states])
-            #self.bk_gru_output = tf.reshape(output[1][:, -1:], [-1, self.hidden_states])
             self.bk_gru_output = tf.reshape(output[1][:, :1], [-1, self.hidden_states])
             self.fw_gru_output_state = output_states[0]
             self.bk_gru_output_state = output_states[1]
@@ -88,13 +82,14 @@ class Tweet2Vec_BiGRU(BaseModel):
     def test(self, batch_x, batch_y):
         t_0 = time.time()
         feed_dict = {self._input: batch_x, self.output_expected: batch_y}
-        t_v, p_v, lo, acc, o_p = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy, tf.nn.softmax(self.output_predicted)], feed_dict=feed_dict)
+        t_v, p_v, lo, acc, o_p, o_e = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy,
+                                                        tf.nn.softmax(self.output_predicted), self.output_expected_oh], feed_dict=feed_dict)
         t = time.time() - t_0
         batch_strings = []
         for i, line in enumerate(batch_x):
             l = bytes([x for x in line if x != 0]).decode('utf8', 'ignore')
             batch_strings.append(l)
-            #x = l[:50]
-            #p = "."*(50 - len(x))
-            #print(x+p, o_p[i])
+            x = l[:50]
+            p = "." * (50 - len(x))
+            print(x + p, o_p[i],  o_e[i])
         return {'loss': lo, 'accuracy': acc, 'time': t, 'output': zip(batch_strings, t_v, p_v)}

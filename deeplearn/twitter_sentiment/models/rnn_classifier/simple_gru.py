@@ -57,7 +57,7 @@ class SimpleGRUClassifier(BaseModel):
                                 name='final_biases_2',
                                 scope=scope,
                                 trainable=True)
-            self.output_predicted = tf.matmul(tf.matmul(encoded_text, _weights) + _biases, _weights_2) + _biases_2
+            self.output_predicted = tf.matmul(tf.nn.sigmoid(tf.matmul(encoded_text, _weights) + _biases), _weights_2) + _biases_2
 
     def build_inference_model(self, trainable=False):
         with tf.variable_scope('inference', reuse=None):
@@ -167,14 +167,22 @@ class SimpleGRUClassifierConv(SimpleGRUClassifier):
                                               o_features=self.convolutional_features[2],
                                               window_size=self.window_sizes[2],
                                               scope='layer_3')
+            pool_3 = self.max_pool_layer(i_tensor=conv_3,
+                                         window_size=self.pooling_sizes[2],
+                                         strides=self.pooling_strides[2],
+                                         scope=scope)
             conv_4 = self.convolutional_block(i_tensor=conv_3,
                                               i_features=self.convolutional_features[2],
                                               o_features=self.convolutional_features[3],
                                               window_size=self.window_sizes[3],
                                               scope='layer_4')
+            pool_4 = self.max_pool_layer(i_tensor=conv_4,
+                                         window_size=self.pooling_sizes[3],
+                                         strides=self.pooling_strides[3],
+                                         scope=scope)
 
-            D = conv_4.shape[1].value * conv_4.shape[2].value * conv_4.shape[3].value
-            conv_4=tf.reshape(conv_4, [-1, D])
+            D = pool_4.shape[1].value * pool_4.shape[2].value * pool_4.shape[3].value
+            pool_4=tf.reshape(pool_4, [-1, D])
 
             _weights = self.var(input_shape=[D, self.num_classes],
                                 name='final_weights',
