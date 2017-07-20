@@ -6,80 +6,180 @@
     </head>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="../js/highcharts.js"></script>
+    <script src="../js/semantic.min.js"></script>
     <script src="../js/train_update.js"></script>
     <script src="../js/training_graphs.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
     <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../css/semantic.min.css">
     <link rel="stylesheet" href="../css/highcharts.css">
     <link rel="stylesheet" href="../css/style.css">
     <body>
     <h1>Training Monitor</h1>
 
+<div class='ui container'>
+    <div class="ui icon message">
 
-<div class='content-area'>
-    <div class="progress" style="height:100px; width:100%;">
-        <div class="progress-item" style="height:100%; width:45%; display: inline-block; vertical-align:top">
-            <div class='stats-title'>Elapsed time</div>
-            <p style="font-size: 30px" id='elapsed-time'></p>
+
+
+
+        <div class="progress-meter", id='progress-meter' style="width:125px; height:125px"></div>
+
+        <div class="progress-text" style="position:absolute; top:0px; width:100px; text-align:center; font-size:10px"><b>EPOCH</b></br>
+            <div id="epoch-number" style="display: inline">2534</div> of <div id='total-epochs' style="display: inline">5000</div></div>
+
+
+            <div class="ui statistics">
+              <div class="statistic">
+                  <div class="label">
+                    Elapsed time
+                  </div>
+                <div class="value" id='elapsed-time'>
+                  22
+                </div>
+              </div>
+              <div class="statistic">
+                  <div class="label">
+                    Remaining time
+                  </div>
+                <div class="value" id='remaining-time'>
+                  31,200
+                </div>
+              </div>
+
+            </div>
+
+
+     <!-- <div class="content">
+
+        <div class="progress" style="height:100px; width:100%;">
+            <div class="progress-item" style="height:100%; width:45%; display: inline-block; vertical-align:top">
+                <div class='stats-title'>Elapsed time</div>
+                <p style="font-size: 30px" id='elapsed-time'></p>
+            </div>
+            <div class="progress-item" style="height:100%; width:45%; display: inline-block; vertical-align:top">
+                <div class='stats-title'>Remaining time</div>
+                <p  style="font-size: 30px" id='remaining-time'></p>
+            </div>
+
         </div>
-        <div class="progress-item" style="height:100%; width:45%; display: inline-block; vertical-align:top">
-            <div class='stats-title'>Remaining time</div>
-            <p  style="font-size: 30px" id='remaining-time'></p>
+
+    </div> -->
+    </div>
+    <div class="ui two column grid">
+        <div class="four wide column">
+            <!--<div class="progress-item" style="position:relative; height:150px; width:100%; vertical-align:top">
+                <div class="progress-meter", id='progress-meter' style="margin:auto; width:100%; height:150px; display: inline-block; vertical-align:top; horizontal-align:middle"></div>
+                <div class="progress-text" style="position:absolute; top:0px; width:100px; text-align:center; transform: translate(40%, 200%); font-size:10px"><b>EPOCH</b></br>
+                    <div id="epoch-number" style="display: inline">2534</div> of <div id='total-epochs' style="display: inline">5000</div></div>
+            </div>-->
+
+              <h4 class="ui top attached block header">
+                Loss
+              </h4>
+              <div class="ui bottom attached segment">
+                  <table>
+                      <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-loss">NAN</td></tr>
+                      <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-loss">NAN</td></tr>
+                  </table>
+              </div>
+
+              <h4 class="ui top attached block header">
+                Accuracy
+              </h4>
+              <div class="ui bottom attached segment">
+                  <table>
+                      <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-accuracy">NAN</td></tr>
+                      <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-accuracy">NAN</td></tr>
+                  </table>
+              </div>
+
+              <h4 class="ui top attached block header">
+                Time
+              </h4>
+              <div class="ui bottom attached segment">
+                  <table>
+                      <tr><td class="stats-label" style="width:25%">Batch:</td><td class="stats-value" id="stats-batch-time" style="width:75%">NAN</td></tr>
+                      <tr><td class="stats-label" style="width:25%">Epoch:</td><td class="stats-value" id="stats-epoch-time" style="width:75%">NAN</td></tr>
+                  </table>
+              </div>
+
+              <h4 class="ui top attached block header">
+                System
+              </h4>
+              <div class="ui bottom attached segment">
+                  <table>
+                      <tr><td class="stats-label" style="width:20%">CPU:</td><td class="stats-value" id="stats-cpu-usage" style="width:80%">NAN</td></tr>
+                      <tr><td class="stats-label" style="width:20%">Memory:</td><td class="stats-value" id="stats-memory-usage" style="width:80%">NAN</td></tr>
+                  </table>
+              </div>
+
+
+            <!-- <div class="progress-item" style="height:150px; width:100%;  vertical-align:top">
+                <div class='stats-title'>Loss</div>
+                <table>
+                    <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-loss">NAN</td></tr>
+                    <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-loss">NAN</td></tr>
+                </table>
+            </div>
+
+
+            <div class="progress-item" style="height:150px; width:100%;  ">
+                <div class='stats-title'>Accuracy</div>
+            </div>
+            <div class="progress-item" style="height:150px; width:100%;  vertical-align:top">
+                <div class='stats-title'>Time</div>
+            </div>
+            <div class="progress-item" style="height:150px; width:100%;  vertical-align:top">
+                <div class='stats-title'>System</div>
+            </div>-->
+
+        </div>
+        <div class="column twelve wide">
+            <h4 class="ui top attached block header">
+                Loss
+              </h4>
+              <div class="ui bottom attached segment", id="loss-graph-content">
+                Segment
+              </div>
+
+              <h4 class="ui top attached block header">
+                  Accuracy
+                </h4>
+                <div class="ui bottom attached segment", id="acc-graph-content">
+                  Segment
+                </div>
         </div>
 
     </div>
 
+
+
+<!--
     <div class="progress" style="height:150px; width:100%;">
-        <div class="progress-item" style="position:relative; height:100%; width:19%; display: inline-block; vertical-align:top">
-            <div class="progress-meter", id='progress-meter' style="margin:auto; width:100%; height:150px; display: inline-block; vertical-align:top; horizontal-align:middle"></div>
-            <div class="progress-text" style="position:absolute; top:0px; width:100px; text-align:center; transform: translate(40%, 200%); font-size:10px"><b>EPOCH</b></br>
-                <div id="epoch-number" style="display: inline">2534</div> of <div id='total-epochs' style="display: inline">5000</div></div>
-        </div>
-        <div class="progress-item" style="height:100%; width:19%; display: inline-block; vertical-align:top">
-            <div class='stats-title'>Loss</div>
-            <table>
-                <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-loss">NAN</td></tr>
-                <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-loss">NAN</td></tr>
-            </table>
-        </div>
-        <div class="progress-item" style="height:100%; width:19%; display: inline-block">
-            <div class='stats-title'>Accuracy</div>
-            <table>
-                <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-accuracy">NAN</td></tr>
-                <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-accuracy">NAN</td></tr>
-            </table>
-        </div>
-        <div class="progress-item" style="height:100%; width:19%; display: inline-block; vertical-align:top">
-            <div class='stats-title'>Time</div>
-            <table>
-                <tr><td class="stats-label" style="width:25%">Batch:</td><td class="stats-value" id="stats-batch-time" style="width:75%">NAN</td></tr>
-                <tr><td class="stats-label" style="width:25%">Epoch:</td><td class="stats-value" id="stats-epoch-time" style="width:75%">NAN</td></tr>
-            </table>
-        </div>
-        <div class="progress-item" style="height:100%; width:19%; display: inline-block; vertical-align:top">
-            <div class='stats-title'>System</div>
-            <table>
-                <tr><td class="stats-label" style="width:20%">CPU:</td><td class="stats-value" id="stats-cpu-usage" style="width:80%">NAN</td></tr>
-                <tr><td class="stats-label" style="width:20%">Memory:</td><td class="stats-value" id="stats-memory-usage" style="width:80%">NAN</td></tr>
-            </table>
-        </div>
 
     </div>
-    <div class="graph">
+     <div class="graph">
         <div class="graph-title">
             Loss
         </div>
         <div class='graph-content', id="loss-graph-content"></div>
-    </div>
-    <p></p>
+    </div> -->
+
+
+
+
+    <!-- <p></p>
     <div class="graph">
         <div class="graph-title">
             Accuracy
         </div>
         <div class="graph-content", id="acc-graph-content"></div>
-    </div>
+    </div> -->
+
+
 </div>
     </body>
 <script type="text/javascript">

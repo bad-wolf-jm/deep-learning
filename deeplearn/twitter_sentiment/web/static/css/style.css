@@ -133,7 +133,7 @@ section{
     vertical-align: bottom;
     text-align: left;
     border-bottom:0px;
-    font-size: 12px;
+    /* font-size: 12px; */
 }
 
 .stats-value {
@@ -141,7 +141,7 @@ section{
     font-size:20px;
     font-weight:400;
     border-bottom:0px;
-    transform: translate(0%, 4px);
+    transform: translate(0%, 0px);
 }
 
 .content-area {
