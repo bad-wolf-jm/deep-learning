@@ -65,22 +65,28 @@ class Tweet2Vec_BiGRU(BaseModel):
             self.batch_loss = tf.reduce_mean(loss, axis=0)
             self.batch_accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.cast(self.true_value, tf.uint8), tf.cast(self.predicted_value, tf.uint8)), tf.float32))
 
-    def train(self, batch_x, batch_y):
+    def train(self, train_x, train_y):
         t_1 = time.time()
+        batch_x = [self.pad(element, self.seq_length) for element in train_x]
+        batch_y = [element for element in train_y]
         feed_dict = {self._input: batch_x, self.output_expected: batch_y}
         _, lo, acc = tf_session().run([self.train_step, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
 
-    def validate(self, batch_x, batch_y):
+    def validate(self,  train_x, train_y):
         t_1 = time.time()
+        batch_x = [self.pad(element, self.seq_length) for element in train_x]
+        batch_y = [element for element in train_y]
         feed_dict = {self._input: batch_x, self.output_expected: batch_y}
         lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
 
-    def test(self, batch_x, batch_y):
+    def test(self,  train_x, train_y):
         t_0 = time.time()
+        batch_x = [self.pad(element, self.seq_length) for element in train_x]
+        batch_y = [element for element in train_y]
         feed_dict = {self._input: batch_x, self.output_expected: batch_y}
         t_v, p_v, lo, acc, o_p, o_e = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy,
                                                         tf.nn.softmax(self.output_predicted), self.output_expected_oh], feed_dict=feed_dict)
@@ -93,3 +99,8 @@ class Tweet2Vec_BiGRU(BaseModel):
             p = "." * (50 - len(x))
             print(x + p, o_p[i],  o_e[i])
         return {'loss': lo, 'accuracy': acc, 'time': t, 'output': zip(batch_strings, t_v, p_v)}
+
+    def pad(self, array, length):
+        array = list(array[:length])
+        array += [0] * (length - len(array))
+        return array

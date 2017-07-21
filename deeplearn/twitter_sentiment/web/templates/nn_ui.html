@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>NN Tool</title>
+    </head>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="../static/js/highcharts.js"></script>
+    <script src="../static/js/semantic.min.js"></script>
+    <!--<script src="../static/js/train_update.js"></script>
+    <script src="../static/js/training_graphs.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>-->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"> -->
+    <!-- <link rel="stylesheet" href="../static/css/highcharts.css">-->
+    <link rel="stylesheet" href="../static/css/semantic.min.css">
+    <!-- <link rel="stylesheet" href="../static/css/semantic.darkly.min.css"> -->
+   <link rel="stylesheet" href="../static/css/style.css">
+    <body class="template">
+
+  <div class="ui grey top attached inverted menu">
+    <div class="ui header item">
+      NN Training Tool
+    </div>
+
+    <div class="ui dropdown item">
+      Models
+      <div class="menu">
+        <div class="item">
+          <span class="text">Create new model</span>
+        </div>
+        <div class="divider"></div>
+        <div class="item">
+          Load model...
+        </div>
+        <div class="item">
+          Save current model...
+        </div>
+      </div>
+    </div>
+    <div class="right menu">
+       <div class="ui item">
+         ByteCNN_3 (deep)
+       </div>
+       <div class="ui icon item">
+         <i class="settings icon"></i>
+       </div>
+       <div class="ui icon item">
+         <i class="save icon"></i>
+       </div>
+       <div class="ui icon item">
+         <i class="copy icon"></i>
+       </div>
+
+     </div>
+  </div>
+
+
+  <div class="ui attached blue icon message">
+    <i class="notched circle loading icon"></i>
+    <div class="content">
+      <div class="header">
+        Training in progress...
+      </div>
+      <p>ByteCNN_3 is training right now</p>
+      <button class="ui right floated red button">Stop training</button>
+        <button class="ui right floated button">Monitor</button>
+    </div>
+  </div>
+
+  <div class="ui blue modal" id="create-model">
+    <i class="close icon"></i>
+    <div class="header">
+      Create new model
+    </div>
+    <div class="image content">
+      <div class="description">
+        <div class="ui form">
+          <div class="field">
+            <input type="text" placeholder="Model name">
+          </div>
+          <div class="field">
+            <textarea rows="2" placeholder="Model description"></textarea>
+          </div>
+          <div class="ui fluid selection dropdown">
+            <input name="user" type="hidden">
+            <i class="dropdown icon"></i>
+            <div class="default text">Select model type</div>
+            <div class="menu">
+              <div class="item" data-value="jenny">
+                <img class="ui mini avatar image" src="/images/avatar/small/jenny.jpg">
+                Jenny Hess
+              </div>
+              <div class="item" data-value="elliot">
+                <img class="ui mini avatar image" src="/images/avatar/small/elliot.jpg">
+                Elliot Fu
+              </div>
+              <div class="item" data-value="stevie">
+                <img class="ui mini avatar image" src="/images/avatar/small/stevie.jpg">
+                Stevie Feliciano
+              </div>
+              <div class="item" data-value="christian">
+                <img class="ui mini avatar image" src="/images/avatar/small/christian.jpg">
+                Christian
+              </div>
+              <div class="item" data-value="matt">
+                <img class="ui mini avatar image" src="/images/avatar/small/matt.jpg">
+                Matt
+              </div>
+              <div class="item" data-value="justen">
+                <img class="ui mini avatar image" src="/images/avatar/small/justen.jpg">
+                Justen Kitsune
+              </div>
+            </div>
+          </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="ui positive right labeled icon button">
+        Create
+        <i class="checkmark icon"></i>
+      </div>
+      <div class="ui black deny button">
+        Cancel
+      </div>
+    </div>
+  </div>
+
+
+<script>
+$('.ui.dropdown').dropdown();
+$('#create-model').modal('show');
+</script>
+
+    </body>
+</html>

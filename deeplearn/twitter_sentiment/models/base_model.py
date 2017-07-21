@@ -21,6 +21,7 @@ class BaseModel(object):
         self._variables = {}
         self.batch_loss = None
         self.batch_accuracy = None
+        #self.graph = tf.Graph()
 
     def build_inference_model(self):
         raise NotImplementedError()
@@ -41,26 +42,26 @@ class BaseModel(object):
         op = tf.variables_initializer(self._variables.values())
         tf_session().run(op)
 
-    def get_instance_parameters(self):
-        return {}
+    #def get_instance_parameters(self):
+    #    return {}
 
-    def save_to_pickle(self, filename):
-        var_dict = {name: tf_session().run([self._variables[name]])[0] for name in self._variables}
-        weight_file = open(filename, 'wb')
-        pickle.dump({'instance_parameters': self.get_instance_parameters(), 'model_weights': var_dict}, weight_file)
+    #def save_to_pickle(self, filename):
+    #    var_dict = {name: tf_session().run([self._variables[name]])[0] for name in self._variables}
+    #    weight_file = open(filename, 'wb')
+    #    pickle.dump({'instance_parameters': self.get_instance_parameters(), 'model_weights': var_dict}, weight_file)
 
-    @classmethod
-    def instance_from_pickle(cls, filename, training_instance=False):
-        weight_file = open(filename, 'rb')
-        model_data = pickle.load(weight_file)
-        inst = cls(**model_data['instance_parameters'])
-        inst._variables = model_data['model_weights']
-        if training_instance:
-            inst.build_training_model()
-        else:
-            inst.build_inference_model()
-        inst.initialize()
-        return inst
+    #@classmethod
+    #def instance_from_pickle(cls, filename, training_instance=False):
+    #    weight_file = open(filename, 'rb')
+    #    model_data = pickle.load(weight_file)
+    #    inst = cls(**model_data['instance_parameters'])
+    #    inst._variables = model_data['model_weights']
+    #    if training_instance:
+    #        inst.build_training_model()
+    #    else:
+    #        inst.build_inference_model()
+    #    inst.initialize()
+    #    return inst
 
     def train(self, batch_x, batch_y):
         t_1 = time.time()

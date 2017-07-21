@@ -1,6 +1,7 @@
 #import numpy as np
 import time
 import tensorflow as tf
+#import numpy as np
 from models.categorical_encoder import CategoricalEncoder
 from models.base_model import BaseModel
 from models.tf_session import tf_session
@@ -13,14 +14,12 @@ from models.tf_session import tf_session
 
 
 class ByteCNN(BaseModel):
-    def __init__(self, seq_length=140, input_depth=256,
-                 num_categories=5,
-                 level_features=[64, 64, 128, 256, 512],
-                 sub_levels=[2, 2, 2, 2],
-                 classifier_layers=[4096, 2048, 2048]):
+    def __init__(self, seq_length=140, input_depth=256, num_categories=5, level_features=[64, 64, 128, 256, 512],
+                 sub_levels=[2, 2, 2, 2], classifier_layers=[4096, 2048, 2048]):
         super(ByteCNN, self).__init__()
         assert len(sub_levels) == len(level_features) - 1
         self.input_width = seq_length
+        self.seq_length = seq_length
         self.input_depth = input_depth
         self.num_categories = num_categories
         self.level_features = level_features
@@ -124,7 +123,9 @@ class ByteCNN(BaseModel):
         print(p_v)
         return {'loss': lo, 'accuracy': acc}
 
-    def test(self, batch_x, batch_y):
+    def test(self, train_x, train_y):
+        batch_x = [self.pad(element, self.seq_length) for element in train_x]
+        batch_y = [element for element in train_y]
         t_0 = time.time()
         feed_dict = {self._input: batch_x, self._output: batch_y}
         t_v, p_v, lo, acc = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
@@ -134,3 +135,30 @@ class ByteCNN(BaseModel):
             l = bytes([x for x in line if x != 0]).decode('utf8', 'ignore')
             batch_strings.append(l)
         return {'loss': lo, 'accuracy': acc, 'time': t, 'output': zip(batch_strings, t_v, p_v)}
+
+    def train(self, train_x, train_y):
+        batch_x = [self.pad(element, self.seq_length) for element in train_x]
+        batch_y = [element for element in train_y]
+        d = super(ByteCNN, self).train(batch_x, batch_y)
+        print (d)
+        return d
+
+    def validate(self, train_x, train_y):
+        batch_x = [self.pad(element, self.seq_length) for element in train_x]
+        batch_y = [element for element in train_y]
+        d = super(ByteCNN, self).validate(batch_x, batch_y)
+        #d = self.model.validate(batch_x, batch_y)
+        print (d)
+        return d
+
+    #def test_model(self, train_x, train_y):
+    #    batch_x = np.array([self.pad(element, self.seq_length) for element in train_x])
+    #    batch_y = np.array([element for element in train_y])
+    #    d = super(ByteCNN, self).validate(batch_x, batch_y)
+    #    d = self.model.test(batch_x, batch_y)
+    #    return d
+
+    def pad(self, array, length):
+        array = list(array[:length])
+        array += [0] * (length - len(array))
+        return array

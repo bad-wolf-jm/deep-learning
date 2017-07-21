@@ -58,23 +58,23 @@ class StreamSummary(object):
         return return_value
 
 
-class TrainingSummary(object):
-    def __init__(self, summary_span=None, fields=None):
-        super(TrainingSummary, self).__init__()
-        self.train_summary = StreamSummary(summary_span, fields)
-        self.validation_summary = StreamSummary(summary_span, fields)
-
-    def add_to_summary(self, summary, index=0, **kwargs):
-        summary_name = summary + '_summary'
-        summary = getattr(self, summary_name)
-        summary.add(index=index, **kwargs)
-
-    def get_summary(self, summary, fields=None, min_batch_index=None, max_batch_index=None):
-        summary_name = summary + '_summary'
-        summary = getattr(self, summary_name)
-        return summary.get(fields=fields, min_batch_index=min_batch_index, max_batch_index=max_batch_index)
-
-    def get_stats(self, summary, fields=None, backlog=None):
-        summary_name = summary + '_summary'
-        summary = getattr(self, summary_name)
-        return summary.stats(fields=fields, backlog=backlog)
+#class TrainingSummary(object):
+#    def __init__(self, summary_span=None, fields=None):
+#        super(TrainingSummary, self).__init__()
+#        self.train_summary = StreamSummary(summary_span, fields)
+#        self.validation_summary = StreamSummary(summary_span, fields)
+#
+#    def add_to_summary(self, summary, index=0, **kwargs):
+#        summary_name = summary + '_summary'
+#        summary = getattr(self, summary_name)
+#        summary.add(index=index, **kwargs)
+#
+#    def get_summary(self, summary, fields=None, min_batch_index=None, max_batch_index=None):
+#        summary_name = summary + '_summary'
+#        summary = getattr(self, summary_name)
+#        return summary.get(fields=fields, min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+#
+#    def get_stats(self, summary, fields=None, backlog=None):
+#        summary_name = summary + '_summary'
+#        summary = getattr(self, summary_name)
+#        return summary.stats(fields=fields, backlog=backlog)

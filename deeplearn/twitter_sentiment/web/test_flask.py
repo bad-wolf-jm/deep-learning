@@ -89,7 +89,6 @@ def get_training_graph_series():
     mimetype = mimetypes.get(ext, "text/html")
     content = get_file(complete_path)
     return Response(content, mimetype=mimetype)
-        < / div >
 
 
 @app.route('/site/static/<string:page_folder>/<string:page_name>')

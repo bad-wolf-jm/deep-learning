@@ -15,46 +15,46 @@ flags.add_argument('-n', '--min-length',  dest='length_cutoff', type=int, defaul
 flags.add_argument('-m', '--max-length',  dest='max_length', type=int, default=140, help='The maximum length of a tweet to send to the training server')
 flags = flags.parse_args()
 
-max_line_length = 0
-LENGTH_CUTOFF = 10
-MAX_TWEET_LENGTH = 1024
+#max_line_length = 0
+#LENGTH_CUTOFF = 10
+#MAX_TWEET_LENGTH = 1024
 
 
-class TrainRNNClassifier(TrainingSupervisor):
-    def train_step(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-        batch_y = np.array([element for element in train_y])
-        d = self.model.train(batch_x, batch_y)
-        print(d)
-        return d
-
-    def validation_step(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-        batch_y = np.array([element for element in train_y])
-        d = self.model.validate(batch_x, batch_y)
-        return d
-
-    def test_model(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-        batch_y = np.array([element for element in train_y])
-        d = self.model.test(batch_x, batch_y)
-        return d
-
-    def pad(self, array, length):
-        array = list(array[:length])
-        array += [0] * (length - len(array))
-        return array
-
-
-def save_before_exiting(*a):
-    path = foo.save_model_image()
-    foo.shutdown()
-    print('\rProcess terminated, model saved as', path)
-
-
-signal.signal(signal.SIGTERM, save_before_exiting)
-
-
+#class TrainRNNClassifier(TrainingSupervisor):
+#    def train_step(self, train_x, train_y):
+#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
+#        batch_y = np.array([element for element in train_y])
+#        d = self.model.train(batch_x, batch_y)
+#        print(d)
+#        return d
+#
+#    def validation_step(self, train_x, train_y):
+#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
+#        batch_y = np.array([element for element in train_y])
+#        d = self.model.validate(batch_x, batch_y)
+#        return d
+#
+#    def test_model(self, train_x, train_y):
+#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
+#        batch_y = np.array([element for element in train_y])
+#        d = self.model.test(batch_x, batch_y)
+#        return d
+#
+#    def pad(self, array, length):
+#        array = list(array[:length])
+#        array += [0] * (length - len(array))
+#        return array
+#
+#
+#def save_before_exiting(*a):
+#    path = foo.save_model_image()
+#    foo.shutdown()
+#    print('\rProcess terminated, model saved as', path)
+#
+#
+#signal.signal(signal.SIGTERM, save_before_exiting)
+#
+#
 supervisor = None
 
 
@@ -63,7 +63,7 @@ def start_training():
     model = SimpleGRUClassifier()
     model.build_training_model()
     model.initialize()
-    foo = TrainRNNClassifier(model, flags.validation_interval)
+    foo = TrainingSupervisor(model, flags.validation_interval)
     supervisor = foo
     data_generator = sentiment_training_generator(batch_size=flags.batch_size, epochs=flags.epochs, validation_size=flags.validation_size)
 
