@@ -10,7 +10,7 @@ from threading import Thread
 import psutil
 import glob
 
-from models.rnn_classifier import train
+from models.byte_cnn import train
 
 
 import datetime

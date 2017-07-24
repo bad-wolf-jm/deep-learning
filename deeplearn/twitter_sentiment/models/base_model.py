@@ -63,16 +63,27 @@ class BaseModel(object):
     #    inst.initialize()
     #    return inst
 
-    def train(self, batch_x, batch_y):
+    def train(self, batch_x, batch_y, session=None):
         t_1 = time.time()
         feed_dict = {self._input: batch_x, self._output: batch_y}
-        _, lo, acc = tf_session().run([self.train_step, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        _, lo, acc = self.run_ops(session,
+                                  [self.train_step, self.batch_loss, self.batch_accuracy],
+                                  feed_dict=feed_dict)
+        #_, lo, acc = tf_session().run([self.train_step, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': lo, 'accuracy': acc, 'time': batch_time}
 
-    def validate(self, batch_x, batch_y):
+    def validate(self, batch_x, batch_y, session=None):
         t_1 = time.time()
         feed_dict = {self._input: batch_x, self._output: batch_y}
-        lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        lo, acc = self.run_ops(session,
+                               [self.batch_loss, self.batch_accuracy],
+                               feed_dict=feed_dict)
+        #lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': lo, 'accuracy': acc,  'time': batch_time}
+
+
+    def run_ops(self, session = None, *args, **kwargs):
+        session = session or tf_session()
+        return session.run(*args, **kwargs)

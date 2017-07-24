@@ -2,7 +2,7 @@ from train.dbi import DBConnection
 
 db_host = '127.0.0.1'
 db_user = 'root'
-db_password = 'root'
+db_password = ''
 
 db_connection = DBConnection(host=db_host, user=db_user, password=db_password)
 db_connection.connect('sentiment_analysis_data')
@@ -13,7 +13,7 @@ def count_rows(table, min_id=0, max_id=None):
 
 
 def _generate_batches(min_id=0, max_id=None, batch_size=10, epochs=None, sentiment_map=None, table=None):
-    gen = db_connection.batches(table, 'shuffle_id', ['sanitized_text', 'sentiment'], batch_size=batch_size, epochs=epochs)
+    gen = db_connection.batches(table, 'id', ['sanitized_text', 'sentiment'], batch_size=batch_size, epochs=epochs)
     sentiment_map = sentiment_map or {}
     for b in iter(gen):
         batch_x = []

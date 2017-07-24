@@ -46,6 +46,7 @@ class TrainingSupervisor(object):
         self._batches_per_epoch = None
         self._batch_index = None
         self._total_batches = None
+        self._session = None
 
     @property
     def batch_number(self):
@@ -120,7 +121,7 @@ class TrainingSupervisor(object):
 
     def train_on_batch(self, train_x, train_y):
         self.batch_index += 1
-        d = self.model.train(train_x, train_y)
+        d = self.model.train(train_x, train_y, session = self._session)
         d = {'accuracy': float(d['accuracy']),
              'loss': float(d['loss']),
              'time': float(d['time'])}
@@ -128,7 +129,7 @@ class TrainingSupervisor(object):
         return d
 
     def validate_on_batch(self, train_x, train_y):
-        d = self.model.validate(train_x, train_y)
+        d = self.model.validate(train_x, train_y, session = self._session)
         d = {'accuracy': float(d['accuracy']),
              'loss': float(d['loss']),
              'time': float(d['time'])}
@@ -136,7 +137,7 @@ class TrainingSupervisor(object):
         return d
 
     def test_on_batch(self, train_x, train_y):
-        d = self.model.test(train_x, train_y)
+        d = self.model.test(train_x, train_y, session = self._session)
         d = {'accuracy': float(d['accuracy']),
              'loss': float(d['loss']),
              'time': float(d['time']),
@@ -144,14 +145,22 @@ class TrainingSupervisor(object):
         return d
 
     def get_loss_summary(self, min_batch_index=None, max_batch_index=None):
-        x = self.train_summary.get(fields=['loss'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
-        y = self.validation_summary.get(fields=['loss'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+        x = self.train_summary.get(fields=['loss'],
+                                   min_batch_index=min_batch_index,
+                                   max_batch_index=max_batch_index)
+        y = self.validation_summary.get(fields=['loss'],
+                                        min_batch_index=min_batch_index,
+                                        max_batch_index=max_batch_index)
         return {'train': x['loss'],
                 'validation': y['loss']}
 
     def get_accuracy_summary(self, min_batch_index=None, max_batch_index=None):
-        x = self.train_summary.get(fields=['accuracy'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
-        y = self.validation_summary.get(fields=['accuracy'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+        x = self.train_summary.get(fields=['accuracy'],
+                                   min_batch_index=min_batch_index,
+                                   max_batch_index=max_batch_index)
+        y = self.validation_summary.get(fields=['accuracy'],
+                                        min_batch_index=min_batch_index,
+                                        max_batch_index=max_batch_index)
         return {'train': x['accuracy'],
                 'validation': y['accuracy']}
 
@@ -163,13 +172,13 @@ class TrainingSupervisor(object):
         self._batch_index = training_batch.get('batch_index', None)
         self._total_batches = training_batch.get('total_batches', None)
 
-    #def _clean_test_folder(self):
+    # def _clean_test_folder(self):
     #    files = [[f, os.stat(f).st_ctime]for f in glob.glob("{root}/*.json".format(root=self.test_root))]
     #    files = sorted(files, key=lambda x: x[1], reverse=True)[self.test_keep or 10:]
     #    for f in files:
     #        os.unlink(f[0])
 
-    #def get_test_results(self):
+    # def get_test_results(self):
     #    files = [[f, os.stat(f).st_ctime]for f in glob.glob("{root}/*.json".format(root=self.test_root))]
     #    files = sorted(files, key=lambda x: x[1], reverse=True)  # [self.test_keep or 10:]
     #    return [f[0] for f in files]
@@ -180,9 +189,10 @@ class TrainingSupervisor(object):
                  'predicted': int(predicted)}
                 for string, truth, predicted in out]
 
-    def run_training(self, training_data_generator, validation_data_generator=None):
+    def run_training(self, training_data_generator, validation_data_generator=None, session=None):
         validation_iterator = validation_data_generator or self.__default_validation_iterator()
-        tf_session().run(tf.global_variables_initializer())
+        # tf_session().run(tf.global_variables_initializer())
+        self._session = session
         self._training_start_time = time.time()
         last_test_time = self._training_start_time
         test_index = 1
@@ -190,7 +200,8 @@ class TrainingSupervisor(object):
             self._update_progress_info(training_batch)
             test_result_on_train = None
             if (self.test_interval is not None) and (time.time() - last_test_time >= self.test_interval):
-                test_result_on_train = self.test_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
+                test_result_on_train = self.test_on_batch(train_x=training_batch['train_x'],
+                                                          train_y=training_batch['train_y'])
                 test_result_on_train['output'] = self.__process_output(test_result_on_train['output'])
                 #[{"input": string, 'truth': int(truth), 'predicted': int(predicted)}
                 #                                  for string, truth, predicted in test_result_on_train['output']]
@@ -200,20 +211,20 @@ class TrainingSupervisor(object):
                                                 train_y=validation_batch['train_y'])
                     #result_output = result['output']
                     #test_output_file = "{model_name}-test-{index}-loss:{loss:.4f}-accuracy:{accuracy:.2f}.json"
-                    #test_output_file = test_output_file.format(model_name=type(self.model).__name__,
+                    # test_output_file = test_output_file.format(model_name=type(self.model).__name__,
                     #                                           index=test_index, loss=result['loss'],
                     #                                           accuracy=100 * result['accuracy'])
                     #test_output_path = os.path.join(self.test_root, test_output_file)
                     result['output'] = self.__process_output(result['output'])
                     #[{'input': string, 'truth': int(truth), 'predicted': int(predicted)}
                     #                    for string, truth, predicted in result['output']]
-                    #output_string = json.dumps({'train': test_result_on_train,
+                    # output_string = json.dumps({'train': test_result_on_train,
                     #                            'test': result})
-                    #with open(test_output_path, 'w') as to_file:
+                    # with open(test_output_path, 'w') as to_file:
                     #    to_file.write(output_string)
                     last_test_time = time.time()
                     test_index += 1
-                    #self._clean_test_folder()
+                    # self._clean_test_folder()
                 self.save_test(train=test_result_on_train, test=result)
 
             self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
@@ -247,50 +258,50 @@ class TrainingSupervisor(object):
     def save_test(self, train=None, test=None):
         pass
 
-class PaddedInputTrainingSupervisor(TrainingSupervisor):
-    def __init__(self, model, input_padding, padding_value=0, *args, **kwargs):
-        self.input_padding = input_padding
-        self.padding_value = padding_value
-        super(TrainWithPaddedInput, self)._init__(model, *args, **kwargs)
-
-    def train_step(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, self.input_padding) for element in train_x])
-        batch_y = np.array([element for element in train_y])
-        d = self.model.train(batch_x, batch_y)
-        print(d)
-        return d
-
-    def validation_step(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, self.input_padding) for element in train_x])
-        batch_y = np.array([element for element in train_y])
-        d = self.model.validate(batch_x, batch_y)
-        return d
-
-    def test_model(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, self.input_padding) for element in train_x])
-        batch_y = np.array([element for element in train_y])
-        d = self.model.test(batch_x, batch_y)
-        return d
-
-    def pad(self, array, length):
-        array = array[:length]
-        array += [self.padding_value] * (length - len(array))
-        return array
-
-
-class AutoencoderTrainingSupervisor(PaddedInputTrainingSupervisor):
-    def train_step(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-        d = self.model.train(batch_x, batch_x)
-        print(d)
-        return d
-
-    def validation_step(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-        d = self.model.validate(batch_x, batch_x)
-        return d
-
-    def test_model(self, train_x, train_y):
-        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-        d = self.model.validate(batch_x, batch_x)
-        return d
+# class PaddedInputTrainingSupervisor(TrainingSupervisor):
+#    def __init__(self, model, input_padding, padding_value=0, *args, **kwargs):
+#        self.input_padding = input_padding
+#        self.padding_value = padding_value
+#        super(TrainWithPaddedInput, self)._init__(model, *args, **kwargs)
+#
+#    def train_step(self, train_x, train_y):
+#        batch_x = np.array([self.pad(element, self.input_padding) for element in train_x])
+#        batch_y = np.array([element for element in train_y])
+#        d = self.model.train(batch_x, batch_y)
+#        print(d)
+#        return d
+#
+#    def validation_step(self, train_x, train_y):
+#        batch_x = np.array([self.pad(element, self.input_padding) for element in train_x])
+#        batch_y = np.array([element for element in train_y])
+#        d = self.model.validate(batch_x, batch_y)
+#        return d
+#
+#    def test_model(self, train_x, train_y):
+#        batch_x = np.array([self.pad(element, self.input_padding) for element in train_x])
+#        batch_y = np.array([element for element in train_y])
+#        d = self.model.test(batch_x, batch_y)
+#        return d
+#
+#    def pad(self, array, length):
+#        array = array[:length]
+#        array += [self.padding_value] * (length - len(array))
+#        return array
+#
+#
+# class AutoencoderTrainingSupervisor(PaddedInputTrainingSupervisor):
+#    def train_step(self, train_x, train_y):
+#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
+#        d = self.model.train(batch_x, batch_x)
+#        print(d)
+#        return d
+#
+#    def validation_step(self, train_x, train_y):
+#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
+#        d = self.model.validate(batch_x, batch_x)
+#        return d
+#
+#    def test_model(self, train_x, train_y):
+#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
+#        d = self.model.validate(batch_x, batch_x)
+#        return d

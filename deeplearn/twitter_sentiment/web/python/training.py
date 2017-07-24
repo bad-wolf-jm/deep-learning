@@ -30,7 +30,7 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
 
     def get_test_results(self):
         files = [[f, os.stat(f).st_ctime]for f in glob.glob("{root}/*.json".format(root=self.test_root))]
-        files = sorted(files, key=lambda x: x[1], reverse=True)  # [self.test_keep or 10:]
+        files = sorted(files, key=lambda x: x[1], reverse=True)
         return [f[0] for f in files]
 
     def save_test(self, train=None, test=None):

@@ -10,6 +10,7 @@ import psutil
 import glob
 import datetime
 import time
+import web.python.bootstrap as bootstrap
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -33,16 +34,32 @@ def get_static_page(page_folder, page_name):
         ".html": "text/html",
         ".js": "application/javascript",
     }
-
     ext = os.path.splitext(page_name)[1]
     mimetype = mimetypes.get(ext, "text/html")
 
     print(page_path)
     return Response(open(page_path).read(), mimetype=mimetype)
 
+
+@app.route('/resource', methods = ['POST'])
+def update_text():
+    print(request.headers.get('contentType'))
+    print("RES", request.get_json(force=True))
+    return Response(json.dumps({"status":'ok'}), mimetype='application/json')
+
+
 @app.route('/ui')
 def get_front_page():
-    return render_template('nn_ui.html')
+    page_template = request.args.get('page', None)
+    template = 'nn_ui.html'
+    if page_template is not None:
+        template = "nn_"+page_template+'.html'
+    server_data = {
+        'model_types': bootstrap.list_model_types()
+    }
+
+    return render_template(template, model_types=bootstrap.list_model_types(),
+                           server_data=server_data)
 
 if __name__ == '__main__':
     app.run() #host='0.0.0.0')

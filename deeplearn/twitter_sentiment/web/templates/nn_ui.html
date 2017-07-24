@@ -2,11 +2,12 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>NN Tool</title>
+        <title>Neuronet Training Tool</title>
     </head>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="../static/js/highcharts.js"></script>
     <script src="../static/js/semantic.min.js"></script>
+    <link rel="stylesheet" href="static/css/icon.min.css">
     <!--<script src="../static/js/train_update.js"></script>
     <script src="../static/js/training_graphs.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
@@ -21,38 +22,25 @@
 
   <div class="ui grey top attached inverted menu">
     <div class="ui header item">
-      NN Training Tool
+      Neuronet Training Tool
     </div>
 
-    <div class="ui dropdown item">
-      Models
-      <div class="menu">
-        <div class="item">
-          <span class="text">Create new model</span>
-        </div>
-        <div class="divider"></div>
-        <div class="item">
-          Load model...
-        </div>
-        <div class="item">
-          Save current model...
-        </div>
-      </div>
-    </div>
     <div class="right menu">
        <div class="ui item">
          ByteCNN_3 (deep)
        </div>
-       <div class="ui icon item">
-         <i class="settings icon"></i>
+       <div class="ui icon dropdown item">
+         <i class="setting icon"></i>
+         <div class="menu">
+           <div class="item">
+             <span class="text" onClick="show_create_model_dialog()">New...</span>
+           </div>
+           <div class="divider"></div>
+           <div class="item">
+             Load...
+           </div>
+         </div>
        </div>
-       <div class="ui icon item">
-         <i class="save icon"></i>
-       </div>
-       <div class="ui icon item">
-         <i class="copy icon"></i>
-       </div>
-
      </div>
   </div>
 
@@ -69,70 +57,73 @@
     </div>
   </div>
 
-  <div class="ui blue modal" id="create-model">
-    <i class="close icon"></i>
+<div class="ui modal" id="create-model">
     <div class="header">
-      Create new model
+        Create new model
     </div>
     <div class="image content">
-      <div class="description">
-        <div class="ui form">
-          <div class="field">
-            <input type="text" placeholder="Model name">
-          </div>
-          <div class="field">
-            <textarea rows="2" placeholder="Model description"></textarea>
-          </div>
-          <div class="ui fluid selection dropdown">
-            <input name="user" type="hidden">
-            <i class="dropdown icon"></i>
-            <div class="default text">Select model type</div>
-            <div class="menu">
-              <div class="item" data-value="jenny">
-                <img class="ui mini avatar image" src="/images/avatar/small/jenny.jpg">
-                Jenny Hess
-              </div>
-              <div class="item" data-value="elliot">
-                <img class="ui mini avatar image" src="/images/avatar/small/elliot.jpg">
-                Elliot Fu
-              </div>
-              <div class="item" data-value="stevie">
-                <img class="ui mini avatar image" src="/images/avatar/small/stevie.jpg">
-                Stevie Feliciano
-              </div>
-              <div class="item" data-value="christian">
-                <img class="ui mini avatar image" src="/images/avatar/small/christian.jpg">
-                Christian
-              </div>
-              <div class="item" data-value="matt">
-                <img class="ui mini avatar image" src="/images/avatar/small/matt.jpg">
-                Matt
-              </div>
-              <div class="item" data-value="justen">
-                <img class="ui mini avatar image" src="/images/avatar/small/justen.jpg">
-                Justen Kitsune
-              </div>
+        <div class="description">
+            <div class="ui form">
+                <div class="field">
+                    <input id='new-model-name' type="text" placeholder="Model name">
+                </div>
+                <div class="ui fluid selection icon dropdown">
+                    <input name="user" type="hidden" id='new-model-type'>
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Select model type</div>
+                    <div class="icon menu">
+                        {% for type_description in model_types%}
+                          <div class="tags icon item" data-value="{{ type_description['name']}}">
+                            <b><i class="code icon"></i></b>
+                            {{ type_description['name'] }}
+                          </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <p></p>
+                <div class="field">
+                    <textarea rows="3" placeholder="Model description"></textarea>
+                </div>
             </div>
-          </div>
-      </div>
-      </div>
+        </div>
     </div>
-
     <div class="actions">
-      <div class="ui positive right labeled icon button">
-        Create
-        <i class="checkmark icon"></i>
-      </div>
-      <div class="ui black deny button">
+        <div class="ui positive right labeled icon button" onClick="create_new_model()">
+            Create
+            <i class="checkmark icon"></i>
+        </div>
+        <div class="ui black deny button">
         Cancel
-      </div>
+        </div>
     </div>
-  </div>
+</div>
+
 
 
 <script>
 $('.ui.dropdown').dropdown();
-$('#create-model').modal('show');
+function create_new_model() {
+    $.ajax({
+         type: "post",
+         url: "resource",
+         dataType: "json",
+         success: function (msg) {
+             if (msg) {
+                 //alert("Somebody was added in list !"+msg);
+                 console.log(msg);
+                 //location.reload(true);
+             } else {
+                 alert("Cannot add to list !");
+             }
+         },
+
+         data: JSON.stringify({test: 'data to send'})
+     });
+}
+
+function show_create_model_dialog() {
+    $('#create-model').modal('show');
+}
 </script>
 
     </body>

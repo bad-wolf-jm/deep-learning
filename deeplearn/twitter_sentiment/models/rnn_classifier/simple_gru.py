@@ -75,30 +75,38 @@ class SimpleGRUClassifier(BaseModel):
             self.batch_loss = tf.reduce_mean(loss, axis=0)
             self.batch_accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.cast(self.true_value, tf.uint8), tf.cast(self.predicted_value, tf.uint8)), tf.float32))
 
-    def train(self, train_x, train_y):
+    def train(self, train_x, train_y, session=None):
         t_1 = time.time()
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
         feed_dict = {self._input: batch_x, self.output_expected: batch_y}
-        _, lo, acc = tf_session().run([self.train_step, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        _, lo, acc = self.run_ops(session,
+                                  [self.train_step, self.batch_loss, self.batch_accuracy],
+                                  feed_dict=feed_dict)
+        #_, lo, acc = tf_session().run([self.train_step, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
 
-    def validate(self, train_x, train_y):
+    def validate(self, train_x, train_y, session=None):
         t_1 = time.time()
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
         feed_dict = {self._input: batch_x, self.output_expected: batch_y}
-        lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        _, lo, acc = self.run_ops(session, [self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        #lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
 
-    def test(self, train_x, train_y):
+    def test(self, train_x, train_y, session=None):
         t_0 = time.time()
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
         feed_dict = {self._input: batch_x, self.output_expected: batch_y}
-        t_v, p_v, lo, acc, o_p = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy, tf.nn.softmax(self.output_predicted)], feed_dict=feed_dict)
+        t_v, p_v, lo, acc, o_p = self.run_ops(session,
+                                              [self.true_value, self.predicted_value, self.batch_loss,
+                                               self.batch_accuracy, tf.nn.softmax(self.output_predicted)],
+                                              feed_dict=feed_dict)
+        #t_v, p_v, lo, acc, o_p = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy, tf.nn.softmax(self.output_predicted)], feed_dict=feed_dict)
         t = time.time() - t_0
         batch_strings = []
         for i, line in enumerate(batch_x):

@@ -6,6 +6,9 @@ from train.supervisor import TrainingSupervisor
 from train.data import sentiment_training_generator, cms_training_generator
 import argparse
 from config import stream
+import tensorflow as tf
+from models.tf_session import tf_session
+
 
 flags = argparse.ArgumentParser()
 stream.fill_arg_parser(flags)
@@ -58,6 +61,7 @@ def start_training():
     model = ByteCNN()
     model.build_training_model()
     model.initialize()
+    tf_session().run(tf.global_variables_initializer())
     foo = TrainingSupervisor(model, flags.validation_interval)
     supervisor = foo
     data_generator = sentiment_training_generator(batch_size=flags.batch_size, epochs=flags.epochs, validation_size=flags.validation_size)

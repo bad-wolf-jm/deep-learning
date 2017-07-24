@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Neuronet Training Tool</title>
+    </head>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="../static/js/highcharts.js"></script>
+    <script src="../static/js/semantic.min.js"></script>
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <link rel="stylesheet" href="static/css/icon.min.css">
+    <link rel="stylesheet" href="../static/css/semantic.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <body class="template">
+        <div class="ui grey top attached inverted menu">
+            <div class="ui header item">
+            Neuronet Training Tool
+            </div>
+            <div class="right menu">
+                <div class="ui item">
+                    ByteCNN_3 (deep)
+                </div>
+                <div class="ui icon dropdown item">
+                    <i class="setting icon"></i>
+                    <div class="menu">
+                        <div class="item">
+                            <span class="text" onClick="show_create_model_dialog()">New...</span>
+                        </div>
+                        <div class="divider"></div>
+                            <div class="item">
+                            Load...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p></p>
+        <div class="ui container">
+            {% block page_content %}
+            {% endblock page_content %}
+        </div>
+        <script>
+            $('.ui.dropdown').dropdown();
+            function create_new_model() {
+                $.ajax({
+                    type: "post",
+                    url: "resource",
+                    dataType: "json",
+                    success: function (msg) {
+                        if (msg) {
+                            console.log(msg);
+                        } else {
+                            alert("Cannot add to list !");
+                        }
+                    },
+                    data: JSON.stringify({test: 'data to send'})
+                });
+            }
+
+            function show_create_model_dialog() {
+            $('#create-model').modal('show');
+            }
+        </script>
+    </body>
+</html>

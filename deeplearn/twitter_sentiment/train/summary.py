@@ -58,7 +58,7 @@ class StreamSummary(object):
         return return_value
 
 
-#class TrainingSummary(object):
+# class TrainingSummary(object):
 #    def __init__(self, summary_span=None, fields=None):
 #        super(TrainingSummary, self).__init__()
 #        self.train_summary = StreamSummary(summary_span, fields)

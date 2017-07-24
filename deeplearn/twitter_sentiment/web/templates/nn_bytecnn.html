@@ -1,0 +1,70 @@
+{% extends "nn_skeleton.html" %}
+
+{% block page_content %}
+<h2 class='ui top attached block header'>
+    Type of model.
+</h2>
+<p class='ui attached segment'>
+    A possibly long text that describes that particular type of model.
+</p>
+<p class='ui bottom attached segment'>
+    Link to article, if there is one.
+</p>
+
+<div class="ui centered cards">
+  <div class="card">
+    <div class="content">
+      <img class="right floated mini ui image" src="/images/avatar/large/elliot.jpg">
+      <div class="header">
+           Name of instance
+      </div>
+      <div class="meta">
+        Date
+      </div>
+      <div class="meta">
+        Last Training Info (if any)
+      </div>
+      <div class="description">
+        Each card represents an instance of this type of model, along with some information
+        about the performance of said instance during its last training session, and information about
+        notes made during training (number).  This text is very long because I want to see if the
+        card has a maximum. (the text should be truncated if it is too long).  Probably best of the text is kept short
+      </div>
+    </div>
+    <div class="content">
+        <i class="comment icon"></i>
+        3 comments
+      </div>
+    <div class="extra content">
+      <div class="ui two buttons">
+        <div class="ui basic black button">Train</div>
+        <div class="ui basic black button">Test</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+      <div class="blurring dimmable image">
+        <div class="ui inverted dimmer">
+          <div class="content">
+            <div class="center">
+              <div class="ui primary button">Add Friend</div>
+            </div>
+          </div>
+        </div>
+        <img src="/images/avatar/large/jenny.jpg">
+      </div>
+      <div class="content">
+        <a class="header">Create new model</a>
+        <div class="meta">
+          <span class="date">Create in Aug 2014</span>
+        </div>
+      </div>
+      <div class="extra content">
+        <a>
+          <i class="users icon"></i>
+          2 Members
+        </a>
+      </div>
+    </div>
+</div>
+{% endblock %}

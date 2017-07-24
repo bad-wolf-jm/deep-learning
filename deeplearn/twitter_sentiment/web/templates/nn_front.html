@@ -1,0 +1,46 @@
+{% extends "nn_skeleton.html" %}
+{% block page_content %}
+    <div class="ui segment">
+        <div class="ui items">
+            {% for model_type in server_data['model_types']%}
+                <div class="item">
+                    <div class="image">
+                      <img src="static/images/brain-ai-newsletter.jpg">
+                    </div>
+                    <div class="content">
+                        <a class="header">{{ model_type['display_name'] }}</a>
+                        <div class="ui right floated label">
+                            {% if model_type['instance_count'] is not none and model_type['instance_count'] != 0 %}
+                                {{ model_type['instance_count'] }} models
+                            {% else %}
+                                No models
+                            {% endif %}
+                        </div>
+                        <div class="meta">
+                            <span>{{ model_type['description'] }}</span>
+                        </div>
+                        <div class="description">
+                            <p></p>
+                        </div>
+                        <div class="extra">
+                            {% if model_type['citation'] is not none %}
+                                {{ model_type['citation'] }}
+                            {% else %}
+                                <i>(No citation provided)</i>
+                            {% endif %}
+                        </div>
+                        <div class="extra">
+                            {# Model inputs go here #}
+                            <div class="ui label">
+                                Model type
+                            </div>
+                            <div class="ui label">
+                                Input type
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

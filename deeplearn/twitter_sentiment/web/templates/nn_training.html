@@ -1,25 +1,5 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>NN Training Monitor</title>
-    </head>
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="../js/highcharts.js"></script>
-    <script src="../js/semantic.min.js"></script>
-    <script src="../js/train_update.js"></script>
-    <script src="../js/training_graphs.js"></script>
-    <script src="https://code.highcharts.com/highcharts-more.js"></script>
-    <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="../css/semantic.min.css">
-    <link rel="stylesheet" href="../css/icon.min.css">
-    <!-- <link rel="stylesheet" href="../css/semantic.darkly.min.css"> -->
-    <link rel="stylesheet" href="../css/highcharts.css">
-    <link rel="stylesheet" href="../css/style.css">
-    <body>
-
+{% extends "nn_skeleton.html" %}
+{% block page_content %}
   <div class='ui container' style="height:200px">
       <h1 class="ui center align icon header" style="width:100%; padding:40px">
       <i class="desktop icon"></i>
@@ -115,19 +95,4 @@
 
     </div>
 </div>
-    </body>
-<script type="text/javascript">
-setInterval(update_stats, 2000);
-setInterval(update_progress, 2000);
-setInterval(update_graphs, 2000);
-setInterval(update_cpuinfo, 2000);
-
-$(document).ready(
-    function ()
-    {
-        loss_graph = make_graph($('#graph').height(), 'loss-graph-content');
-        accuracy_graph = make_graph($('#graph').height(), 'acc-graph-content');
-    }
-);
-</script>
-</html>
+{% endblock %}

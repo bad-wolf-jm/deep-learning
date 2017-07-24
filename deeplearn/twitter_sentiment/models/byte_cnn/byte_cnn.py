@@ -89,18 +89,18 @@ class ByteCNN(BaseModel):
             conv_block_1, [-1, conv_block_1.shape[2].value, conv_block_1.shape[3].value])
         return conv_block_1
 
-    def var(self, input_shape, trainable=True, name="variable", scope=None):
-        full_variable_name = '{scope}/{name}'.format(scope=tf.get_variable_scope().name, name=name)
-        initializer = self._variables.get(full_variable_name, None)
-        if initializer is None:
-            initializer = tf.random_normal(input_shape, stddev=0.35)
-        v = tf.Variable(initializer, name=name)
-        self._variables[full_variable_name] = v
-        return v
-
-    def initialize(self):
-        op = tf.variables_initializer(self._variables.values())
-        tf_session().run(op)
+    #def var(self, input_shape, trainable=True, name="variable", scope=None):
+    #    full_variable_name = '{scope}/{name}'.format(scope=tf.get_variable_scope().name, name=name)
+    #    initializer = self._variables.get(full_variable_name, None)
+    #    if initializer is None:
+    #        initializer = tf.random_normal(input_shape, stddev=0.35)
+    #    v = tf.Variable(initializer, name=name)
+    #    self._variables[full_variable_name] = v
+    #    return v
+#
+    #def initialize(self):
+    #    op = tf.variables_initializer(self._variables.values())
+    #    tf_session().run(op)
 
     def build_training_model(self):
         self.build_inference_model()
@@ -123,12 +123,15 @@ class ByteCNN(BaseModel):
         print(p_v)
         return {'loss': lo, 'accuracy': acc}
 
-    def test(self, train_x, train_y):
+    def test(self, train_x , train_y, session=None):
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
         t_0 = time.time()
         feed_dict = {self._input: batch_x, self._output: batch_y}
-        t_v, p_v, lo, acc = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        t_v, p_v, lo, acc = self.run_ops(session,
+                                         [self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy],
+                                         feed_dict=feed_dict)
+        #t_v, p_v, lo, acc = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         t = time.time() - t_0
         batch_strings = []
         for line in batch_x:
@@ -136,17 +139,17 @@ class ByteCNN(BaseModel):
             batch_strings.append(l)
         return {'loss': lo, 'accuracy': acc, 'time': t, 'output': zip(batch_strings, t_v, p_v)}
 
-    def train(self, train_x, train_y):
+    def train(self, train_x, train_y, session=None):
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
-        d = super(ByteCNN, self).train(batch_x, batch_y)
+        d = super(ByteCNN, self).train(batch_x, batch_y, session)
         print (d)
         return d
 
-    def validate(self, train_x, train_y):
+    def validate(self, train_x, train_y, session=None):
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
-        d = super(ByteCNN, self).validate(batch_x, batch_y)
+        d = super(ByteCNN, self).validate(batch_x, batch_y, session)
         #d = self.model.validate(batch_x, batch_y)
         print (d)
         return d
