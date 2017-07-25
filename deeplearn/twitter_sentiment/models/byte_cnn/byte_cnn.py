@@ -89,7 +89,7 @@ class ByteCNN(BaseModel):
             conv_block_1, [-1, conv_block_1.shape[2].value, conv_block_1.shape[3].value])
         return conv_block_1
 
-    #def var(self, input_shape, trainable=True, name="variable", scope=None):
+    # def var(self, input_shape, trainable=True, name="variable", scope=None):
     #    full_variable_name = '{scope}/{name}'.format(scope=tf.get_variable_scope().name, name=name)
     #    initializer = self._variables.get(full_variable_name, None)
     #    if initializer is None:
@@ -98,7 +98,7 @@ class ByteCNN(BaseModel):
     #    self._variables[full_variable_name] = v
     #    return v
 #
-    #def initialize(self):
+    # def initialize(self):
     #    op = tf.variables_initializer(self._variables.values())
     #    tf_session().run(op)
 
@@ -123,7 +123,7 @@ class ByteCNN(BaseModel):
         print(p_v)
         return {'loss': lo, 'accuracy': acc}
 
-    def test(self, train_x , train_y, session=None):
+    def test(self, train_x, train_y, session=None):
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
         t_0 = time.time()
@@ -131,7 +131,6 @@ class ByteCNN(BaseModel):
         t_v, p_v, lo, acc = self.run_ops(session,
                                          [self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy],
                                          feed_dict=feed_dict)
-        #t_v, p_v, lo, acc = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         t = time.time() - t_0
         batch_strings = []
         for line in batch_x:
@@ -150,16 +149,8 @@ class ByteCNN(BaseModel):
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
         d = super(ByteCNN, self).validate(batch_x, batch_y, session)
-        #d = self.model.validate(batch_x, batch_y)
         print (d)
         return d
-
-    #def test_model(self, train_x, train_y):
-    #    batch_x = np.array([self.pad(element, self.seq_length) for element in train_x])
-    #    batch_y = np.array([element for element in train_y])
-    #    d = super(ByteCNN, self).validate(batch_x, batch_y)
-    #    d = self.model.test(batch_x, batch_y)
-    #    return d
 
     def pad(self, array, length):
         array = list(array[:length])

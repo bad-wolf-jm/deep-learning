@@ -70,7 +70,6 @@ class Tweet2Vec_BiGRU(BaseModel):
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
         feed_dict = {self._input: batch_x, self.output_expected: batch_y}
-        #_, lo, acc = tf_session().run([self.train_step, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         _, lo, acc = self.run_ops(session,
                                   [self.train_step, self.batch_loss, self.batch_accuracy],
                                   feed_dict=feed_dict)
@@ -85,7 +84,6 @@ class Tweet2Vec_BiGRU(BaseModel):
         lo, acc = self.run_ops(session,
                                [self.batch_loss, self.batch_accuracy],
                                feed_dict=feed_dict)
-        #lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
 
@@ -98,8 +96,6 @@ class Tweet2Vec_BiGRU(BaseModel):
                                                    [self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy,
                                                     tf.nn.softmax(self.output_predicted), self.output_expected_oh],
                                                    feed_dict=feed_dict)
-        #t_v, p_v, lo, acc, o_p, o_e = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy,
-        #                                                tf.nn.softmax(self.output_predicted), self.output_expected_oh], feed_dict=feed_dict)
         t = time.time() - t_0
         batch_strings = []
         for i, line in enumerate(batch_x):

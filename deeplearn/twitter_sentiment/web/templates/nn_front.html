@@ -1,17 +1,35 @@
 {% extends "nn_skeleton.html" %}
+{% macro format_citation(citation_data) %}
+  From: <i><b>{{ citation_data['title'] }}</b></i>
+  {% if citation_data['author'] is not none %}
+    , by {{ citation_data['author'] }}
+  {% endif %}
+  {% if citation_data['date'] is not none %}
+    , {{ citation_data['date'] }}
+  {% endif %}
+  {% if citation_data['link'] is not none %}
+    , {{ citation_data['link'] }}
+  {% endif %}
+{% endmacro %}
 {% block page_content %}
     <div class="ui segment">
-        <div class="ui items">
-            {% for model_type in server_data['model_types']%}
+        <div class="ui divided items">
+            {% for model_type in model_types%}
                 <div class="item">
                     <div class="image">
-                      <img src="static/images/brain-ai-newsletter.jpg">
+                      <img src="../static/images/brain-ai-newsletter.jpg">
                     </div>
                     <div class="content">
-                        <a class="header">{{ model_type['display_name'] }}</a>
+                        <a class="header" href="models/{{ model_type['name'] }}">
+                          {{ model_type['display_name'] }}
+                        </a>
                         <div class="ui right floated label">
-                            {% if model_type['instance_count'] is not none and model_type['instance_count'] != 0 %}
+                            {% if model_type['instance_count'] is not none %}
+                              {% if model_type['instance_count'] > 1 %}
                                 {{ model_type['instance_count'] }} models
+                              {% else %}
+                                1 model
+                              {% endif %}
                             {% else %}
                                 No models
                             {% endif %}
@@ -24,18 +42,25 @@
                         </div>
                         <div class="extra">
                             {% if model_type['citation'] is not none %}
-                                {{ model_type['citation'] }}
+                                {{ format_citation(model_type['citation']) }}
                             {% else %}
                                 <i>(No citation provided)</i>
                             {% endif %}
                         </div>
                         <div class="extra">
                             {# Model inputs go here #}
-                            <div class="ui label">
-                                Model type
+                            <div class="ui purple label">
+                                Type:
+                                <div class="detail">
+                                  {{ model_type['type'] }}
+                                </div>
+
                             </div>
-                            <div class="ui label">
-                                Input type
+                            <div class="ui blue label">
+                                Input:
+                                <div class="detail">
+                                  {{ model_type['input_type'] }}
+                                </div>
                             </div>
                         </div>
                     </div>

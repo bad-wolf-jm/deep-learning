@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Neuronet Training Tool</title>
+    </head>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="../static/js/highcharts.js"></script>
+    <script src="../static/js/semantic.min.js"></script>
+    <link rel="stylesheet" href="static/css/icon.min.css">
+    <!--<script src="../static/js/train_update.js"></script>
+    <script src="../static/js/training_graphs.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>-->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"> -->
+    <!-- <link rel="stylesheet" href="../static/css/highcharts.css">-->
+    <link rel="stylesheet" href="../static/css/semantic.min.css">
+    <!-- <link rel="stylesheet" href="../static/css/semantic.darkly.min.css"> -->
+   <link rel="stylesheet" href="../static/css/style.css">
+    <body class="template">
+
+  <div class="ui grey top attached inverted menu">
+    <div class="ui header item">
+      Neuronet Training Tool
+    </div>
+
+    <div class="right menu">
+       <div class="ui item">
+         ByteCNN_3 (deep)
+       </div>
+       <div class="ui icon dropdown item">
+         <i class="setting icon"></i>
+         <div class="menu">
+           <div class="item">
+             <span class="text" onClick="show_create_model_dialog()">New...</span>
+           </div>
+           <div class="divider"></div>
+           <div class="item">
+             Load...
+           </div>
+         </div>
+       </div>
+     </div>
+  </div>
+<p></p><p></p>
+
+<div class="ui container">
+    <form class="ui fluid form">
+        <h2 class="ui top attached segment">
+            Model metadata
+        </h2>
+        <div class="ui attached segment">
+            <input type="text" name="" placeholder="Name of model">
+            <p></p>
+            <textarea type="text" name="" placeholder="Description"></textarea>
+        </div>
+        <h2 class="ui attached segment">
+            Input parameters
+        </h2>
+        <div class="ui attached segment">
+            <div class='inline field'>
+                <div class="ui labeled input">
+                    <div class="ui label">
+                        Sequence length:
+                    </div>
+                    <input type="text" name="" value="default value" id='seq_length'>
+                </div>
+                <div class="ui left pointing basic label">
+                    Maximal length of an input sequence
+                </div>
+
+            </div>
+            <div class="inline field">
+                <div class="ui labeled input">
+                    <div class="ui label">
+                        Encoding dimension:
+                    </div>
+                    <input type="text" name="" value="default value" id='embedding_dimension'>
+                </div>
+                <div class="ui left pointing basic label">
+                    Input encoding dimension
+                </div>
+
+            </div>
+            <div class="inline field">
+                <div class="ui labeled input">
+                    <div class="ui label">
+                        Number of categories:
+                    </div>
+                    <input type="text" name="" value="default value" id='num_categories'>
+                </div>
+                <div class="ui left pointing basic label">
+                    Model output dimension
+                </div>
+            </div>
+            {# <div class="ui divider"></div> #}
+        </div>
+        <h2 class="ui attached segment">
+            Model parameters
+        </h2>
+        <div class="ui attached segment">
+            <div class="inline field">
+                <div class="ui labeled input">
+                    <div class="ui label">
+                        Level features:
+                    </div>
+                    <input type="text" name="" value="default value" id='num_categories'>
+                </div>
+                <div class="ui left pointing basic label">
+                    Number of output features for each convolutional level
+                </div>
+            </div>
+
+            <div class="inline field">
+                <div class="ui labeled input">
+                    <div class="ui label">
+                        Sublevels:
+                    </div>
+                    <input type="text" name="" value="default value" id='num_categories'>
+                </div>
+                <div class="ui left pointing basic label">
+                    Number of convolutional blocks for each level
+                </div>
+            </div>
+            <div class="inline field">
+                <div class="ui labeled input">
+                    <div class="ui label">
+                        Classifier layers:
+                    </div>
+                    <input type="text" name="" value="default value" id='num_categories'>
+                </div>
+                <div class="ui left pointing basic label">
+                    Output dimensions for each fully connected layer
+                </div>
+            </div>
+
+
+        </div>
+        <h2 class="ui attached segment">
+            Dataset
+        </h2>
+        <div class="ui attached segment">
+            Dropdown list of datasets. Details populated on choice. The dataset is attached to the model.
+            Also sets the number of categories of the model. Cannot change (should change model)
+        </div>
+
+    </form>
+</div>
+
+
+
+<script>
+$('.ui.dropdown').dropdown();
+function create_new_model() {
+    $.ajax({
+         type: "post",
+         url: "resource",
+         dataType: "json",
+         success: function (msg) {
+             if (msg) {
+                 //alert("Somebody was added in list !"+msg);
+                 console.log(msg);
+                 //location.reload(true);
+             } else {
+                 alert("Cannot add to list !");
+             }
+         },
+
+         data: JSON.stringify({test: 'data to send'})
+     });
+}
+
+function show_create_model_dialog() {
+    $('#create-model').modal('show');
+}
+</script>
+
+    </body>
+</html>

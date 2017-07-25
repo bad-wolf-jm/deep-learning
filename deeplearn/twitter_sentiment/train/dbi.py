@@ -21,7 +21,6 @@ class DBIterator(object):
             yield item['batch']
 
 
-
 class DBConnection(object):
     def __init__(self, host='localhost', user='root', password='root'):
         super(DBConnection, self).__init__()
@@ -123,6 +122,7 @@ class DBConnection(object):
         iterator.total_number_of_batches = total_num_batches
         iterator.number_of_epochs = epochs
         return iterator
+
 
 if __name__ == '__main__':
     db = DBConnection(host='localhost', user='root', password='root')

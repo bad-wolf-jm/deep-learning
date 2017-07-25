@@ -2,7 +2,7 @@ from train.dbi import DBConnection
 
 db_host = '127.0.0.1'
 db_user = 'root'
-db_password = ''
+db_password = 'root'
 
 db_connection = DBConnection(host=db_host, user=db_user, password=db_password)
 db_connection.connect('sentiment_analysis_data')
@@ -38,7 +38,7 @@ def generate_sentiment_batches(min_id=0, max_id=None, batch_size=10, epochs=None
         yield i
 
 
-def sentiment_training_generator(batch_size=10, epochs=None, validation_size=None):
+def sentiment_training_generator(batch_size=10, epochs=None, validation_size=None, test_size=None):
     if validation_size is not None:
         N = count_rows('trinary_sentiment_dataset')
         test = N // 100
@@ -47,9 +47,19 @@ def sentiment_training_generator(batch_size=10, epochs=None, validation_size=Non
         N = None
         test = 0
         validation_iterator = None
+    if test_size is not None:
+        N = count_rows('trinary_sentiment_dataset')
+        test = N // 100
+        test_iterator = generate_sentiment_batches(min_id=0, max_id=test, batch_size=test_size, epochs=None)
+    else:
+        N = None
+        test = 0
+        test_iterator = None
+
     batch_generator = generate_sentiment_batches(min_id=test + 1, batch_size=batch_size, epochs=epochs)
     return {'train': batch_generator,
-            'validation': validation_iterator}
+            'validation': validation_iterator,
+            'test': test_iterator}
 
 
 def generate_cms_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
@@ -58,7 +68,7 @@ def generate_cms_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
         yield i
 
 
-def cms_training_generator(batch_size=10, epochs=None, validation_size=None):
+def cms_training_generator(batch_size=10, epochs=None, validation_size=None, test_size=None):
     if validation_size is not None:
         N = count_rows('trinary_sentiment_dataset')
         test = N // 100
@@ -67,6 +77,15 @@ def cms_training_generator(batch_size=10, epochs=None, validation_size=None):
         N = None
         test = 0
         validation_iterator = None
+    if test_size is not None:
+        N = count_rows('trinary_sentiment_dataset')
+        test = N // 100
+        test_iterator = generate_cms_batches(min_id=0, max_id=test, batch_size=test_size, epochs=None)
+    else:
+        N = None
+        test = 0
+        test_iterator = None
     batch_generator = generate_cms_batches(min_id=test + 1, batch_size=batch_size, epochs=epochs)
     return {'train': batch_generator,
-            'validation': validation_iterator}
+            'validation': validation_iterator,
+            'test': test_iterator}

@@ -10,35 +10,18 @@ import datetime
 
 
 class TrainingSupervisor(object):
-    def __init__(self, model, validation_interval=None, test_interval=None, summary_span=None, checkpoint_interval=None,
-                 test_keep=None, checkpoint_keep=None):
+    def __init__(self, model, validation_interval=None, test_interval=None,
+                 summary_span=None, checkpoint_interval=None): #, test_keep=None, checkpoint_keep=None):
         super(TrainingSupervisor).__init__()
         self.model = model
         self.batch_index = 0
-
-        #_model_data_root = '~/.sentiment_analysis/training/{model_name}'.format(model_name=type(self.model).__name__)
-        #_model_data_root = os.path.expanduser(_model_data_root)
-        #_model_data_files = ['test', 'checkpoints', 'metadata']
-#
-#        for p in _model_data_files:
-#            _x = os.path.join(_model_data_root, p)
-#            if not os.path.exists(_x):
-#                os.makedirs(_x)
-
         self.validation_interval = validation_interval
-        self.checkpoint_interval = checkpoint_interval  # in batches
-        self.checkpoint_keep = checkpoint_keep
+        self.checkpoint_interval = checkpoint_interval  # in seconds
         self.test_interval = 1  # test_interval in seconds
-        self.test_keep = test_keep
-
-        #self.checkpoint_root = os.path.join(_model_data_root, 'checkpoints')
-        #self.test_root = os.path.join(_model_data_root, 'test')
-        #self.metadata_root = os.path.join(_model_data_root, 'metadata')
 
         fields = ['loss', 'accuracy', 'time']
         self.train_summary = StreamSummary(summary_span, fields)
         self.validation_summary = StreamSummary(summary_span, fields)
-
         self.batch_index = 0
         self._epoch_number = None
         self._total_epochs = None
@@ -172,136 +155,58 @@ class TrainingSupervisor(object):
         self._batch_index = training_batch.get('batch_index', None)
         self._total_batches = training_batch.get('total_batches', None)
 
-    # def _clean_test_folder(self):
-    #    files = [[f, os.stat(f).st_ctime]for f in glob.glob("{root}/*.json".format(root=self.test_root))]
-    #    files = sorted(files, key=lambda x: x[1], reverse=True)[self.test_keep or 10:]
-    #    for f in files:
-    #        os.unlink(f[0])
-
-    # def get_test_results(self):
-    #    files = [[f, os.stat(f).st_ctime]for f in glob.glob("{root}/*.json".format(root=self.test_root))]
-    #    files = sorted(files, key=lambda x: x[1], reverse=True)  # [self.test_keep or 10:]
-    #    return [f[0] for f in files]
-
     def __process_output(self, out):
         return [{"input": string,
                  'truth': int(truth),
                  'predicted': int(predicted)}
                 for string, truth, predicted in out]
 
-    def run_training(self, training_data_generator, validation_data_generator=None, session=None):
+    def run_training(self, training_data_generator, validation_data_generator=None, test_data_generator=None, session=None):
         validation_iterator = validation_data_generator or self.__default_validation_iterator()
-        # tf_session().run(tf.global_variables_initializer())
+        test_iterator = test_data_generator or self.__default_validation_iterator()
         self._session = session
         self._training_start_time = time.time()
         last_test_time = self._training_start_time
+        last_checkpoint_time = self._training_start_time
+
         test_index = 1
         for training_batch in training_data_generator:
             self._update_progress_info(training_batch)
             test_result_on_train = None
-            if (self.test_interval is not None) and (time.time() - last_test_time >= self.test_interval):
+            if (self.test_interval is not None) and \
+                (time.time() - last_test_time >= self.test_interval):
                 test_result_on_train = self.test_on_batch(train_x=training_batch['train_x'],
                                                           train_y=training_batch['train_y'])
                 test_result_on_train['output'] = self.__process_output(test_result_on_train['output'])
-                #[{"input": string, 'truth': int(truth), 'predicted': int(predicted)}
-                #                                  for string, truth, predicted in test_result_on_train['output']]
-                validation_batch = next(validation_iterator)
-                if validation_batch is not None:
-                    result = self.test_on_batch(train_x=validation_batch['train_x'],
-                                                train_y=validation_batch['train_y'])
-                    #result_output = result['output']
-                    #test_output_file = "{model_name}-test-{index}-loss:{loss:.4f}-accuracy:{accuracy:.2f}.json"
-                    # test_output_file = test_output_file.format(model_name=type(self.model).__name__,
-                    #                                           index=test_index, loss=result['loss'],
-                    #                                           accuracy=100 * result['accuracy'])
-                    #test_output_path = os.path.join(self.test_root, test_output_file)
+                test_batch = next(test_iterator)
+                result=None
+                if test_batch is not None:
+                    result = self.test_on_batch(train_x=test_batch['train_x'],
+                                                train_y=test_batch['train_y'])
                     result['output'] = self.__process_output(result['output'])
-                    #[{'input': string, 'truth': int(truth), 'predicted': int(predicted)}
-                    #                    for string, truth, predicted in result['output']]
-                    # output_string = json.dumps({'train': test_result_on_train,
-                    #                            'test': result})
-                    # with open(test_output_path, 'w') as to_file:
-                    #    to_file.write(output_string)
                     last_test_time = time.time()
+                    last_checkpoint_time = time.time()
                     test_index += 1
-                    # self._clean_test_folder()
                 self.save_test(train=test_result_on_train, test=result)
 
-            self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
+            self.train_on_batch(train_x=training_batch['train_x'],
+                                train_y=training_batch['train_y'])
             self.batch_index += 1
 
-            if (self.checkpoint_interval is not None) and ((training_batch['batch_index'] % self.checkpoint_interval) == 0):
+            if (self.checkpoint_interval is not None) and \
+                (time.time() - last_checkpoint_time >= self.checkpoint_interval):
                 path = self.save_training_checkpoint('training-checkpoint.chkpt')
                 print('Saving checkpoint:', path)
 
-            if (self.validation_interval is not None) and ((training_batch['batch_index'] % self.validation_interval) == 0):
+            if (self.validation_interval is not None) and \
+                ((training_batch['batch_index'] % self.validation_interval) == 0):
                 validation_batch = next(validation_iterator)
                 if validation_batch is not None:
                     self.validate_on_batch(train_x=validation_batch['train_x'], train_y=validation_batch['train_y'])
-
-    def save_model_as(self, dirname, file_name):
-        saver = tf.train.Saver()
-        checkpoint_name = file_name
-        x = os.path.join(dirname, checkpoint_name)
-        path = saver.save(tf_session(), x)
-        return path
+            self.housekeeping()
 
     def save_training_checkpoint(self, file_name):
-        return self.save_model_as(self.checkpoint_root, file_name)
-
-    def save_model_image(self, *a):
-        return self.save_model_as('restore-model-image.chkpt')
-
-    def shutdown(self):
         pass
 
-    def save_test(self, train=None, test=None):
+    def housekeeping(self):
         pass
-
-# class PaddedInputTrainingSupervisor(TrainingSupervisor):
-#    def __init__(self, model, input_padding, padding_value=0, *args, **kwargs):
-#        self.input_padding = input_padding
-#        self.padding_value = padding_value
-#        super(TrainWithPaddedInput, self)._init__(model, *args, **kwargs)
-#
-#    def train_step(self, train_x, train_y):
-#        batch_x = np.array([self.pad(element, self.input_padding) for element in train_x])
-#        batch_y = np.array([element for element in train_y])
-#        d = self.model.train(batch_x, batch_y)
-#        print(d)
-#        return d
-#
-#    def validation_step(self, train_x, train_y):
-#        batch_x = np.array([self.pad(element, self.input_padding) for element in train_x])
-#        batch_y = np.array([element for element in train_y])
-#        d = self.model.validate(batch_x, batch_y)
-#        return d
-#
-#    def test_model(self, train_x, train_y):
-#        batch_x = np.array([self.pad(element, self.input_padding) for element in train_x])
-#        batch_y = np.array([element for element in train_y])
-#        d = self.model.test(batch_x, batch_y)
-#        return d
-#
-#    def pad(self, array, length):
-#        array = array[:length]
-#        array += [self.padding_value] * (length - len(array))
-#        return array
-#
-#
-# class AutoencoderTrainingSupervisor(PaddedInputTrainingSupervisor):
-#    def train_step(self, train_x, train_y):
-#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-#        d = self.model.train(batch_x, batch_x)
-#        print(d)
-#        return d
-#
-#    def validation_step(self, train_x, train_y):
-#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-#        d = self.model.validate(batch_x, batch_x)
-#        return d
-#
-#    def test_model(self, train_x, train_y):
-#        batch_x = np.array([self.pad(element, MAX_TWEET_LENGTH) for element in train_x])
-#        d = self.model.validate(batch_x, batch_x)
-#        return d

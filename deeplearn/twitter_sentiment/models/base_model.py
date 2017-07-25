@@ -10,7 +10,6 @@ import pickle
 class StopTraining(Exception):
     pass
 
-
 class BaseModel(object):
     """
     Encode a categorical variable as a vector of dimension `output_dimension`.
@@ -42,34 +41,12 @@ class BaseModel(object):
         op = tf.variables_initializer(self._variables.values())
         tf_session().run(op)
 
-    #def get_instance_parameters(self):
-    #    return {}
-
-    #def save_to_pickle(self, filename):
-    #    var_dict = {name: tf_session().run([self._variables[name]])[0] for name in self._variables}
-    #    weight_file = open(filename, 'wb')
-    #    pickle.dump({'instance_parameters': self.get_instance_parameters(), 'model_weights': var_dict}, weight_file)
-
-    #@classmethod
-    #def instance_from_pickle(cls, filename, training_instance=False):
-    #    weight_file = open(filename, 'rb')
-    #    model_data = pickle.load(weight_file)
-    #    inst = cls(**model_data['instance_parameters'])
-    #    inst._variables = model_data['model_weights']
-    #    if training_instance:
-    #        inst.build_training_model()
-    #    else:
-    #        inst.build_inference_model()
-    #    inst.initialize()
-    #    return inst
-
     def train(self, batch_x, batch_y, session=None):
         t_1 = time.time()
         feed_dict = {self._input: batch_x, self._output: batch_y}
         _, lo, acc = self.run_ops(session,
                                   [self.train_step, self.batch_loss, self.batch_accuracy],
                                   feed_dict=feed_dict)
-        #_, lo, acc = tf_session().run([self.train_step, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': lo, 'accuracy': acc, 'time': batch_time}
 
@@ -79,7 +56,6 @@ class BaseModel(object):
         lo, acc = self.run_ops(session,
                                [self.batch_loss, self.batch_accuracy],
                                feed_dict=feed_dict)
-        #lo, acc = tf_session().run([self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
         return {'loss': lo, 'accuracy': acc,  'time': batch_time}
 

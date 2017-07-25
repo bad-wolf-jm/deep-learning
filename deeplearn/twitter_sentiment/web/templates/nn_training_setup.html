@@ -1,0 +1,17 @@
+{% extends "nn_skeleton.html" %}
+{% macro format_citation(citation_data) %}
+  From: <i><b>{{ citation_data['title'] }}</b></i>
+  {% if citation_data['author'] is not none %}
+    , by {{ citation_data['author'] }}
+  {% endif %}
+  {% if citation_data['date'] is not none %}
+    , {{ citation_data['date'] }}
+  {% endif %}
+  {% if citation_data['link'] is not none %}
+    , {{ citation_data['link'] }}
+  {% endif %}
+{% endmacro %}
+
+{% block page_content %}
+<h1>Training setup</h1>
+{% endblock %}

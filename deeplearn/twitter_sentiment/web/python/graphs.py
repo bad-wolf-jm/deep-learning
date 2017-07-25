@@ -1,3 +1,5 @@
+import copy
+
 from models.byte_cnn.byte_cnn import ByteCNN
 from models.rnn_classifier.bidirectional_gru import Tweet2Vec_BiGRU
 from models.rnn_classifier.simple_gru import SimpleGRUClassifier
@@ -213,7 +215,7 @@ model_specs = {
 }
 
 def get_default_model_specs(type):
-    return model_specs.get(type, None)
+    return copy.deepcopy(model_specs.get(type, None))
 
 def build_skeleton(type, **init_params):
     specs = get_default_model_specs(type)

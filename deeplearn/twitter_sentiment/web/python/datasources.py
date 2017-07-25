@@ -1,3 +1,4 @@
+import copy
 from train.data import sentiment_training_generator
 from train.data import cms_training_generator
 
@@ -144,6 +145,8 @@ generator_specs = {
         'category_labels': {0:'Male',
                             1:'Female'}
     }
-
-
 }
+
+
+def get_dataset_specs(type):
+    return copy.deepcopy(generator_specs.get(type, None))

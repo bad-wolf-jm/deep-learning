@@ -5,24 +5,48 @@
         <title>Neuronet Training Tool</title>
     </head>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="../static/js/highcharts.js"></script>
-    <script src="../static/js/semantic.min.js"></script>
+    <script src="http://localhost:5000/static/js/highcharts.js"></script>
+    <script src="http://localhost:5000/static/js/semantic.min.js"></script>
+    <script src="http://localhost:5000/static/js/utilities.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+
+    {% block header_scripts %}
+    {% endblock %}
     <script type="text/javascript" async
       src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
-    <link rel="stylesheet" href="static/css/icon.min.css">
-    <link rel="stylesheet" href="../static/css/semantic.min.css">
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="http://localhost:5000/static/css/icon.min.css">
+    <link rel="stylesheet" href="http://localhost:5000/static/css/semantic.min.css">
+    <link rel="stylesheet" href="http://localhost:5000/static/css/style.css">
     <body class="template">
         <div class="ui grey top attached inverted menu">
             <div class="ui header item">
-            Neuronet Training Tool
+            <a href="http://localhost:5000/ui/types">Neuronet Training Tool</a>
             </div>
             <div class="right menu">
                 <div class="ui item">
-                    ByteCNN_3 (deep)
+                  <div class="ui purple label">
+                    <i class="large microchip icon"></i>
+                    CPU:
+                    <div class="detail" id='stats-cpu-usage'>
+                      ...
+                    </div>
+                  </div>
+                  <div class="ui green icon label">
+                    <i class="large disk outline icon"></i>
+                    Memory:
+                    <div class="detail" id='stats-memory-usage'>
+                      ...
+                    </div>
+                  </div>
+
                 </div>
-                <div class="ui icon dropdown item">
+                <a class="ui item" href="http://localhost:5000/ui/training">
+                    {# <i class="notched circle loading icon"></i> #}
+                    ByteCNN_3 (deep)
+                </a>
+                {# <div class="ui icon dropdown item">
                     <i class="setting icon"></i>
                     <div class="menu">
                         <div class="item">
@@ -33,7 +57,7 @@
                             Load...
                         </div>
                     </div>
-                </div>
+                </div> #}
             </div>
         </div>
         <p></p>
@@ -42,6 +66,20 @@
             {% endblock page_content %}
         </div>
         <script>
+            function update_cpuinfo()
+            {
+                $.getJSON('http://localhost:5000/status/system_stats.json',
+                        function(data) {
+                            cpu_percentage = data.cpu;
+                            memory_used = data.memory[0];
+                            memory_available = data.memory[1];
+                            $('#stats-cpu-usage').html(`<span style="font-size:16px">${cpu_percentage.toFixed(2)}%</span>`);
+                            $('#stats-memory-usage').html(format_memory_usage(memory_used, memory_available));
+                        }
+                    );
+
+            };
+            setInterval(update_cpuinfo, 2000);
             $('.ui.dropdown').dropdown();
             function create_new_model() {
                 $.ajax({
@@ -58,10 +96,12 @@
                     data: JSON.stringify({test: 'data to send'})
                 });
             }
-
             function show_create_model_dialog() {
             $('#create-model').modal('show');
             }
         </script>
+        {% block scripts%}
+        {% endblock %}
+
     </body>
 </html>
