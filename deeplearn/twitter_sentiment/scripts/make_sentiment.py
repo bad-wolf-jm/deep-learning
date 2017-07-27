@@ -30,7 +30,7 @@ tables = ['amazon__reviews',
           'twitch__posts',
           'twitter__tweets',
           'windows__comments',
-          'youtubeapi__comments']
+          'youtube__comments']
 
 
 def addslashes(s):
@@ -80,13 +80,15 @@ with feed_connection.cursor() as feed_cursor:
                     tweet = addslashes(tweet)
                     sanitized_tweet = addslashes(sanitized_tweet)
                     sql = """INSERT INTO trinary_sentiment_dataset
-                                            (id, sentiment, text, sanitized_text,
+                                            (id, vader_sentiment, sentiwordnet_sentiment, text, sanitized_text,
                                             char_length, byte_length,
                                             sanitized_char_length, sanitized_byte_length)
-                            VALUES ({id}, {sentiment}, '{text}', '{sanitized_tweet}',
+                            VALUES ({id}, {vader_sentiment}, {sentiwordnet_sentiment}, '{text}', '{sanitized_tweet}',
                                     {char_length}, {byte_length},
                                     {sanitized_char_length}, {sanitized_byte_length})"""
-                    sql = sql.format(id=index, sentiment=int(sent),
+                    sql = sql.format(id=index,
+                                     vader_sentiment=int(vader),
+                                     sentiwordnet_sentiment=int(sentiwordnet),
                                      text=tweet,
                                      sanitized_tweet=sanitized_tweet,
                                      char_length=tweet_stats['char_length'],

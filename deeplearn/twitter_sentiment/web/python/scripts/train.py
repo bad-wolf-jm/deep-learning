@@ -8,16 +8,23 @@ import json
 import os
 import re
 import random
+import time
 from threading import Thread
 import psutil
 import glob
 import datetime
 import threading
+import logging
+
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
 
 from web.python import bootstrap
 from web.python.bootstrap import PersistentGraph, list_model_types
 from web.python.training import PersistentTrainingSupervisor
-
+from notify.send_mail import EmailNotification
 
 TEMPLATES_ROOT = os.path.join(os.path.expanduser('~'),
                               'python',
@@ -52,6 +59,17 @@ def get_training_info():
                                     'accuracy': supervisor.get_average_training_accuracy(15)},
                        'validation': {'loss': supervisor.get_average_validation_loss(15),
                                       'accuracy': supervisor.get_average_validation_accuracy(15)}})
+
+
+@app.route('/json/latest_test.json')
+def get_latest_test():
+    files = supervisor._meta.get_confusion_matrices()
+    if len(files) > 0:
+        f = files[0]
+        with open(f) as matrix_file:
+            x = matrix_file.read()
+            return x
+    return json.dumps(None)
 
 
 @app.route('/json/training_progress.json')
@@ -112,97 +130,81 @@ def get_page(page_folder, page_name):
         return app.send_static_file(page_path)
 
 
+last_email_time = 0
+
+
 @app.route('/site/report_testing_email.html')
 def get_report_email():
-    foo = supervisor.get_test_results()
-    bar = json.loads(open(foo[0]).read())
-    training_progress = json.loads(get_training_progress())
-    test_true_values = [x['truth'] for x in bar['test']['output']]
-    test_predicted_values = [x['predicted'] for x in bar['test']['output']]
-    test_confusion_matrix = format_confusion_matrix([0, 1, 2], test_true_values, test_predicted_values)
+    global last_email_time
 
-    train_true_values = [x['truth'] for x in bar['train']['output']]
-    train_predicted_values = [x['predicted'] for x in bar['train']['output']]
-    train_confusion_matrix = format_confusion_matrix([0, 1, 2], train_true_values, train_predicted_values)
+    def __matrix_to_dict(ll):
+        return {(i, j): n for i, j, n in ll}
+    foo = supervisor._meta.get_confusion_matrices(min_date=last_email_time)
+    bar = [json.loads(open(x).read()) for x in foo]
 
-    test_loss = bar['test']['loss']
-    test_accuracy = bar['test']['accuracy'] * 100
-    train_loss = bar['train']['loss']
-    train_accuracy = bar['train']['accuracy'] * 100
-
-    epoch_percent = '{:.2f}'.format(training_progress['percent_epoch_complete'])
-    remaining_time = datetime.datetime.utcfromtimestamp(training_progress['remaining_time']).strftime('%H:%M:%S')
-    elapsed_time = datetime.datetime.utcfromtimestamp(training_progress['elapsed_time']).strftime('%H:%M:%S')
-    training_progress['epoch_progress'] = '{:.2f}'.format(training_progress['percent_epoch_complete'])
-
+    test_matrices = []
+    for file_path in foo:
+        matrix = json.loads(open(file_path).read())
+        test_time = datetime.datetime.fromtimestamp(os.stat(file_path).st_ctime)
+        t = matrix['test']
+        t['time'] = test_time.isoformat()
+        t['matrix'] = __matrix_to_dict(t['matrix'])
+        test_matrices.append(t)
+    last_email_time = time.time()
     return render_template('email.html',
-                           name=type(supervisor.model).__name__,
-                           epoch_number=training_progress['epoch_number'],
-                           total_epochs=training_progress['total_epochs'],
-                           epoch_percent=epoch_percent,
-                           remaining_time=remaining_time,
-                           elapsed_time=elapsed_time,
-                           test_loss=test_loss,
-                           test_accuracy=test_accuracy,
-                           train_loss=test_loss,
-                           train_accuracy=test_accuracy,
-                           train_confusion_matrix=train_confusion_matrix,
-                           test_confusion_matrix=test_confusion_matrix,
-                           test_table_rows=bar['test']['output'],
-                           train_table_rows=bar['train']['output'])
+                           test_matrices=test_matrices,
+                           supervisor=supervisor)
 
 
 @app.route('/ui/training')
 def display_training_status():
     template = 'nn_training.html'
     model_types = bootstrap.list_model_types()
-    return render_template(template, model_types=model_types)
-
-#def send_email_every_minute():
-#    while True:
-#        print('Sending email')
-#        try:
-#            EmailNotification.sendEmail(get_report_email(), subject="Training report")
-#            time.sleep(3600)
-#        except:
-#            time.sleep(6)
+    return render_template(template,
+                           supervisor=supervisor,
+                           model_types=model_types)
 
 
-
+def send_email_every_minute():
+    while True:
+        print('Sending email')
+        try:
+            EmailNotification.sendEmail(get_report_email(), subject="Training report")
+            time.sleep(60)
+        except:
+            time.sleep(6)
 
 
 supervisor = None
+lock = threading.Lock()
 
 
 def main_training():
     global supervisor
-    q = PersistentGraph.load(name="Script Create", type_="ByteCNN")
+    global lock
+    #q = PersistentGraph.load(name="TestRNN", type_="SimpleGRUClassifierConv")
+    #q = PersistentGraph.load(name="TestRNN", type_="SimpleGRUClassifier")
+    #q = PersistentGraph.load(name="TestRNN", type_="Tweet2Vec_BiGRU")
+    #q = PersistentGraph.load(name="Script Create", type_="ByteCNN")
+    q = PersistentGraph.load(name='Model_Tweet2Vec_BiGRU_CMSDataset', type_='Tweet2Vec_BiGRU')
+    #q = PersistentGraph.load(name='Model_ByteCNN_CMSDataset', type_='ByteCNN')#
     q.initialize(session=None, training=True, resume=False)
     train_settings = q.load_train_settings()
-
-    # NOTE Lookup the training data, like batch size, validation_size, test interval and number_of_classes
-    # of epochs to pass them to the train_model function
-    # - validation_interval
-    # - validation_size
-    # - test_interval
-    # - test_size
-    # - checkpoint_interval
-    # - number of epochs
-    # - e-mail interval
 
     train_settings = {
         'validation_interval': 5,
         'test_interval': 15 * 60,
-        'e_mail_interval': 3600,
+        'e_mail_interval': 1.5 * 3600,
         'summary_span': None,
         'checkpoint_interval': 30 * 60,
         'batch_size': 100,
         'validation_size': 100,
         'test_size': 1000,
-        'epochs': 10
+        'epochs': 30
     }
 
     model_saved_settings = q.load_train_settings()
+    model_saved_settings = model_saved_settings or {}
     train_settings.update(model_saved_settings)
 
     supervisor = PersistentTrainingSupervisor(q,
@@ -210,6 +212,7 @@ def main_training():
                                               test_interval=train_settings['test_interval'],
                                               summary_span=train_settings['summary_span'],
                                               checkpoint_interval=train_settings['checkpoint_interval'])
+    lock.release()
     supervisor.train_model(batch_size=train_settings['batch_size'],
                            validation_size=train_settings['validation_size'],
                            test_size=train_settings['test_size'],
@@ -217,9 +220,11 @@ def main_training():
 
 
 if __name__ == '__main__':
-    #q = PersistentGraph.load(name="Script Create", type_="ByteCNN")
-    #q.initialize(session=None, training=True, resume=False)
-    main_training()
-    #thread = threading.Thread(target=main_training)
-    #thread.start()
-    #app.run()
+    # main_training()
+    lock.acquire()
+    thread = threading.Thread(target=main_training)
+    thread.start()
+    lock.acquire()
+    e_mail_thread = threading.Thread(target=send_email_every_minute)
+    e_mail_thread.start()
+    app.run()

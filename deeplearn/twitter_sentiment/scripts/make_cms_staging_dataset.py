@@ -62,7 +62,7 @@ with connection.cursor() as cursor:
     I = 0
     for index, row in enumerate(entries):
         tweet = row['text']
-        sent = row['flag_id']
+        sent = row['flag_id'] - 1
         if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= 1024:
             tweet_stats = {'char_length': len(tweet),
                            'byte_length': len(tweet.encode('utf8'))}

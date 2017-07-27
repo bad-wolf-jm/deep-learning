@@ -30,7 +30,7 @@ def addslashes(s):
 
 sql_insert_statements = []
 key=0
-
+genders={'male':0, 'female':1}
 for i, g in enumerate(glob.glob(_file)):
     file_name = os.path.basename(g)
     id_, gender, age, industry, sign, _ = file_name.split('.')
@@ -48,7 +48,7 @@ for i, g in enumerate(glob.glob(_file)):
                 sql = """INSERT INTO blog_corpus (id, blogger_id, gender, age, char_length, byte_length, text) VALUES ({id}, {blogger_id}, '{gender}', {age}, {char_length}, {byte_length}, '{text}')"""
                 sql=sql.format(id=key,
                                blogger_id=id_,
-                               gender=gender,
+                               gender=genders[gender],
                                age=age,
                                text=addslashes(text),
                                char_length=len(text),

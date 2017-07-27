@@ -1,7 +1,11 @@
 import os
 import json
 import pprint
+import glob
+import time
+import datetime
 import web.python.graphs as graphs
+import web.python.datasources as datasources
 import tensorflow as tf
 
 APP_ROOT_FOLDER = os.path.expanduser("~/.sentiment-analysis/nn")
@@ -47,21 +51,30 @@ def list_type_instances(type_name):
     return []
 
 
+# TODO Class should be able to test if training is resumable
+# TODO Class should save the training status
+
+
+
 class PersistentGraph(object):
-    def __init__(self, name, model_type, dataset, **hyperparameters):
+    def __init__(self, name, model_type, dataset, description="", **hyperparameters):
         super(PersistentGraph, self).__init__()
         self.type = model_type
         self.name = name
         self.hyperparameters = hyperparameters
         self._graph = None
-        self.dataset = dataset
+        self.description = description
+        self.dataset_type = dataset
+        self.dataset = datasources.get_dataset_specs(dataset)
+        self.category_labels = self.dataset.get('category_labels')
+        self.hyperparameters['num_classes'] = self.dataset.get('number_of_classes')
 
     @property
     def graph(self):
         return self._graph
 
     def construct(self):
-        self.model_root = os.path.join(APP_MODELS_FOLDER, self.type, self.name)
+        self.model_root = os.path.join(APP_MODELS_FOLDER, self.name)
         self.weight_root = os.path.join(self.model_root, 'weights')
         self.train_root = os.path.join(self.model_root, 'training')
         self.notes_root = os.path.join(self.model_root, 'notes')
@@ -73,19 +86,23 @@ class PersistentGraph(object):
         self.training_settings_file = os.path.join(self.model_root, 'training.json')
 
     @classmethod
-    def new(cls, name, model_type, dataset_type, **hyper):
+    def new(cls, name, model_type, dataset_type, description="", **hyper):
         specs = graphs.get_default_model_specs(model_type)
+        data_specs = datasources.get_dataset_specs(dataset_type)
         parameters = {name: specs['hyperparameters'][name]['default'] for name in specs['hyperparameters']}
         parameters.update(hyper)
         pprint.pprint(parameters)
-        x = cls(name, model_type, dataset_type, **parameters)
+        x = cls(name, model_type, dataset_type, description, **parameters)
         x.construct()
         return x
 
-    def __get_files(self, root,  min_date=None, max_date=None):
+    def __get_files(self, root, template = '*.json', min_date=None, max_date=None):
         x = []
-        files = [[f, os.stat(f).st_ctime]for f in glob.glob("{root}/*.json".format(root=root))]
+        files = [[f, os.stat(f).st_ctime] for f in glob.glob("{root}/{template}".format(root=root, template=template))]
         files = sorted(files, key=lambda x: x[1], reverse=True)
+        min_date = min_date or 0
+        max_date = max_date or time.time() #datetime.datetime.toda()
+        #print (files)
         return [f[0] for f in files if f[1] >= min_date and f[1] <= max_date]
 
     def __count_files(self, root):
@@ -100,6 +117,9 @@ class PersistentGraph(object):
     def get_tests(self, min_date=None, max_date=None):
         return self.__get_files(self.test_root, min_date, max_date)
 
+    def get_confusion_matrices(self, min_date=None, max_date=None):
+        return self.__get_files(self.test_root, "test-output-matrix*.json", min_date, max_date)
+
     def count_notes(self):
         return self.__count_files(self.notes_root)
 
@@ -108,30 +128,32 @@ class PersistentGraph(object):
 
     def save_metadata(self):
         with open(self.metadata_file, 'w') as metadata_file:
-            metadata_file.write(json.dumps(self.get_metadata()))
+            metadata_file.write(json.dumps(self.get_metadata(), indent=4))
 
     def get_metadata(self):
         metadata = {}
         metadata['type'] = self.type
         metadata['name'] = self.name
+        metadata['description'] = self.description
         metadata['hyperparameters'] = self.hyperparameters
         metadata['model_root'] = self.model_root
         metadata['weight_root'] = self.weight_root
         metadata['train_root'] = self.train_root
         metadata['notes_root'] = self.notes_root
         metadata['test_root'] = self.test_root
-        metadata['dataset'] = self.dataset
+        metadata['dataset'] = self.dataset_type
         return metadata
 
     @classmethod
     def load(cls, type_, name):
-        model_root = os.path.join(APP_MODELS_FOLDER, type_, name)
+        model_root = os.path.join(APP_MODELS_FOLDER, name)
         m_path = os.path.join(model_root, 'model.json')
         t_path = os.path.join(model_root, 'train.json')
         model_metadata_file = open(m_path)
         model_metadata = json.loads(model_metadata_file.read())
         new_instance = cls(model_metadata['name'], model_metadata['type'],
                            model_metadata['dataset'],
+                           model_metadata['description'],
                            **model_metadata['hyperparameters'])
         new_instance.metadata_file = m_path
         new_instance.training_settings_file = t_path
@@ -140,7 +162,6 @@ class PersistentGraph(object):
         new_instance.train_root = model_metadata['train_root']
         new_instance.notes_root = model_metadata['notes_root']
         new_instance.test_root = model_metadata['test_root']
-        new_instance.dataset = model_metadata['dataset']
         pprint.pprint(model_metadata)
         return new_instance
 
@@ -178,12 +199,14 @@ class PersistentGraph(object):
 
     def save(self):
         self.save_metadata()
+        #self.save_train_settings()
         with self._graph.as_default():
             saver = tf.train.Saver()
             saver.save(self._session, os.path.join(self.weight_root, "model.ckpt"))
 
     def save_training_state(self):
         self.save_metadata()
+        #self.save_train_settings()
         with self._graph.as_default():
             saver = tf.train.Saver()
             saver.save(self._session, os.path.join(self.train_root, "model.ckpt"))

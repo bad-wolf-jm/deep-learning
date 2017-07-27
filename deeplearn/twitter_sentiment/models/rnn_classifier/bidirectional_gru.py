@@ -12,7 +12,7 @@ class Tweet2Vec_BiGRU(BaseModel):
     """
     toplevel_scope = "categorical_encoder"
 
-    def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=512, num_classes=3):
+    def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=512, num_classes=3, **kwargs):
         super(Tweet2Vec_BiGRU, self).__init__()
         self._input_dtype = tf.int32
         self.seq_length = seq_length
@@ -24,8 +24,8 @@ class Tweet2Vec_BiGRU(BaseModel):
         with tf.variable_scope('embedding', reuse=None) as scope:
             self._input = tf.placeholder(dtype=self._input_dtype, shape=[None, self.seq_length], name="INPUT")
             x = tf.reshape(self._input, [-1])
-            self._one_hot_input = tf.one_hot(x, depth=256, axis=1)
-            x = tf.reshape(self._one_hot_input, [-1, 1024, 256])
+            self._one_hot_input = tf.one_hot(x, depth=self.embedding_dimension, axis=1)
+            x = tf.reshape(self._one_hot_input, [-1, self.seq_length, self.embedding_dimension])
 
         with tf.variable_scope('bidirectional_encoder', reuse=None) as scope:
             self.forward_gru = tf.nn.rnn_cell.GRUCell(self.hidden_states, activation=None)
@@ -73,7 +73,9 @@ class Tweet2Vec_BiGRU(BaseModel):
         _, lo, acc = self.run_ops(session,
                                   [self.train_step, self.batch_loss, self.batch_accuracy],
                                   feed_dict=feed_dict)
+
         batch_time = time.time() - t_1
+        #print({'loss': float(lo), 'accuracy': float(acc), 'time': batch_time})
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
 
     def validate(self,  train_x, train_y, session=None):
@@ -101,9 +103,9 @@ class Tweet2Vec_BiGRU(BaseModel):
         for i, line in enumerate(batch_x):
             l = bytes([x for x in line if x != 0]).decode('utf8', 'ignore')
             batch_strings.append(l)
-            x = l[:50]
-            p = "." * (50 - len(x))
-            print(x + p, o_p[i],  o_e[i])
+            #x = l[:50]
+            #p = "." * (50 - len(x))
+            #print(x + p, o_p[i],  o_e[i])
         return {'loss': lo, 'accuracy': acc, 'time': t, 'output': zip(batch_strings, t_v, p_v)}
 
     def pad(self, array, length):

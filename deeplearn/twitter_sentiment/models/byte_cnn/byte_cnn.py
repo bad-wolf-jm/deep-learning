@@ -14,14 +14,14 @@ from models.tf_session import tf_session
 
 
 class ByteCNN(BaseModel):
-    def __init__(self, seq_length=140, input_depth=256, num_categories=5, level_features=[64, 64, 128, 256, 512],
+    def __init__(self, seq_length=140, input_depth=256, num_classes=5, level_features=[64, 64, 128, 256, 512],
                  sub_levels=[2, 2, 2, 2], classifier_layers=[4096, 2048, 2048]):
         super(ByteCNN, self).__init__()
         assert len(sub_levels) == len(level_features) - 1
         self.input_width = seq_length
         self.seq_length = seq_length
         self.input_depth = input_depth
-        self.num_categories = num_categories
+        self.num_classes = num_classes
         self.level_features = level_features
         self.sub_levels = sub_levels
         self.classifier_layers = classifier_layers
@@ -60,7 +60,7 @@ class ByteCNN(BaseModel):
             for num_output in self.classifier_layers[1:]:
                 x = FC(x, num_output, activation_fn=None)
 
-        self.decision_output = self.decision_layer_3 = FC(x, self.num_categories, activation_fn=None)
+        self.decision_output = self.decision_layer_3 = FC(x, self.num_classes, activation_fn=None)
         print(self.decision_layer_3.get_shape())
 
     def temporal_batch_normalize(self, i_tensor):
@@ -89,25 +89,12 @@ class ByteCNN(BaseModel):
             conv_block_1, [-1, conv_block_1.shape[2].value, conv_block_1.shape[3].value])
         return conv_block_1
 
-    # def var(self, input_shape, trainable=True, name="variable", scope=None):
-    #    full_variable_name = '{scope}/{name}'.format(scope=tf.get_variable_scope().name, name=name)
-    #    initializer = self._variables.get(full_variable_name, None)
-    #    if initializer is None:
-    #        initializer = tf.random_normal(input_shape, stddev=0.35)
-    #    v = tf.Variable(initializer, name=name)
-    #    self._variables[full_variable_name] = v
-    #    return v
-#
-    # def initialize(self):
-    #    op = tf.variables_initializer(self._variables.values())
-    #    tf_session().run(op)
-
     def build_training_model(self):
         self.build_inference_model()
         with tf.variable_scope('training_ops'):
             with tf.variable_scope('output'):
                 self._output = tf.placeholder(dtype=tf.uint8, shape=[None, 1], name="OUTPUT")
-                self._one_hot_output = tf.one_hot(self._output, depth=self.num_categories, axis=-1)
+                self._one_hot_output = tf.one_hot(self._output, depth=self.num_classes, axis=-1)
             loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.decision_layer_3, labels=self._one_hot_output)
             self.train_step = tf.train.MomentumOptimizer(learning_rate=0.000001, momentum=0.9).minimize(loss)
             self.predicted_value = tf.argmax(self.decision_layer_3, 1)
@@ -115,21 +102,16 @@ class ByteCNN(BaseModel):
             self.batch_loss = tf.reduce_mean(loss, axis=0)
             self.batch_accuracy = tf.reduce_mean(tf.cast(tf.equal(self.true_value, tf.cast(self.predicted_value, tf.uint8)), tf.float32))
 
-    def debug_validate(self, batch_x, batch_y):
-        feed_dict = {self._input: batch_x, self._output: batch_y}
-        t_v, p_v, lo, acc = tf_session().run([self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
-        print()
-        print(t_v)
-        print(p_v)
-        return {'loss': lo, 'accuracy': acc}
-
     def test(self, train_x, train_y, session=None):
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
         t_0 = time.time()
         feed_dict = {self._input: batch_x, self._output: batch_y}
         t_v, p_v, lo, acc = self.run_ops(session,
-                                         [self.true_value, self.predicted_value, self.batch_loss, self.batch_accuracy],
+                                         [self.true_value,
+                                          self.predicted_value,
+                                          self.batch_loss,
+                                          self.batch_accuracy],
                                          feed_dict=feed_dict)
         t = time.time() - t_0
         batch_strings = []

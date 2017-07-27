@@ -29,8 +29,6 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
         with open(test_confusion_path, 'w') as test_file:
             test_file.write(json.dumps(test_confusion_result))
 
-        print('Save test')
-
     def save_training_checkpoint(self, file_name):
         return self._meta.save_training_state()
 
@@ -46,16 +44,18 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
             if (t_l, p_l) not in matrix:
                 matrix[(t_l, p_l)] = 0
             matrix[(t_l, p_l)] += 1
-        return [[i, j, matrix[i, j]] for i, j in matrix]
+        #print (matrix)
+        return [[i, j, matrix[j, i]] for i, j in matrix]
 
     def make_test_output_matrix(self, train, test):
+        labels = sorted(self._meta.category_labels.keys())
         test_true_values = [x['truth'] for x in test['output']]
         test_predicted_values = [x['predicted'] for x in test['output']]
-        test_confusion_matrix = self.__format_confusion_matrix([0, 1, 2], test_true_values, test_predicted_values)
+        test_confusion_matrix = self.__format_confusion_matrix(labels, test_true_values, test_predicted_values)
 
         train_true_values = [x['truth'] for x in train['output']]
         train_predicted_values = [x['predicted'] for x in train['output']]
-        train_confusion_matrix = self.__format_confusion_matrix([0, 1, 2], train_true_values, train_predicted_values)
+        train_confusion_matrix = self.__format_confusion_matrix(labels, train_true_values, train_predicted_values)
         return {'train': {'loss': train['loss'],
                           'accuracy': train['accuracy'],
                           'matrix': train_confusion_matrix},
@@ -64,10 +64,20 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
                          'matrix': test_confusion_matrix}}
 
     def train_model(self, batch_size=100, validation_size=None, test_size=None, epochs=None):
-        data = get_dataset_specs(self._meta.dataset)['constructor']
+        data = self._meta.dataset['constructor']
         data_generator = data(batch_size=batch_size,
                               epochs=epochs,
                               validation_size=validation_size,
                               test_size=test_size)
         self.run_training(data_generator['train'], data_generator['validation'], data_generator['test'],
                           session=self._meta._session)
+
+
+    def test_train(self, batch_size=100, validation_size=100, test_size=100, epochs=1):
+        data = self._meta.dataset['constructor']
+        data_generator = data(batch_size=batch_size,
+                              epochs=epochs,
+                              validation_size=validation_size,
+                              test_size=test_size)
+        self.run_test_training(data_generator['train'], data_generator['validation'], data_generator['test'],
+                                session=self._meta._session)

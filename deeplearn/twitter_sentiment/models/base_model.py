@@ -47,6 +47,7 @@ class BaseModel(object):
         _, lo, acc = self.run_ops(session,
                                   [self.train_step, self.batch_loss, self.batch_accuracy],
                                   feed_dict=feed_dict)
+
         batch_time = time.time() - t_1
         return {'loss': lo, 'accuracy': acc, 'time': batch_time}
 

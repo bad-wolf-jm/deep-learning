@@ -158,7 +158,6 @@ function update_stats()
 {
     $.getJSON('http://localhost:5000/json/training_stats.json',
             function(data) {
-                //console.log(data);
                 $('#stats-training-loss').text(data.training.loss.toFixed(2));
                 $('#stats-training-accuracy').text((100*data.training.accuracy).toFixed(2));
                 $('#stats-validation-loss').text(data.validation.loss.toFixed(2));
@@ -182,8 +181,27 @@ function update_progress()
                 training_progress_chart.series[0].points[0].update(data.percent_training_complete);
             }
         );
-
 }
+
+function update_confusion_matrix()
+{
+    $.getJSON('http://localhost:5000/json/latest_test.json',
+            function(data) {
+              var test_data = data.test;
+              var test_batch_size =0;
+              $('#current-test-loss').text(test_data.loss.toFixed(2));
+              $('#current-test-accuracy').text((100*test_data.accuracy).toFixed(2)+"%");
+              for (var i=0; i<test_data.matrix.length; i++){
+                var cell_entry = test_data.matrix[i];
+                var cell_id = `#c-cell-${cell_entry[0]}-${cell_entry[1]}`;
+                $(cell_id).text(cell_entry[2]);
+                test_batch_size = test_batch_size + cell_entry[2];
+              }
+              $('#current-test-batch-size').text(test_batch_size);
+            }
+        );
+}
+
 
 function humanFileSize(bytes) {
     var thresh = 1024;

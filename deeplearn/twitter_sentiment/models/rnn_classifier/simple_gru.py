@@ -12,7 +12,7 @@ class SimpleGRUClassifier(BaseModel):
     """
     toplevel_scope = "categorical_encoder"
 
-    def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=512, num_classes=3, num_rnn_layers=3):
+    def __init__(self, seq_length=1024, hidden_states=128, embedding_dimension=512, num_classes=3, num_rnn_layers=3, **kwargs):
         super(SimpleGRUClassifier, self).__init__()
         self._input_dtype = tf.int32
         self.seq_length = seq_length
@@ -25,8 +25,8 @@ class SimpleGRUClassifier(BaseModel):
         with tf.variable_scope('embedding', reuse=None) as scope:
             self._input = tf.placeholder(dtype=self._input_dtype, shape=[None, self.seq_length], name="INPUT")
             x = tf.reshape(self._input, [-1])
-            self._one_hot_input = tf.one_hot(x, depth=256, axis=1)
-            x = tf.reshape(self._one_hot_input, [-1, 1024, 256])
+            self._one_hot_input = tf.one_hot(x, depth=self.embedding_dimension, axis=1)
+            x = tf.reshape(self._one_hot_input, [-1, self.seq_length, self.embedding_dimension])
 
         with tf.variable_scope('gru_encoder', reuse=None) as scope:
             encoding_layers = [tf.nn.rnn_cell.GRUCell(self.hidden_states) for _ in range(self.number_of_layers)]
@@ -84,6 +84,7 @@ class SimpleGRUClassifier(BaseModel):
                                   [self.train_step, self.batch_loss, self.batch_accuracy],
                                   feed_dict=feed_dict)
         batch_time = time.time() - t_1
+        print({'loss': float(lo), 'accuracy': float(acc), 'time': batch_time})
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
 
     def validate(self, train_x, train_y, session=None):
@@ -91,8 +92,9 @@ class SimpleGRUClassifier(BaseModel):
         batch_x = [self.pad(element, self.seq_length) for element in train_x]
         batch_y = [element for element in train_y]
         feed_dict = {self._input: batch_x, self.output_expected: batch_y}
-        _, lo, acc = self.run_ops(session, [self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
+        lo, acc = self.run_ops(session, [self.batch_loss, self.batch_accuracy], feed_dict=feed_dict)
         batch_time = time.time() - t_1
+        print({'loss': float(lo), 'accuracy': float(acc), 'time': batch_time})
         return {'loss': float(lo), 'accuracy': float(acc), 'time': batch_time}
 
     def test(self, train_x, train_y, session=None):
@@ -109,9 +111,9 @@ class SimpleGRUClassifier(BaseModel):
         for i, line in enumerate(batch_x):
             l = bytes([x for x in line if x != 0]).decode('utf8', 'ignore')
             batch_strings.append(l)
-            x = l[:50]
-            p = "." * (50 - len(x))
-            print(x + p, o_p[i])
+        #    x = l[:50]
+        #    p = "." * (50 - len(x))
+        #    print(x + p, o_p[i])
         return {'loss': lo, 'accuracy': acc, 'time': t, 'output': zip(batch_strings, t_v, p_v)}
 
     def pad(self, array, length):
@@ -121,6 +123,18 @@ class SimpleGRUClassifier(BaseModel):
 
 
 class SimpleGRUClassifierConv(SimpleGRUClassifier):
+    def __init__(self,
+                 convolutional_features = [32, 64, 128, 512],
+                 window_sizes = [3, 3, 3, 3],
+                 pooling_sizes = [5, 5, 5, 5],
+                 pooling_strides = [2, 2, 2, 2], **kwargs):
+        super(SimpleGRUClassifierConv, self).__init__(**kwargs)
+        self.convolutional_features = convolutional_features
+        self.window_sizes = window_sizes
+        self.pooling_sizes = pooling_sizes
+        self.pooling_strides = pooling_strides
+
+
     def convolutional_block(self, i_tensor, i_features, o_features, window_size=3, scope=None):
         with tf.variable_scope(scope):
             kernel = self.var(input_shape=[window_size, window_size, i_features, o_features], name='layer_1_convolution')
@@ -135,10 +149,10 @@ class SimpleGRUClassifierConv(SimpleGRUClassifier):
         return conv_block_1
 
     def init_model(self, trainable=False):
-        self.convolutional_features = [32, 64, 128, 512]
-        self.window_sizes = [3, 3, 3, 3]
-        self.pooling_sizes = [5, 5, 5, 5]
-        self.pooling_strides = [2, 2, 2, 2]
+        #self.convolutional_features = [32, 64, 128, 512]
+        #self.window_sizes = [3, 3, 3, 3]
+        #self.pooling_sizes = [5, 5, 5, 5]
+        #self.pooling_strides = [2, 2, 2, 2]
         with tf.variable_scope('embedding', reuse=None) as scope:
             self._input = tf.placeholder(dtype=self._input_dtype, shape=[None, self.seq_length], name="INPUT")
             x = tf.reshape(self._input, [-1])
@@ -156,46 +170,67 @@ class SimpleGRUClassifierConv(SimpleGRUClassifier):
             encoded_text = tf.reshape(encoded_text, [-1, self.hidden_states, self.seq_length, 1])
             print('Yr=', encoded_text.get_shape())
 
+        #features = [1]
+        #features.extend(self.convolutional_features)
         with tf.variable_scope('convolutional_classifier', reuse=None) as scope:
-            conv_1 = self.convolutional_block(i_tensor=encoded_text,
-                                              i_features=1,
-                                              o_features=self.convolutional_features[0],
-                                              window_size=self.window_sizes[0],
-                                              scope='layer_1')
-            pool_1 = self.max_pool_layer(i_tensor=conv_1,
-                                         window_size=self.pooling_sizes[0],
-                                         strides=self.pooling_strides[0],
-                                         scope='layer_1')
-            conv_2 = self.convolutional_block(i_tensor=pool_1,
-                                              i_features=self.convolutional_features[0],
-                                              o_features=self.convolutional_features[1],
-                                              window_size=self.window_sizes[1],
-                                              scope='layer_2')
-            pool_2 = self.max_pool_layer(i_tensor=conv_2,
-                                         window_size=self.pooling_sizes[1],
-                                         strides=self.pooling_strides[1],
-                                         scope=scope)
-            conv_3 = self.convolutional_block(i_tensor=pool_2,
-                                              i_features=self.convolutional_features[1],
-                                              o_features=self.convolutional_features[2],
-                                              window_size=self.window_sizes[2],
-                                              scope='layer_3')
-            pool_3 = self.max_pool_layer(i_tensor=conv_3,
-                                         window_size=self.pooling_sizes[2],
-                                         strides=self.pooling_strides[2],
-                                         scope=scope)
-            conv_4 = self.convolutional_block(i_tensor=conv_3,
-                                              i_features=self.convolutional_features[2],
-                                              o_features=self.convolutional_features[3],
-                                              window_size=self.window_sizes[3],
-                                              scope='layer_4')
-            pool_4 = self.max_pool_layer(i_tensor=conv_4,
-                                         window_size=self.pooling_sizes[3],
-                                         strides=self.pooling_strides[3],
-                                         scope=scope)
-
-            D = pool_4.shape[1].value * pool_4.shape[2].value * pool_4.shape[3].value
-            pool_4 = tf.reshape(pool_4, [-1, D])
+            i_features = 1
+            conv_input = encoded_text
+            for layer_index in range(len(self.convolutional_features)-1):
+                conv_layer = self.convolutional_block(i_tensor=conv_input,
+                                                  i_features=i_features,
+                                                  o_features=self.convolutional_features[layer_index],
+                                                  window_size=self.window_sizes[layer_index],
+                                                  scope='layer_{}'.format(layer_index))
+                pool_layer = self.max_pool_layer(i_tensor=conv_layer,
+                                             window_size=self.pooling_sizes[layer_index],
+                                             strides=self.pooling_strides[layer_index],
+                                             scope='layer_{}'.format(layer_index))
+                conv_input = pool_layer
+                i_features = self.convolutional_features[layer_index]
+#
+#
+#
+#
+#            """
+#            conv_1 = self.convolutional_block(i_tensor=encoded_text,
+#                                              i_features=1,
+#                                              o_features=self.convolutional_features[0],
+#                                              window_size=self.window_sizes[0],
+#                                              scope='layer_1')
+#            pool_1 = self.max_pool_layer(i_tensor=conv_1,
+#                                         window_size=self.pooling_sizes[0],
+#                                         strides=self.pooling_strides[0],
+#                                         scope='layer_1')
+#            conv_2 = self.convolutional_block(i_tensor=pool_1,
+#                                              i_features=self.convolutional_features[0],
+#                                              o_features=self.convolutional_features[1],
+#                                              window_size=self.window_sizes[1],
+#                                              scope='layer_2')
+#            pool_2 = self.max_pool_layer(i_tensor=conv_2,
+#                                         window_size=self.pooling_sizes[1],
+#                                         strides=self.pooling_strides[1],
+#                                         scope=scope)
+#            conv_3 = self.convolutional_block(i_tensor=pool_2,
+#                                              i_features=self.convolutional_features[1],
+#                                              o_features=self.convolutional_features[2],
+#                                              window_size=self.window_sizes[2],
+#                                              scope='layer_3')
+#            pool_3 = self.max_pool_layer(i_tensor=conv_3,
+#                                         window_size=self.pooling_sizes[2],
+#                                         strides=self.pooling_strides[2],
+#                                         scope=scope)
+#            conv_4 = self.convolutional_block(i_tensor=conv_3,
+#                                              i_features=self.convolutional_features[2],
+#                                              o_features=self.convolutional_features[3],
+#                                              window_size=self.window_sizes[3],
+#                                              scope='layer_4')
+#            pool_4 = self.max_pool_layer(i_tensor=conv_4,
+#                                         window_size=self.pooling_sizes[3],
+#                                         strides=self.pooling_strides[3],
+#                                         scope=scope)
+#"""
+            D = pool_layer.shape[1].value * pool_layer.shape[2].value * pool_layer.shape[3].value
+            pool_layer = tf.reshape(pool_layer, [-1, D])
 
             _weights = self.var(input_shape=[D, self.num_classes],
                                 name='final_weights',
@@ -205,7 +240,7 @@ class SimpleGRUClassifierConv(SimpleGRUClassifier):
                                name='final_biases',
                                scope=scope,
                                trainable=True)
-            self.output_predicted = tf.matmul(conv_4, _weights) + _biases
+            self.output_predicted = tf.matmul(pool_layer, _weights) + _biases
 
     def build_inference_model(self, trainable=False):
         with tf.variable_scope('inference', reuse=None):

@@ -1,12 +1,53 @@
 {% extends "nn_skeleton.html" %}
+
+{% macro render_confusion_matrix(matrix_entries) %}
+  {% set labels = supervisor._meta.category_labels %}
+  <table style="ui celled table">
+    <tr>
+      <td class="empty-cell"></td>
+      {% for label in labels.keys()|sort() %}
+        <td  class="confusion-matrix-label-cell" style="text-align:center"><b>{{ labels[label] }}</b></td>
+      {% endfor%}
+    </tr>
+    {% for label_r in labels.keys()|sort() %}
+      <tr>
+        <td class="confusion-matrix-label-cell"><b>{{ labels[label_r] }}</b></td>
+        {% for label_c in labels.keys()|sort() %}
+          {% if label_c == label_r: %}
+            <td class="confusion-matrix-entry-cell positive" id='c-cell-{{label_r}}-{{label_c}}'> ... </td>
+          {% else %}
+            <td class="confusion-matrix-entry-cell negative" id='c-cell-{{label_r}}-{{label_c}}'> ... </td>
+          {% endif %}
+        {% endfor%}
+      </tr>
+    {% endfor%}
+  </table>
+{% endmacro %}
+
+{% block current_model_name %}
+  {{ supervisor._meta.name }}
+{% endblock %}
+
 {% block page_content %}
-  <div class='ui container' style="height:200px">
-      <h1 class="ui center align icon header" style="width:100%; padding:40px">
+  {# <div class='ui container' style="height:200px">
+      <h2 class="ui icon header" style="width:100%; padding:40px">
       <i class="desktop icon"></i>
       <div class="content">
         Training monitor
       </div>
-    </h1>
+    </h2>
+  </div> #}
+  <h3 class="ui top attached fluid left block header">
+    <i class="desktop icon"></i>
+    Training monitor
+  </h3>
+  <div class="ui bottom attached segment">
+    {# render_confusion_matrix() #}
+    Model name: {{ supervisor._meta.name }}
+    Model type: {{ supervisor._meta.type }}
+    Dataset: {{ supervisor._meta.dataset['display_name'] }}
+    Categories: {{ supervisor._meta.dataset['category_labels'] }}
+    Optimizer: UNK
   </div>
 
 
@@ -35,15 +76,43 @@
               </div>
             </div>
           </div>
+    <h3 class="ui top attached fluid block header">
+      Model performance
+    </h3>
+    <div class="ui attached segment">
+      {{ render_confusion_matrix() }}
+    </div>
+    <div class="ui bottom attached segment">
+      <div class="ui teal right floated label">
+        Test batch size:
+        <div class="detail" id='current-test-batch-size'>
+          345
+        </div>
+      </div>
+      <div class="ui grey right floated label">
+        Test loss:
+        <div class="detail" id='current-test-loss'>
+          .445
+        </div>
+      </div>
+      <div class="ui grey right floated label">
+        Test accuracy:
+        <div class="detail" id='current-test-accuracy'>
+          22.3%
+        </div>
+      </div>
+
+    </div>
+
     <div class="ui two column equal height grid">
         <div class="four wide column stretched">
-              <h4 class="ui top attached block header">
+              {# <h4 class="ui top attached block header">
                 Loss
               </h4>
               <div class="ui bottom attached segment">
                   <table>
-                      <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-loss">NAN</td></tr>
-                      <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-loss">NAN</td></tr>
+                      <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-loss2">NAN</td></tr>
+                      <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-loss2">NAN</td></tr>
                   </table>
               </div>
 
@@ -52,11 +121,10 @@
               </h4>
               <div class="ui bottom attached segment">
                   <table>
-                      <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-accuracy">NAN</td></tr>
-                      <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-accuracy">NAN</td></tr>
+                      <tr><td class="stats-label">Training:</td><td class="stats-value" id="stats-training-accuracy2">NAN</td></tr>
+                      <tr><td class="stats-label">Validation:</td><td class="stats-value" id="stats-validation-accuracy2">NAN</td></tr>
                   </table>
-              </div>
-
+              </div> #}
               <h4 class="ui top attached block header">
                 Time
               </h4>
@@ -80,6 +148,19 @@
         <div class="column twelve wide">
             <h4 class="ui top attached small block header">
                 Loss
+                <div class="ui top right green label">
+                  Avg. training:
+                  <div class="detail"  id="stats-training-loss">
+                    foo
+                  </div>
+                </div>
+                <div class="ui top right green label">
+                  Avg. validation:
+                  <div class="detail"  id="stats-validation-loss">
+                    foo
+                  </div>
+                </div>
+
               </h4>
               <div class="ui bottom attached segment", id="loss-graph-content" style="height:190px">
                 Segment
@@ -87,6 +168,19 @@
 
               <h4 class="ui top attached block header">
                   Accuracy
+                  <div class="ui top right green label">
+                    Avg. training:
+                    <div class="detail" id="stats-training-accuracy">
+                      foo
+                    </div>
+                  </div>
+                  <div class="ui top right green label">
+                    Avg. validation:
+                    <div class="detail" id="stats-validation-accuracy">
+                      foo
+                    </div>
+                  </div>
+
                 </h4>
                 <div class="ui bottom attached segment", id="acc-graph-content" style="height:190px">
                   Segment
@@ -102,7 +196,7 @@
 setInterval(update_stats, 2000);
 setInterval(update_progress, 2000);
 setInterval(update_graphs, 2000);
-//setInterval(update_cpuinfo, 2000);
+setInterval(update_confusion_matrix, 2000);
 
 $(document).ready(
     function ()

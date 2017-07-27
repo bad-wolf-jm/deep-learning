@@ -31,7 +31,7 @@ model_specs = {
                 'description': "The encoding dimension for inputs",
                 'default': 256
             },
-            'num_categories': {
+            'num_classes': {
                 'type': int,
                 'display': 'Number of categories',
                 'description': "The number of classifying labels this model outputs",
@@ -84,7 +84,7 @@ model_specs = {
                 'description': "The dimension of the recurrent unit internal state",
                 'default': 128
             },
-            'num_categories': {
+            'num_classes': {
                 'type': int,
                 'display': 'Number of categories',
                 'description': "The number of classifying labels this model outputs",
@@ -125,7 +125,7 @@ model_specs = {
                 'description': "The dimension of the recurrent unit internal state",
                 'default': 128
             },
-            'num_categories': {
+            'num_classes': {
                 'type': int,
                 'display': 'Number of categories',
                 'description': "The number of classifying labels this model outputs",
@@ -173,7 +173,7 @@ model_specs = {
                 'description': "The dimension of the recurrent unit internal state",
                 'default': 128
             },
-            'num_categories': {
+            'num_classes': {
                 'type': int,
                 'display': 'Number of categories',
                 'description': "The number of classifying labels this model outputs",
@@ -193,17 +193,17 @@ model_specs = {
             'window_sizes': {
                 'type': list,
                 'description': "Dimensions of the fully connected classifier",
-                'default': [3,3,3,3]
+                'default': [3, 3, 3, 3]
             },
             'pooling_sizes': {
                 'type': list,
                 'description': "Dimensions of the fully connected classifier",
-                'default': [3,3,3,3]
+                'default': [3, 3, 3, 3]
             },
             'pooling_strides': {
                 'type': list,
                 'description': "Dimensions of the fully connected classifier",
-                'default': [2,2,2,2]
+                'default': [2, 2, 2, 2]
             },
             'classifier_layers': {
                 'type': list,
@@ -214,13 +214,15 @@ model_specs = {
     }
 }
 
+
 def get_default_model_specs(type):
     return copy.deepcopy(model_specs.get(type, None))
+
 
 def build_skeleton(type, **init_params):
     specs = get_default_model_specs(type)
     if specs is not None:
         model_params = specs['hyperparameters']
-        default_params = {name:model_params[name].get('default', None) for name in model_params}
+        default_params = {name: model_params[name].get('default', None) for name in model_params}
         default_params.update(init_params)
         return specs['constructor'](**default_params)

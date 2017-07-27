@@ -10,7 +10,6 @@
     <script src="http://localhost:5000/static/js/utilities.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
     <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
-
     {% block header_scripts %}
     {% endblock %}
     <script type="text/javascript" async
@@ -40,24 +39,10 @@
                       ...
                     </div>
                   </div>
-
                 </div>
                 <a class="ui item" href="http://localhost:5000/ui/training">
-                    {# <i class="notched circle loading icon"></i> #}
-                    ByteCNN_3 (deep)
+                    {% block  current_model_name %} {% endblock %}
                 </a>
-                {# <div class="ui icon dropdown item">
-                    <i class="setting icon"></i>
-                    <div class="menu">
-                        <div class="item">
-                            <span class="text" onClick="show_create_model_dialog()">New...</span>
-                        </div>
-                        <div class="divider"></div>
-                            <div class="item">
-                            Load...
-                        </div>
-                    </div>
-                </div> #}
             </div>
         </div>
         <p></p>
@@ -77,28 +62,9 @@
                             $('#stats-memory-usage').html(format_memory_usage(memory_used, memory_available));
                         }
                     );
-
             };
             setInterval(update_cpuinfo, 2000);
             $('.ui.dropdown').dropdown();
-            function create_new_model() {
-                $.ajax({
-                    type: "post",
-                    url: "resource",
-                    dataType: "json",
-                    success: function (msg) {
-                        if (msg) {
-                            console.log(msg);
-                        } else {
-                            alert("Cannot add to list !");
-                        }
-                    },
-                    data: JSON.stringify({test: 'data to send'})
-                });
-            }
-            function show_create_model_dialog() {
-            $('#create-model').modal('show');
-            }
         </script>
         {% block scripts%}
         {% endblock %}
