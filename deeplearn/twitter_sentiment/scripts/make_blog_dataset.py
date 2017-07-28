@@ -31,6 +31,17 @@ def addslashes(s):
 sql_insert_statements = []
 key=0
 genders={'male':0, 'female':1}
+
+ages{}
+
+
+
+def age_bin(a):
+
+
+
+
+
 for i, g in enumerate(glob.glob(_file)):
     file_name = os.path.basename(g)
     id_, gender, age, industry, sign, _ = file_name.split('.')

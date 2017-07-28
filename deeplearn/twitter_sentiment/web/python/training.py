@@ -2,50 +2,29 @@ import time
 import os
 import math
 import json
+import numpy as np
 import tensorflow as tf
 import glob
 from models.tf_session import tf_session
 import datetime
+import threading
 from train.supervisor import TrainingSupervisor
 from web.python.datasources import get_dataset_specs
+from web.python.bootstrap import PersistentGraph
 
 
 class PersistentTrainingSupervisor(TrainingSupervisor):
-    def __init__(self, model=None, **kwargs):
+    def __init__(self, model=None, optimizer=None, batch_size=None, validation_size=None, test_size=None,
+                 epochs=None, e_mail_interval=None, **kwargs):
         super(PersistentTrainingSupervisor, self).__init__(model._model, **kwargs)
         # self._meta has the meta graph with the path info
         self._meta = model
-
-    def save_test(self, train=None, test=None):
-        test_root = self._meta.test_root
-        test_result = {'train': train, 'test': test}
-        test_confusion_result = self.make_test_output_matrix(train, test)
-        test_file_name = "test-output-raw-{date}.json".format(date=datetime.datetime.today().isoformat())
-        test_confusion_name = "test-output-matrix-{date}.json".format(date=datetime.datetime.today().isoformat())
-        test_path = os.path.join(test_root, test_file_name)
-        test_confusion_path = os.path.join(test_root, test_confusion_name)
-        with open(test_path, 'w') as test_file:
-            test_file.write(json.dumps(test_result))
-        with open(test_confusion_path, 'w') as test_file:
-            test_file.write(json.dumps(test_confusion_result))
-
-    def save_training_checkpoint(self, file_name):
-        return self._meta.save_training_state()
-
-    def housekeeping(self):
-        pass
-
-    def __format_confusion_matrix(self, labels, true_labels, predicted_labels):
-        matrix = {}
-        for i in labels:
-            for j in labels:
-                matrix[i, j] = 0
-        for t_l, p_l in zip(true_labels, predicted_labels):
-            if (t_l, p_l) not in matrix:
-                matrix[(t_l, p_l)] = 0
-            matrix[(t_l, p_l)] += 1
-        #print (matrix)
-        return [[i, j, matrix[j, i]] for i, j in matrix]
+        self.optimizer = optimizer
+        self.batch_size = batch_size
+        self.validation_size = validation_size
+        self.test_size = test_size
+        self.epochs = epochs
+        self.e_mail_interval = e_mail_interval
 
     def make_test_output_matrix(self, train, test):
         labels = sorted(self._meta.category_labels.keys())
@@ -63,21 +42,102 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
                          'accuracy': test['accuracy'],
                          'matrix': test_confusion_matrix}}
 
-    def train_model(self, batch_size=100, validation_size=None, test_size=None, epochs=None):
+    def save_test(self, train=None, test=None):
+        test_root = self._meta.test_root
+        test_result = {'train': train, 'test': test}
+        test_confusion_result = self.make_test_output_matrix(train, test)
+        test_file_name = "test-output-raw-{date}.json".format(date=datetime.datetime.today().isoformat())
+        test_confusion_name = "test-output-matrix-{date}.json".format(date=datetime.datetime.today().isoformat())
+        test_path = os.path.join(test_root, test_file_name)
+        test_confusion_path = os.path.join(test_root, test_confusion_name)
+        with open(test_path, 'w') as test_file:
+            test_file.write(json.dumps(test_result))
+        with open(test_confusion_path, 'w') as test_file:
+            test_file.write(json.dumps(test_confusion_result))
+        # also save loss and accuracy graphs
+
+    def save_training_checkpoint(self, file_name):
+        return self._meta.save_training_state()
+
+    def housekeeping(self):
+        pass
+
+    def __format_confusion_matrix(self, labels, true_labels, predicted_labels):
+        matrix = {}
+        for i in labels:
+            for j in labels:
+                matrix[i, j] = 0
+        for t_l, p_l in zip(true_labels, predicted_labels):
+            if (t_l, p_l) not in matrix:
+                matrix[(t_l, p_l)] = 0
+            matrix[(t_l, p_l)] += 1
+        return [[i, j, matrix[j, i]] for i, j in matrix]
+
+    def __is_nan_of_infinite(self, num):
+        return (np.isnan([num]) or np.isinf([num]))
+
+    def do_train_model(self):
         data = self._meta.dataset['constructor']
-        data_generator = data(batch_size=batch_size,
-                              epochs=epochs,
-                              validation_size=validation_size,
-                              test_size=test_size)
-        self.run_training(data_generator['train'], data_generator['validation'], data_generator['test'],
-                          session=self._meta._session)
+        data_generator = data(batch_size=self.batch_size,
+                              epochs=self.epochs,
+                              validation_size=self.validation_size,
+                              test_size=self.test_size)
+        train_loop = self.run_training(data_generator['train'], data_generator['validation'], data_generator['test'],
+                                       session=self._meta._session)
+        for train_loss in train_loop:
+            yield train_loss
 
 
-    def test_train(self, batch_size=100, validation_size=100, test_size=100, epochs=1):
-        data = self._meta.dataset['constructor']
-        data_generator = data(batch_size=batch_size,
-                              epochs=epochs,
-                              validation_size=validation_size,
-                              test_size=test_size)
-        self.run_test_training(data_generator['train'], data_generator['validation'], data_generator['test'],
-                                session=self._meta._session)
+class ThreadedModelTrainer(object):
+    def __init__(self, model_name, model_type, train_settings):
+        super(ThreadedModelTrainer, self).__init__()
+        self.model_name = model_name
+        self.model_type = model_type
+        self.train_settings = train_settings
+        self.training_supervisor = None
+        self.model_graph = None
+        self.is_running = False
+        self.ready_lock = threading.Lock()
+        self.ready_lock.acquire()
+        self.__internal_thread = None
+        # Keep an internal /tmp folder to save models before stopping
+        # if there is one in there, resume training
+        # add a 'reset' function, which deletes the saved image, and
+        # forces the training to reinitialize everything.
+
+    def __is_nan_of_infinite(self, num):
+        return (np.isnan([num]) or np.isinf([num]))
+
+    def run(self):
+        self.is_running = True
+        self.model_graph = PersistentGraph.load(name=self.model_name, type_=self.model_type)
+        self.model_graph.initialize(session=None, training=True, resume=False)
+        train_settings = self.model_graph.load_train_settings()
+        train_settings = train_settings or {}
+        model_saved_settings = self.model_graph.load_train_settings()
+        model_saved_settings = model_saved_settings or {}
+        train_settings.update(model_saved_settings)
+        self.training_supervisor = PersistentTrainingSupervisor(self.model_graph, **self.train_settings)
+        self.ready_lock.release()
+        for training_loss in self.training_supervisor.do_train_model():
+            if self.__is_nan_of_infinite(training_loss):
+                # self.model_graph.restore_last_checkpoint()
+                # self.training_supervisor.half_learning_rate()
+                pass
+            if not self.is_running:
+                # Stop the training
+                break
+            print(training_loss)
+
+    def start(self):
+        if self.__internal_thread is None:
+            self.__internal_thread = threading.Thread(target=self.run)
+            self.__internal_thread.start()
+
+    def stop(self):
+        if self.__internal_thread is not None:
+            self.is_running = False
+            self.__internal_thread.join()
+            self.__internal_thread = None
+            #self.__internal_thread = threading.Thread(target=self.run)
+            # self.__internal_thread.start()

@@ -231,7 +231,14 @@ class SimpleGRUClassifierConv(SimpleGRUClassifier):
 #"""
             D = pool_layer.shape[1].value * pool_layer.shape[2].value * pool_layer.shape[3].value
             pool_layer = tf.reshape(pool_layer, [-1, D])
-
+            _weights = self.var(input_shape=[D, 128],
+                                name='final_weights',
+                                scope=scope,
+                                trainable=True)
+            _biases = self.var(input_shape=[1, 128],
+                               name='final_biases',
+                               scope=scope,
+                               trainable=True)
             _weights = self.var(input_shape=[D, self.num_classes],
                                 name='final_weights',
                                 scope=scope,

@@ -34,6 +34,15 @@ def list_model_types():
     return types
 
 
+def list_model_instances():
+    m_list = []
+    for name in os.listdir(APP_MODELS_FOLDER):
+        path = os.path.join(APP_MODELS_FOLDER, name)
+        model_desc = os.path.join(path, 'model.json')
+        m_list.append(json.loads(open(model_desc).read()))
+    return m_list
+
+
 def count_models(type):
     folder = os.path.join(APP_MODELS_FOLDER, type)
     print (folder)
@@ -52,7 +61,9 @@ def list_type_instances(type_name):
 
 
 # TODO Class should be able to test if training is resumable
-# TODO Class should save the training status
+# TODO Class should save the training status and graphs
+
+
 
 
 
@@ -101,8 +112,7 @@ class PersistentGraph(object):
         files = [[f, os.stat(f).st_ctime] for f in glob.glob("{root}/{template}".format(root=root, template=template))]
         files = sorted(files, key=lambda x: x[1], reverse=True)
         min_date = min_date or 0
-        max_date = max_date or time.time() #datetime.datetime.toda()
-        #print (files)
+        max_date = max_date or time.time()
         return [f[0] for f in files if f[1] >= min_date and f[1] <= max_date]
 
     def __count_files(self, root):
@@ -152,8 +162,7 @@ class PersistentGraph(object):
         model_metadata_file = open(m_path)
         model_metadata = json.loads(model_metadata_file.read())
         new_instance = cls(model_metadata['name'], model_metadata['type'],
-                           model_metadata['dataset'],
-                           model_metadata['description'],
+                           model_metadata['dataset'], model_metadata['description'],
                            **model_metadata['hyperparameters'])
         new_instance.metadata_file = m_path
         new_instance.training_settings_file = t_path

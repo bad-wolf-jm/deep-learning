@@ -6,7 +6,7 @@ from models.tf_session import tf_session
 
 class BaseClassifier(BaseModel):
     def __init__(self, seq_length=140,  embedding_dimension=256, num_categories=5):
-        super(ByteCNN, self).__init__()
+        super(BaseClassifier, self).__init__()
         assert len(sub_levels) == len(level_features) - 1
         self.seq_length = seq_length
         self.embedding_dimension = input_depth
@@ -14,20 +14,20 @@ class BaseClassifier(BaseModel):
 
     def build_inference_model(self):
         with tf.variable_scope('input'):
-            self._input = tf.placeholder('uint8', shape=[None, self.seq_length], name="INPUT")
+            self.input = tf.placeholder('uint8', shape=[None, self.seq_length], name="INPUT")
             self._one_hot_input = tf.one_hot(self._input, depth=self.embedding_dimension, axis=-1)
-            self.input_tensor = self._one_hot_input
+            self._input_tensor = self._one_hot_input
 
     def build_training_model(self):
         self.build_inference_model()
         with tf.variable_scope('training'):
             with tf.variable_scope('output'):
-                self._output = tf.placeholder(dtype=tf.uint8, shape=[None, 1], name="OUTPUT")
+                self.output = tf.placeholder(dtype=tf.uint8, shape=[None, 1], name="OUTPUT")
                 self._one_hot_output = tf.one_hot(self._output, depth=self.num_categories, axis=-1)
             SXEWL = tf.nn.softmax_cross_entropy_with_logits
-            self.loss = SXEWL(logits=self.interence_output, labels=self._one_hot_output)
+            self.loss = SXEWL(logits=self.inference_output, labels=self._one_hot_output)
             self.predicted_value = tf.cast(tf.argmax(self.inference_output, 1), tf.uint8)
-            self.true_value = tf.reshape(self._output, [-1])
+            self.true_value = tf.reshape(self.output, [-1])
             self.batch_loss = tf.reduce_mean(self.loss, axis=0)
             self.batch_accuracy = tf.reduce_mean(tf.cast(tf.equal(self.true_value, self.predicted_value), tf.float32))
 

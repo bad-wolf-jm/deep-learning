@@ -24,7 +24,7 @@ function format_seconds(t_seconds, units, pluralize=true)
     var s_f, m_f, h_f, d_f;
 
     if (t_seconds < 60) {
-      return `${t_seconds}</span><span style="font-size:15px; margin:2px">${units.seconds}</span>`;
+      return `<span style="font-size:25px; margin:2px">${t_seconds}</span><span style="font-size:15px; margin:2px">${units.seconds}</span>`;
     }
 
     duration = parse_seconds_to_time(t_seconds);

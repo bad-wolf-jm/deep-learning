@@ -11,10 +11,6 @@ import glob
 import datetime
 import time
 import web.python.bootstrap as bootstrap
-from web.python.bootstrap import PersistentGraph, list_model_types
-from web.python.training import PersistentTrainingSupervisor, ThreadedModelTrainer
-from notify.send_mail import EmailNotification
-
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -104,72 +100,23 @@ def list_type_instances(type_name):
 
 
 #@app.route('/ui/instance') # ?type=<type-name>&name=<instance-name>
-@app.route('/actions/train_model')
-def start_training():
-    model_type = request.args.get('type', None)
-    model_name = request.args.get('name', None)
-    training_thread = ThreadedModelTrainer(model_name=model_name, model_type=model_type, train_settings=train_settings)
-    training_thread.start()
-    training_thread.ready_lock.acquire()
-    supervisor = training_thread.training_supervisor
-    template = 'nn_training.html'
-    model_types = bootstrap.list_model_types()
-    return render_template(template,
-                           supervisor=supervisor,
-                           model_types=model_types)
-
-train_settings = {
-    'optimizer': {
-        'name': 'AdamOptimizer',
-        'learning_rate': 0.01,
-        'optimizer_parameters': {
-                'beta1': 0.9,
-                'beta2': 0.999,
-                'epsilon': 0.00000001
-        }
-    },
-    'validation_interval': 5,
-    'test_interval': 1 * 60,
-    'e_mail_interval': 1.5 * 3600,
-    'summary_span': None,
-    'checkpoint_interval': 30 * 60,
-    'batch_size': 100,
-    'validation_size': 100,
-    'test_size': 1000,
-    'epochs': 50
-}
-
-#if __name__ == '__main__':
-# main_training()
-#lock.acquire()
-#thread = threading.Thread(target=main_training)
-#thread.start()
-#lock.acquire()
-#e_mail_thread = threading.Thread(target=send_email_every_minute)
-#e_mail_thread.start()
-training_thread = None #ThreadedModelTrainer(model_name='Model_Tweet2Vec_BiGRU_CMSDataset', model_type='Tweet2Vec_BiGRU', train_settings=train_settings)
-#training_thread.start()
-#training_thread.ready_lock.acquire()
-supervisor = None #training_thread.training_supervisor
-#app.run()
-
 
 
 @app.route('/ui')
 def get_front_page():
-#    page_template = get_page_template(request.args.get('page', None))
-#    model_type = request.args.get('type', None)
-#    instance_name = request.args.get('name', None)
-#
-    template = 'nn_model_type.html'
-#    if page_template is not None:
-#        template = "nn_" + page_template + '.html'
+    page_template = get_page_template(request.args.get('page', None))
+    model_type = request.args.get('type', None)
+    instance_name = request.args.get('name', None)
+
+    template = 'nn_ui.html'
+    if page_template is not None:
+        template = "nn_" + page_template + '.html'
     server_data = {
         'model_types': bootstrap.list_model_types()
     }
-#
+
     return render_template(template,
-                           model_types=bootstrap.list_model_instances(),
+                           model_types=bootstrap.list_model_types(),
                            server_data=server_data)
 
 

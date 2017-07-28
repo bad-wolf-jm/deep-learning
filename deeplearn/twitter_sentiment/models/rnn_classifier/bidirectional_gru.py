@@ -59,7 +59,7 @@ class Tweet2Vec_BiGRU(BaseModel):
             self.output_expected_oh = tf.one_hot(self.output_expected, depth=self.num_classes, axis=-1)
             self.output_expected_oh = tf.reshape(self.output_expected_oh, [-1, self.num_classes])
             loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.output_predicted, labels=self.output_expected_oh)
-            self.train_step = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
+            self.train_step = tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss)
             self.predicted_value = tf.argmax(self.output_predicted, 1)
             self.true_value = tf.reshape(self.output_expected, [-1])
             self.batch_loss = tf.reduce_mean(loss, axis=0)

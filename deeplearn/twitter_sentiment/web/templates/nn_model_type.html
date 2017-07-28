@@ -13,7 +13,8 @@
 {% endmacro %}
 
 {% block page_content %}
-<h2 class='ui top attached block header'>
+
+{# <h2 class='ui top attached block header'>
     {{ model_type['display_name'] }}
     <div class="ui right floated purple basic button">
         Create new instance
@@ -29,63 +30,60 @@
       <i>(No citation provided)</i>
   {% endif %}
 </p>
+#}
 
 
+<div class="ui contents">
+  <div class="ui items">
+      {% for model_type in model_types%}
+        <div class="ui segment">
 
-<div class="ui centered cards">
-  <div class="card">
-    <div class="content">
-      <img class="right floated mini ui image" src="/images/avatar/large/elliot.jpg">
-      <div class="header">
-           Name of instance
-      </div>
-      <div class="meta">
-        Date
-      </div>
-      <div class="meta">
-        Last Training Info (if any)
-      </div>
-      <div class="description">
-        Each card represents an instance of this type of model, along with some information
-        about the performance of said instance during its last training session, and information about
-        notes made during training (number).  This text is very long because I want to see if the
-        card has a maximum. (the text should be truncated if it is too long).  Probably best of the text is kept short
-      </div>
-    </div>
-    <div class="content">
-        <i class="comment icon"></i>
-        3 comments
-      </div>
-    <div class="extra content">
-      <div class="ui two buttons">
-        <a class="ui basic black button" href="http://localhost:5000/ui/training_setup">Train</a>
-        <a class="ui basic black button" href="http://localhost:5000/ui/testing_setup">Test</a>
-      </div>
-    </div>
-  </div>
-  {# <div class="card">
-      <div class="blurring dimmable image">
-        <div class="ui inverted dimmer">
-          <div class="content">
-            <div class="center">
-              <div class="ui primary button">Add Friend</div>
-            </div>
+          <div class="item">
+              <div class="content">
+                  <a class="header" href="models/{{ model_type['name'] }}">
+                    {{ model_type['name'] }}
+                  </a>
+                  <div class="meta">
+                      <span>{{ model_type['description'] }}</span>
+                  </div>
+                  <div class="description">
+                      <p></p>
+                  </div>
+                  <div class="extra">
+                      {# Model inputs go here #}
+                      <div class="ui purple label">
+                          Type:
+                          <div class="detail">
+                            {{ model_type['type'] }}
+                          </div>
+                      </div>
+                      <div class="ui blue label">
+                          Input:
+                          <div class="detail">
+                            {{ model_type['input_type'] }} Input dataset
+                          </div>
+                      </div>
+                  </div>
+                  <div class="ui button" onClick="train_model('{{  model_type['name'] }}', '{{  model_type['type'] }}')">
+                      Train
+                  </div>
+                  <div class="ui button">
+                      Edit
+                  </div>
+              </div>
           </div>
         </div>
-        <img src="/images/avatar/large/jenny.jpg">
-      </div>
-      <div class="content">
-        <a class="header">Create new model</a>
-        <div class="meta">
-          <span class="date">Create in Aug 2014</span>
-        </div>
-      </div>
-      <div class="extra content">
-        <a>
-          <i class="users icon"></i>
-          2 Members
-        </a>
-      </div>
-    </div> #}
+      {% endfor %}
+  </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+  function train_model(model_name, model_type) {
+    var url = `http://localhost:5000/actions/train_model?name=${model_name}&type=${model_type}`;
+    location.replace(url);
+
+  }
+</script>
 {% endblock %}

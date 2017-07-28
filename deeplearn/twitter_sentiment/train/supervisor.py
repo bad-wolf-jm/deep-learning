@@ -4,10 +4,13 @@ import math
 import json
 import tensorflow as tf
 import glob
+import numpy as np
 from models.tf_session import tf_session
 from train.summary import StreamSummary
 import datetime
 
+class InfiniteLoss(Exception):
+    pass
 
 class TrainingSupervisor(object):
     def __init__(self, model, validation_interval=None, test_interval=None,
@@ -110,6 +113,7 @@ class TrainingSupervisor(object):
              'loss': float(d['loss']),
              'time': float(d['time'])}
         self.train_summary.add(self.batch_index, **d)
+        print (d)
         return d
 
     def validate_on_batch(self, train_x, train_y):
@@ -190,12 +194,12 @@ class TrainingSupervisor(object):
             d = self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
             train_loss = d['loss']
 
-            #TODO check if the loss is infinite, or NAN, raise exception if it is
-
             self.batch_index += 1
 
             if (self.checkpoint_interval is not None) and \
                     (time.time() - last_checkpoint_time >= self.checkpoint_interval):
+                # TODO only save a checkpoint if its performance is better that the last_checkpoint_time
+                # saved checkpoint.
                 path = self.save_training_checkpoint('training-checkpoint.chkpt')
                 print('Saving checkpoint:', path)
 
@@ -207,6 +211,7 @@ class TrainingSupervisor(object):
             self.housekeeping()
             batch_time = time.time() - batch_t_0
             self.training_time_summary.add(self.batch_index, time=batch_time)
+            yield train_loss
 
     def run_test_training(self, training_data_generator, validation_data_generator=None, test_data_generator=None, session=None):
         validation_iterator = validation_data_generator or self.__default_validation_iterator()
@@ -224,7 +229,8 @@ class TrainingSupervisor(object):
                 break
 
 
-
+    def save_test(self):
+        pass
 
     def save_training_checkpoint(self, file_name):
         pass

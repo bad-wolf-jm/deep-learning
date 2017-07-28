@@ -23,7 +23,7 @@ log.setLevel(logging.ERROR)
 
 from web.python import bootstrap
 from web.python.bootstrap import PersistentGraph, list_model_types
-from web.python.training import PersistentTrainingSupervisor
+from web.python.training import PersistentTrainingSupervisor, ThreadedModelTrainer
 from notify.send_mail import EmailNotification
 
 TEMPLATES_ROOT = os.path.join(os.path.expanduser('~'),
@@ -40,7 +40,7 @@ app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 CORS(app)
 
-
+#self.model_graph
 def render_template(template_filename, **context):
     return environment.get_template(template_filename).render(context)
 
@@ -164,67 +164,117 @@ def display_training_status():
                            supervisor=supervisor,
                            model_types=model_types)
 
+@app.route('/action/stop_training')
+def stop_training():
+    training_thread.stop()
+    #training_thread.join()
+    print('TRAINING STOPPED')
+    return json.dumps({'status': 'ok'})
+
+@app.route('/action/start_training')
+def start_training():
+    training_thread.start()
+#    training_thread.join()
+    print('TRAINING STARTED')
+    return json.dumps({'status': 'ok'})
+
 
 def send_email_every_minute():
     while True:
         print('Sending email')
         try:
             EmailNotification.sendEmail(get_report_email(), subject="Training report")
-            time.sleep(60)
+            time.sleep(3600)
         except:
             time.sleep(6)
 
 
 supervisor = None
-lock = threading.Lock()
+#lock = threading.Lock()
 
 
-def main_training():
-    global supervisor
-    global lock
-    #q = PersistentGraph.load(name="TestRNN", type_="SimpleGRUClassifierConv")
-    #q = PersistentGraph.load(name="TestRNN", type_="SimpleGRUClassifier")
-    #q = PersistentGraph.load(name="TestRNN", type_="Tweet2Vec_BiGRU")
-    #q = PersistentGraph.load(name="Script Create", type_="ByteCNN")
-    q = PersistentGraph.load(name='Model_Tweet2Vec_BiGRU_CMSDataset', type_='Tweet2Vec_BiGRU')
-    #q = PersistentGraph.load(name='Model_ByteCNN_CMSDataset', type_='ByteCNN')#
-    q.initialize(session=None, training=True, resume=False)
-    train_settings = q.load_train_settings()
+#def main_training():
+#    global supervisor
+#    global lock
+#    #q = PersistentGraph.load(name="TestRNN", type_="SimpleGRUClassifierConv")
+#    #q = PersistentGraph.load(name="TestRNN", type_="SimpleGRUClassifier")
+#    #q = PersistentGraph.load(name="TestRNN", type_="Tweet2Vec_BiGRU")
+#    #q = PersistentGraph.load(name="Script Create", type_="ByteCNN")
+#    q = PersistentGraph.load(name='Model_Tweet2Vec_BiGRU_CMSDataset', type_='Tweet2Vec_BiGRU')
+#    #q = PersistentGraph.load(name='Model_ByteCNN_CMSDataset', type_='ByteCNN')#
+#    q.initialize(session=None, training=True, resume=False)
+#    train_settings = q.load_train_settings()
+#
+#    # TODO Save the training settings alongside the graph
+#
+#    train_settings = {
+#        'optimizer': {
+#            'name': 'AdamOptimizer',
+#            'learning_rate': 0.01,
+#            'optimizer_parameters': {
+#                    'beta1': 0.9,
+#                    'beta2': 0.999,
+#                    'epsilon': 0.00000001
+#            }
+#        },
+#        'validation_interval': 5,
+#        'test_interval': 1 * 60,
+#        'e_mail_interval': 1.5 * 3600,
+#        'summary_span': None,
+#        'checkpoint_interval': 30 * 60,
+#        'batch_size': 100,
+#        'validation_size': 100,
+#        'test_size': 1000,
+#        'epochs': 50
+#    }
+#
+#    model_saved_settings = q.load_train_settings()
+#    model_saved_settings = model_saved_settings or {}
+#    train_settings.update(model_saved_settings)
+#
+#    supervisor = PersistentTrainingSupervisor(q, **train_settings)
+##                                              validation_interval=train_settings['validation_interval'],
+##                                              test_interval=train_settings['test_interval'],
+##                                              summary_span=train_settings['summary_span'],
+##                                              checkpoint_interval=train_settings['checkpoint_interval'])
+#    lock.release()
+#    supervisor.train_model()
+#    #batch_size=train_settings['batch_size'],
+#    #                       validation_size=train_settings['validation_size'],
+#    #                       test_size=train_settings['test_size'],
+#    #                       epochs=train_settings['epochs'])
 
-    train_settings = {
-        'validation_interval': 5,
-        'test_interval': 15 * 60,
-        'e_mail_interval': 1.5 * 3600,
-        'summary_span': None,
-        'checkpoint_interval': 30 * 60,
-        'batch_size': 100,
-        'validation_size': 100,
-        'test_size': 1000,
-        'epochs': 30
-    }
-
-    model_saved_settings = q.load_train_settings()
-    model_saved_settings = model_saved_settings or {}
-    train_settings.update(model_saved_settings)
-
-    supervisor = PersistentTrainingSupervisor(q,
-                                              validation_interval=train_settings['validation_interval'],
-                                              test_interval=train_settings['test_interval'],
-                                              summary_span=train_settings['summary_span'],
-                                              checkpoint_interval=train_settings['checkpoint_interval'])
-    lock.release()
-    supervisor.train_model(batch_size=train_settings['batch_size'],
-                           validation_size=train_settings['validation_size'],
-                           test_size=train_settings['test_size'],
-                           epochs=train_settings['epochs'])
-
+train_settings = {
+    'optimizer': {
+        'name': 'AdamOptimizer',
+        'learning_rate': 0.01,
+        'optimizer_parameters': {
+                'beta1': 0.9,
+                'beta2': 0.999,
+                'epsilon': 0.00000001
+        }
+    },
+    'validation_interval': 5,
+    'test_interval': 1 * 60,
+    'e_mail_interval': 1.5 * 3600,
+    'summary_span': None,
+    'checkpoint_interval': 30 * 60,
+    'batch_size': 100,
+    'validation_size': 100,
+    'test_size': 1000,
+    'epochs': 50
+}
 
 if __name__ == '__main__':
     # main_training()
-    lock.acquire()
-    thread = threading.Thread(target=main_training)
-    thread.start()
-    lock.acquire()
-    e_mail_thread = threading.Thread(target=send_email_every_minute)
-    e_mail_thread.start()
+    #lock.acquire()
+    #thread = threading.Thread(target=main_training)
+    #thread.start()
+    #lock.acquire()
+    #e_mail_thread = threading.Thread(target=send_email_every_minute)
+    #e_mail_thread.start()
+    training_thread = ThreadedModelTrainer(model_name='Model_Tweet2Vec_BiGRU_CMSDataset', model_type='Tweet2Vec_BiGRU', train_settings=train_settings)
+    training_thread.start()
+    training_thread.ready_lock.acquire()
+    supervisor = training_thread.training_supervisor
     app.run()
