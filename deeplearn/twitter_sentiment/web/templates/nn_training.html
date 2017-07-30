@@ -42,117 +42,62 @@
       <i class="left floated desktop icon"></i>
       {{ supervisor._meta.name }}
     </div>
-    <div class="ui segment">
-      <div class="ui grid">
-        <div class="ui four wide column">
-          <div class="item">
-            <div class="content">
-              <div class="header">
-                Model type:
-              </div>
-              {{ supervisor._meta.type }}
-            </div>
-          </div>
-
-          <div class="item">
-            <div class="content">
-              <div class="header">
-                Dataset:
-              </div>
-              {{ supervisor._meta.dataset['display_name'] }}
-            </div>
-          </div>
-          <div class="item">
-            <div class="content">
-              <div class="header">
-                Categories:
-              </div>
-              {% for label in supervisor._meta.dataset['category_labels'] %}
-                {% set label_display = supervisor._meta.dataset['category_labels'][label] %}
-                <div class="ui grey basic mini label">
-                  {{ label_display }}
-                  {# <div class="detail">{{ label_display }}</div> #}
-                </div>
-              {% endfor %}
-            </div>
-          </div>
+    <div class="ui horizontal segments">
+        <div class="ui compact segment">
+            Graph type:
         </div>
-        <div class="ui six wide right floated column">
-          <div class='ui top attached block header segment'>
-            Elapsed time
-          </div>
-          <div class="ui attached segment" id='elapsed-time'>
-            22
-          </div>
-          <div class='ui attached block header segment'>
-                Remaining time
-          </div>
-          <div class="ui bottom attached segment" id='remaining-time'>
-            31,200
-          </div>
-
+        <div class="ui segment">
+            {{ supervisor._meta.type }}
+        </div>
+        <div class="ui segment">
+            Dataset:
+        </div>
+        <div class="ui segment">
+            {{ supervisor._meta.dataset['display_name'] }}
+        </div>
+        <div class="ui segment">
+            Optimizer:
+        </div>
+        <div class="ui segment">
+            {{ supervisor._meta.dataset['display_name'] }} \(\ell = x)\
         </div>
       </div>
-    </div>
+
+
     <div class="ui horizontal segments">
       <div class="ui segment">
-        Batch time: <span class="ui right floated label" id="stats-batch-time">NAN</span>
-      </div>
-      <div class="ui segment">
-        Epoch time: <span class="ui right floated label" id="stats-epoch-time">NAN</span>
-      </div>
-
-      <div class="ui segment">
-        <div class="ui grey right floated label">
-          Test loss:
-          <div class="detail" id='current-test-loss'>
-            .445
+          <div class="ui top left attached label">
+              <div class="progress-text" style="width:100px; text-align:center; font-size:10px"><b>EPOCH</b>
+                  <div id="epoch-number" style="display: inline">2534</div> of <div id='total-epochs' style="display: inline">5000</div>
+              </div>
           </div>
-        </div>
-        <div class="ui grey right floated label">
-          Test accuracy:
-          <div class="detail" id='current-test-accuracy'>
-            22.3%
-          </div>
-        </div>
-
+          <div class="ui right floated icon", id='progress-meter' style="width:50px; height:50px;margin:0px;padding:0px"></div>
       </div>
       <div class="ui segment">
-
+          <div class="ui top left attached label">
+            Epoch time:
+          </div>
+        <p class="" id="stats-epoch-time">NAN</p>
       </div>
-    </div>
+
+      <div class="ui segment">
+          <div class="ui top left attached label">
+            Elapsed time:
+          </div>
+          <p class="" id='elapsed-time'>NAN</p>
+      </div>
+
+      <div class="ui segment">
+        <div class="ui top left attached label">
+          Remaining time:
+        </div>
+        <p class="" id='remaining-time'>NAN</p>
+      </div>
   </div>
 
-<div class='ui container'>
-    <div class="ui message">
-      <div class="ui three column grid">
-        <div class="two wide column">
-          <div class="progress-meter", id='progress-meter' style="width:100px; height:100px;margin:0px;padding:0px"></div>
 
-          <div class="progress-text" style="width:100px; text-align:center; font-size:10px"><b>EPOCH</b>
-              <div id="epoch-number" style="display: inline">2534</div> of <div id='total-epochs' style="display: inline">5000</div>
-            </div>
-        </div>
-            {# <div class='seven wide column'>
-                    Elapsed time
-                <div class="value" id='elapsed-time'>
-                  22
-                </div>
-              </div> #}
-              {# <div class='seven wide column'>
-                    Remaining time
-                <div class="value" id='remaining-time'>
-                  31,200
-                </div>
-              </div> #}
-            </div>
-          </div>
-    <h3 class="ui top attached fluid block header">
-      Model performance
-    </h3>
-    <div class="ui bottom attached segment">
-      {{ render_confusion_matrix() }}
-    </div>
+</div>
+<div class='ui container'>
     <div class="ui one column equal height grid">
         <div class="column sixteen wide">
             <h4 class="ui top attached small block header">
@@ -197,6 +142,26 @@
         </div>
 
     </div>
+    <h3 class="ui top attached fluid block header">
+      Model performance
+      <div class="ui grey right floated label">
+        Test loss:
+        <div class="detail" id='current-test-loss'>
+          .445
+        </div>
+      </div>
+      <div class="ui grey right floated label">
+        Test accuracy:
+        <div class="detail" id='current-test-accuracy'>
+          22.3%
+        </div>
+      </div>
+
+    </h3>
+    <div class="ui bottom attached segment">
+      {{ render_confusion_matrix() }}
+    </div>
+
 </div>
 {% endblock %}
 

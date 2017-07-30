@@ -40,7 +40,7 @@ function make_graph(height, renderTo)
 }
 
 
-var graph_time_span = 500
+var graph_time_span = 30*60;
 var max_displayed_time = -graph_time_span;
 
 var training_loss_series_data = [];

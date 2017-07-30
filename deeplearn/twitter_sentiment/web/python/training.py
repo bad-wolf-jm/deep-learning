@@ -5,11 +5,12 @@ import json
 import numpy as np
 import tensorflow as tf
 import glob
-from models.tf_session import tf_session
+from graphs.base.tf_session import tf_session
 import datetime
 import threading
+from train import optimizers
 from train.supervisor import TrainingSupervisor
-from web.python.datasources import get_dataset_specs
+from train.datasources import get_dataset_specs
 from web.python.bootstrap import PersistentGraph
 
 
@@ -17,7 +18,6 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
     def __init__(self, model=None, optimizer=None, batch_size=None, validation_size=None, test_size=None,
                  epochs=None, e_mail_interval=None, **kwargs):
         super(PersistentTrainingSupervisor, self).__init__(model._model, **kwargs)
-        # self._meta has the meta graph with the path info
         self._meta = model
         self.optimizer = optimizer
         self.batch_size = batch_size
@@ -25,6 +25,14 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
         self.test_size = test_size
         self.epochs = epochs
         self.e_mail_interval = e_mail_interval
+        with self._meta._graph.as_default():
+            optimizer_id = self.optimizer['name']
+            optimizer = optimizers.get_by_id(optimizer_id)
+            optimizer['learning_rate'] = self.optimizer['learning_rate']
+            optimizer['optimizer_parameters'].update(self.optimizer['optimizer_parameters'])
+            self._meta._model.train_setup(optimizer['constructor'],
+                                          optimizer['learning_rate'],
+                                          **optimizer['optimizer_parameters'])
 
     def make_test_output_matrix(self, train, test):
         labels = sorted(self._meta.category_labels.keys())
@@ -87,6 +95,18 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
         for train_loss in train_loop:
             yield train_loss
 
+    def half_learning_rate(self):
+        learning_rate = self._meta._model.learning_rate / 10.0
+        self._meta.build(session=None, training=True, resume=False)
+        self._meta.initialize(session=None, training=True, resume=False)
+        self._meta.restore_last_checkpoint()
+        with self._meta._graph.as_default():
+            self._meta._model.train_setup(tf.train.AdamOptimizer, learning_rate=learning_rate)
+            self._meta.initialize_uninitialized_variables()
+        self._session = self._meta._session
+        self.model = self._meta._model
+        pass
+
 
 class ThreadedModelTrainer(object):
     def __init__(self, model_name, model_type, train_settings):
@@ -111,21 +131,23 @@ class ThreadedModelTrainer(object):
     def run(self):
         self.is_running = True
         self.model_graph = PersistentGraph.load(name=self.model_name, type_=self.model_type)
-        self.model_graph.initialize(session=None, training=True, resume=False)
+        self.model_graph.build(session=None, training=True, resume=False)
         train_settings = self.model_graph.load_train_settings()
         train_settings = train_settings or {}
         model_saved_settings = self.model_graph.load_train_settings()
         model_saved_settings = model_saved_settings or {}
         train_settings.update(model_saved_settings)
         self.training_supervisor = PersistentTrainingSupervisor(self.model_graph, **self.train_settings)
+        self.model_graph.initialize(session=None, training=True, resume=False)
+        # self.model_graph.save_training_state()  # NOTE This will wipe previous training!!!
+        self.model_graph.restore_last_checkpoint()
         self.ready_lock.release()
         for training_loss in self.training_supervisor.do_train_model():
             if self.__is_nan_of_infinite(training_loss):
-                # self.model_graph.restore_last_checkpoint()
-                # self.training_supervisor.half_learning_rate()
-                pass
+                self.training_supervisor.half_learning_rate()
+                print("rate lowered... using new learning rate", self.model_graph._model.learning_rate)
+                print("using new learning rate")
             if not self.is_running:
-                # Stop the training
                 break
             print(training_loss)
 
@@ -133,11 +155,10 @@ class ThreadedModelTrainer(object):
         if self.__internal_thread is None:
             self.__internal_thread = threading.Thread(target=self.run)
             self.__internal_thread.start()
+            self.ready_lock.acquire()
 
     def stop(self):
         if self.__internal_thread is not None:
             self.is_running = False
             self.__internal_thread.join()
             self.__internal_thread = None
-            #self.__internal_thread = threading.Thread(target=self.run)
-            # self.__internal_thread.start()

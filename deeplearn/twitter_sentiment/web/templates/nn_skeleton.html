@@ -8,7 +8,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
         <title>Neuronet Training Tool</title>
     </head>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -25,35 +27,44 @@
     <link rel="stylesheet" href="http://localhost:5000/static/css/icon.min.css">
     <link rel="stylesheet" href="http://localhost:5000/static/css/semantic.min.css">
     <link rel="stylesheet" href="http://localhost:5000/static/css/style.css">
-    <body class="template">
-        <div class="ui grey top attached inverted menu">
-            <div class="ui header item">
-            <a href="http://localhost:5000/ui/types">Neuronet Training Tool</a>
-            </div>
-            <div class="right menu">
-                <div class="ui item">
-                  <div class="ui purple label">
-                    <i class="large microchip icon"></i>
-                    CPU:
-                    <div class="detail" id='stats-cpu-usage'>
-                      ...
-                    </div>
-                  </div>
-                  <div class="ui green icon label">
-                    <i class="large disk outline icon"></i>
-                    Memory:
-                    <div class="detail" id='stats-memory-usage'>
-                      ...
-                    </div>
-                  </div>
+    <style type="text/css">
+      .ui.menu .item img.logo {
+        margin-right: 1.5em;
+      }
+      .main.container {
+        margin-top: 7em;
+      }
+    </style>
+
+    <body>
+        <div class="ui fixed grey inverted menu">
+                <div class="ui header item">
+                    <a href="http://localhost:5000/ui">Neuronet Training Tool</a>
                 </div>
-                <a class="ui item" href="http://localhost:5000/ui/training">
-                    {% block  current_model_name %} {% endblock %}
-                </a>
-            </div>
+                <div class="right menu">
+                    <div class="ui item">
+                      <div class="ui purple label">
+                        <i class="large microchip icon"></i>
+                        CPU:
+                        <div class="detail" id='stats-cpu-usage'>
+                          ...
+                        </div>
+                      </div>
+                      <div class="ui green icon label">
+                        <i class="large disk outline icon"></i>
+                        Memory:
+                        <div class="detail" id='stats-memory-usage'>
+                          ...
+                        </div>
+                      </div>
+                    </div>
+                    <a class="ui item" href="http://localhost:5000/ui/training">
+                        {% block  current_model_name %} {% endblock %}
+                    </a>
+                </div>
+
         </div>
-        <p></p>
-        <div class="ui container">
+        <div class="ui main container">
             {% block page_content %}
             {% endblock page_content %}
         </div>

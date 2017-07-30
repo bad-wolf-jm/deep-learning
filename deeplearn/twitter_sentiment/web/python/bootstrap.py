@@ -4,8 +4,8 @@ import pprint
 import glob
 import time
 import datetime
-import web.python.graphs as graphs
-import web.python.datasources as datasources
+import train.graphs as graphs
+import train.datasources as datasources
 import tensorflow as tf
 
 APP_ROOT_FOLDER = os.path.expanduser("~/.sentiment-analysis/nn")
@@ -64,9 +64,6 @@ def list_type_instances(type_name):
 # TODO Class should save the training status and graphs
 
 
-
-
-
 class PersistentGraph(object):
     def __init__(self, name, model_type, dataset, description="", **hyperparameters):
         super(PersistentGraph, self).__init__()
@@ -107,7 +104,7 @@ class PersistentGraph(object):
         x.construct()
         return x
 
-    def __get_files(self, root, template = '*.json', min_date=None, max_date=None):
+    def __get_files(self, root, template='*.json', min_date=None, max_date=None):
         x = []
         files = [[f, os.stat(f).st_ctime] for f in glob.glob("{root}/{template}".format(root=root, template=template))]
         files = sorted(files, key=lambda x: x[1], reverse=True)
@@ -184,79 +181,62 @@ class PersistentGraph(object):
         f = open(self.training_settings_file, 'w')
         return f.write(json.dumps(kwargs))
 
-    def initialize(self, session, training=True, resume=False):
+    def build(self, session, training=True, resume=False):
         new_graph = tf.Graph()
         new_session = tf.Session(graph=new_graph)
-        restored_from_file = False
-        weight_root = self.weight_root if not resume else self.train_root
         g = graphs.build_skeleton(self.type, **self.hyperparameters)
         with new_graph.as_default():
             if training:
                 g.build_training_model()
             else:
                 g.build_inference_model()
-            if os.path.exists(os.path.join(weight_root, 'model.ckpt.meta')):
-                with new_graph.as_default():
-                    saver = tf.train.Saver()
-                    saver.restore(new_session, os.path.join(weight_root, "model.ckpt"))
-                    restored_from_file = True
-            else:
-                new_session.run(tf.global_variables_initializer())
         self._model = g
         self._graph = new_graph
         self._session = new_session
 
+    def initialize(self, session, training=True, resume=False):
+        weight_root = self.weight_root if not resume else self.train_root
+        with self._graph.as_default():
+            if os.path.exists(os.path.join(weight_root, 'model.ckpt.meta')):
+                saver = tf.train.Saver()
+                saver.restore(self._session, os.path.join(weight_root, "model.ckpt"))
+                restored_from_file = True
+            else:
+                self._session.run(tf.global_variables_initializer())
+                # self.save_training_state()
+
     def save(self):
         self.save_metadata()
-        #self.save_train_settings()
+        # self.save_train_settings()
         with self._graph.as_default():
             saver = tf.train.Saver()
             saver.save(self._session, os.path.join(self.weight_root, "model.ckpt"))
 
+    def dump_weights(self, path):
+        with self._graph.as_default():
+            saver = tf.train.Saver()
+            saver.save(self._session, path)
+
     def save_training_state(self):
         self.save_metadata()
-        #self.save_train_settings()
+        # self.save_train_settings()
         with self._graph.as_default():
             saver = tf.train.Saver()
             saver.save(self._session, os.path.join(self.train_root, "model.ckpt"))
 
+    def restore_last_checkpoint(self):
+        with self._graph.as_default():
+            saver = tf.train.Saver()
+            saver.restore(self._session, os.path.join(self.train_root, "model.ckpt"))
 
-if __name__ == '__main__':
-    pass
-    import numpy as np
-    test_data = np.random.randint(1, 256, [1000, 140])
-    dummy_output = np.random.rand(1000, 1)
+    def restore_weights(self):
+        with self._graph.as_default():
+            saver = tf.train.Saver()
+            saver.restore(self._session, os.path.join(self.weight_root, "model.ckpt"))
 
-    print('Model Created')
-    p = PersistentGraph.new(name="Test Model", type_="ByteCNN")
-    p.initialize(session=None)
-    foo = p._model.test(test_data, dummy_output, session=p._session)
-    model_outputs = [[x[2]] for x in foo['output']]
-    p.save()
-
-    print('Model loading')
-    q = PersistentGraph.load(name="Test Model", type_="ByteCNN")
-    q.initialize(session=None, resume=False)
-    foo = q._model.test(test_data, model_outputs, session=q._session)
-    print(foo)
-
-    # for i, real, pred in foo['output']:
-    #    print(real, pred)
-    #model_outputs = [[x[2]] for x in foo['output']]
-    # q.save()
-
-#        from train.supervisor import TrainingSupervisor
-#        from train.data import sentiment_training_generator, cms_training_generator
-#        print('Model reloaded')
-#        foo = TrainingSupervisor(q._graph, 10)
-#        supervisor = foo
-#        data_generator = sentiment_training_generator(batch_size=50, epochs=50, validation_size=50)
-#        try:
-#            foo.run_training(data_generator['train'], data_generator['validation'], session=q._session)  # batch_generator, validation_iterator)
-#        except KeyboardInterrupt:
-#            #save_before_exiting()
-#            q.save()
-#            #foo.shutdown()
-#            #sys.exit(0)
-#        print('done')
-#
+    def initialize_uninitialized_variables(self):
+        global_variables = tf.global_variables()
+        is_initialized = self._session.run([tf.is_variable_initialized(x) for x in global_variables])
+        uninitialized_variables = [x for (x, v) in zip(global_variables, is_initialized) if not v]
+        if len(uninitialized_variables) > 0:
+            self._session.run(tf.variables_initializer(uninitialized_variables))

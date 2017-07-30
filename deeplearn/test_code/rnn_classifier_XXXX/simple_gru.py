@@ -239,14 +239,14 @@ class SimpleGRUClassifierConv(SimpleGRUClassifier):
                                name='final_biases',
                                scope=scope,
                                trainable=True)
-            _weights = self.var(input_shape=[D, self.num_classes],
-                                name='final_weights',
-                                scope=scope,
-                                trainable=True)
-            _biases = self.var(input_shape=[1, self.num_classes],
-                               name='final_biases',
-                               scope=scope,
-                               trainable=True)
+#            _weights = self.var(input_shape=[D, self.num_classes],
+#                                name='final_weights',
+#                                scope=scope,
+#                                trainable=True)
+#            _biases = self.var(input_shape=[1, self.num_classes],
+#                               name='final_biases',
+#                               scope=scope,
+#                               trainable=True)
             self.output_predicted = tf.matmul(pool_layer, _weights) + _biases
 
     def build_inference_model(self, trainable=False):

@@ -34,15 +34,22 @@
 
 
 <div class="ui contents">
-  <div class="ui items">
+  <div class="ui fluid items">
       {% for model_type in model_types%}
-        <div class="ui segment">
+        <h3 class="ui top attached block segment">
+            {{ model_type['name'] }}
+            <div class="ui label">
+                Type:
+                <div class="detail">
+                  {{ model_type['type'] }}
+                </div>
+            </div>
+        </h3>
 
+        <div class="ui attached segment">
+            The description of the model
           <div class="item">
               <div class="content">
-                  <a class="header" href="models/{{ model_type['name'] }}">
-                    {{ model_type['name'] }}
-                  </a>
                   <div class="meta">
                       <span>{{ model_type['description'] }}</span>
                   </div>
@@ -51,12 +58,6 @@
                   </div>
                   <div class="extra">
                       {# Model inputs go here #}
-                      <div class="ui purple label">
-                          Type:
-                          <div class="detail">
-                            {{ model_type['type'] }}
-                          </div>
-                      </div>
                       <div class="ui blue label">
                           Input:
                           <div class="detail">
@@ -64,14 +65,20 @@
                           </div>
                       </div>
                   </div>
-                  <div class="ui button" onClick="train_model('{{  model_type['name'] }}', '{{  model_type['type'] }}')">
-                      Train
-                  </div>
-                  <div class="ui button">
-                      Edit
-                  </div>
               </div>
           </div>
+        </div>
+        <div class="ui bottom attached segment">
+            <div class="ui mini button">
+                Edit
+            </div>
+            <div class="ui right floated mini red button" onClick="">
+                Train
+            </div>
+            <div class="ui right floated mini green button" onClick="">
+                Test
+            </div>
+
         </div>
       {% endfor %}
   </div>

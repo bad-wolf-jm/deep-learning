@@ -1,9 +1,9 @@
 import copy
 
-from models.byte_cnn.byte_cnn import ByteCNN
-from models.rnn_classifier.bidirectional_gru import Tweet2Vec_BiGRU
-from models.rnn_classifier.simple_gru import SimpleGRUClassifier
-from models.rnn_classifier.simple_gru import SimpleGRUClassifierConv
+from graphs.byte_cnn import ByteCNN
+from graphs.bidirectional_gru import Tweet2Vec_BiGRU
+from graphs.simple_gru import SimpleGRUClassifier
+from graphs.simple_gru_convolution import SimpleGRUClassifierConv
 
 
 model_specs = {
