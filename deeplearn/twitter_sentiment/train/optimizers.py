@@ -86,6 +86,6 @@ def build(name, learning_rate=None, **kwargs):
         kw = {}
         kw.update(x['optimizer_parameters'])
         kw.update(kwargs)
-        return {'constructor': constructor, 'learning_rate': learning_rate, 'optimizer_args': kw}#constructor(learning_rate=learning_rate, **kw)
+        return {'constructor': constructor, 'learning_rate': learning_rate, 'optimizer_args': kw}
     else:
         return None

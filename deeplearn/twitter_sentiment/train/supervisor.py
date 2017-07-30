@@ -1,16 +1,18 @@
 import time
-import os
-import math
-import json
-import tensorflow as tf
-import glob
+#import os
+#import math
+#import json
+#import tensorflow as tf
+#import glob
 import numpy as np
-from models.tf_session import tf_session
+#from models.tf_session import tf_session
 from train.summary import StreamSummary
 import datetime
 
+
 class InfiniteLoss(Exception):
     pass
+
 
 class TrainingSupervisor(object):
     def __init__(self, model=None, validation_interval=None, test_interval=None,
@@ -171,6 +173,9 @@ class TrainingSupervisor(object):
         self._training_start_time = time.time()
         last_test_time = self._training_start_time
         last_checkpoint_time = self._training_start_time
+        num_failed_checkpoints = 0
+        current_min_loss = np.inf
+        current_best_accuracy = 0
 
         test_index = 1
         for training_batch in training_data_generator:
@@ -187,10 +192,8 @@ class TrainingSupervisor(object):
                     result = self.test_on_batch(train_x=test_batch['train_x'], train_y=test_batch['train_y'])
                     result['output'] = self.__process_output(result['output'])
                     last_test_time = time.time()
-                    #last_checkpoint_time = time.time()
                     test_index += 1
                 self.save_test(train=test_result_on_train, test=result)
-                #last_test_time = time.time()
 
             d = self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
             train_loss = d['loss']
@@ -199,12 +202,21 @@ class TrainingSupervisor(object):
 
             if (self.checkpoint_interval is not None) and \
                     (time.time() - last_checkpoint_time >= self.checkpoint_interval):
-                # TODO only save a checkpoint if its performance is better that the last_checkpoint_time
-                # saved checkpoint.  Run a validation on a test batch, and compare it to the data from the last
-                # checkpoint
-                path = self.save_training_checkpoint('training-checkpoint.chkpt')
-                print('Saving checkpoint:', path)
-                last_checkpoint_time = time.time()
+                test_batch = next(test_iterator)
+                x = self.validate_on_batch(train_x=test_batch['train_x'], train_y=test_batch['train_y'])
+                if not (np.isnan(x['loss']) or np.isinf(x['loss'])):
+                    if (current_min_loss > x['loss']) or (current_best_accuracy < x['loss']):
+                        path = self.save_training_checkpoint()
+                        last_checkpoint_time = time.time()
+                        current_min_loss = x['loss']
+                        current_best_accuracy = x['loss']
+                    else:
+                        if num_failed_checkpoints > 3:
+                            yield np.nan
+                            num_failed_checkpoints = 0
+                            continue
+                        else:
+                            num_failed_checkpoints += 1
 
             if (self.validation_interval is not None) and \
                     ((training_batch['batch_index'] % self.validation_interval) == 0):
@@ -216,29 +228,10 @@ class TrainingSupervisor(object):
             self.training_time_summary.add(self.batch_index, time=batch_time)
             yield train_loss
 
-#    def run_test_training(self, training_data_generator, validation_data_generator=None, test_data_generator=None, session=None):
-#        validation_iterator = validation_data_generator or self.__default_validation_iterator()
-#        test_iterator = test_data_generator or self.__default_validation_iterator()
-#        self._session = session
-#        for training_batch in training_data_generator:
-#            d = self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
-#            print ('training', d)
-#            test_batch = next(test_iterator)
-#            result = self.test_on_batch(train_x=test_batch['train_x'], train_y=test_batch['train_y'])
-#            validation_batch = next(validation_iterator)
-#            self.validate_on_batch(train_x=validation_batch['train_x'], train_y=validation_batch['train_y'])
-#            self.batch_index += 1
-#            if self.batch_index > 3:
-#                break
-
-#    def half_learning_rate(self):
-#        self.model.half_learning_rate()
-#        pass
-
     def save_test(self):
         pass
 
-    def save_training_checkpoint(self, file_name):
+    def save_training_checkpoint(self):
         pass
 
     def housekeeping(self):

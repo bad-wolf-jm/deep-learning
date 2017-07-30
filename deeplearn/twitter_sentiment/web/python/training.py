@@ -64,7 +64,7 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
             test_file.write(json.dumps(test_confusion_result))
         # also save loss and accuracy graphs
 
-    def save_training_checkpoint(self, file_name):
+    def save_training_checkpoint(self):
         return self._meta.save_training_state()
 
     def housekeeping(self):
@@ -139,8 +139,8 @@ class ThreadedModelTrainer(object):
         train_settings.update(model_saved_settings)
         self.training_supervisor = PersistentTrainingSupervisor(self.model_graph, **self.train_settings)
         self.model_graph.initialize(session=None, training=True, resume=False)
-        # self.model_graph.save_training_state()  # NOTE This will wipe previous training!!!
-        self.model_graph.restore_last_checkpoint()
+        self.model_graph.save_training_state()  # NOTE This will wipe previous training!!!
+        #self.model_graph.restore_last_checkpoint()
         self.ready_lock.release()
         for training_loss in self.training_supervisor.do_train_model():
             if self.__is_nan_of_infinite(training_loss):

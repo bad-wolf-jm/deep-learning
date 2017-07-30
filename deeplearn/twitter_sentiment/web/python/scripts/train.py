@@ -102,12 +102,12 @@ def get_training_graph_series():
     return json.dumps({'loss': loss,
                        'accuracy': accuracy})
 
-    complete_path = os.path.join(root_dir(), path)
-    ext = os.path.splitext(path)[1]
-    mimetype = mimetypes.get(ext, "text/html")
-    content = get_file(complete_path)
-    return Response(content, mimetype=mimetype)
-
+#    complete_path = os.path.join(root_dir(), path)
+#    ext = os.path.splitext(path)[1]
+#    mimetype = mimetypes.get(ext, "text/html")
+#    content = get_file(complete_path)
+#    return Response(content, mimetype=mimetype)
+#
 
 @app.route('/static/<string:page_folder>/<path:page_name>')
 def get_page(page_folder, page_name):
@@ -205,7 +205,7 @@ train_settings = {
     'test_interval': 1 * 60,
     'e_mail_interval': 1.5 * 3600,
     'summary_span': None,
-    'checkpoint_interval': 30 * 60,
+    'checkpoint_interval': 45 * 60,
     'batch_size': 100,
     'validation_size': 100,
     'test_size': 1000,
@@ -213,12 +213,12 @@ train_settings = {
 }
 
 if __name__ == '__main__':
-    training_thread = ThreadedModelTrainer(model_name='Model_Tweet2Vec_BiGRU_CMSDataset',
-                                           model_type='Tweet2Vec_BiGRU',
-                                           train_settings=train_settings)
-    #training_thread = ThreadedModelTrainer(model_name='Model_Tweet2Vec_BiGRU_SSTBDataset_5',
+    #training_thread = ThreadedModelTrainer(model_name='Model_Tweet2Vec_BiGRU_CMSDataset',
     #                                       model_type='Tweet2Vec_BiGRU',
     #                                       train_settings=train_settings)
+    training_thread = ThreadedModelTrainer(model_name='Model_Tweet2Vec_BiGRU_SSTBDataset_5',
+                                           model_type='Tweet2Vec_BiGRU',
+                                           train_settings=train_settings)
 
     training_thread.start()
     #training_thread.ready_lock.acquire()
