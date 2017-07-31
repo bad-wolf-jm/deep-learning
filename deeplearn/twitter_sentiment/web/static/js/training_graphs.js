@@ -52,7 +52,7 @@ var validation_accuracy_series_data = [];
 
 function update_graphs()
 {
-    $.getJSON('http://localhost:5000/json/training_graphs.json?min_timestamp='+Math.round(max_displayed_time),
+    $.getJSON('/json/training_graphs.json?min_timestamp='+Math.round(max_displayed_time),
         function(data) {
             var loss_training_timestamps = data.loss.train.map((p)=> p[0]);
             var loss_validation_timestamps = data.loss.validation.map((p)=> p[0]);

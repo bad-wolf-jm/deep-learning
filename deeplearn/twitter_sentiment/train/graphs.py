@@ -25,7 +25,7 @@ model_specs = {
                 'description': "The maximal length of input sequences",
                 'default': 512
             },
-            'input_depth': {
+            'embedding_dimension': {
                 'type': int,
                 'display': 'Encoding dimension',
                 'description': "The encoding dimension for inputs",

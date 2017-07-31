@@ -156,7 +156,7 @@ training_progress_chart = new Highcharts.Chart({
 
 function update_stats()
 {
-    $.getJSON('http://localhost:5000/json/training_stats.json',
+    $.getJSON('/json/training_stats.json',
             function(data) {
                 $('#stats-training-loss').text(data.training.loss.toFixed(2));
                 $('#stats-training-accuracy').text((100*data.training.accuracy).toFixed(2));
@@ -169,7 +169,7 @@ function update_stats()
 
 function update_progress()
 {
-    $.getJSON('http://localhost:5000/json/training_progress.json',
+    $.getJSON('/json/training_progress.json',
             function(data) {
                 $('#stats-batch-time').html(format_seconds_short(data.batch_time.toFixed(2)));
                 $('#stats-epoch-time').html(format_seconds_short(data.epoch_time.toFixed(2)));
@@ -185,7 +185,7 @@ function update_progress()
 
 function update_confusion_matrix()
 {
-    $.getJSON('http://localhost:5000/json/latest_test.json',
+    $.getJSON('/json/latest_test.json',
             function(data) {
               var test_data = data.test;
               var test_batch_size =0;
@@ -224,7 +224,7 @@ function format_memory_usage(used, total){
 
 function update_cpuinfo()
 {
-    $.getJSON('http://localhost:5000/json/system_stats.json',
+    $.getJSON('/json/system_stats.json',
             function(data) {
                 cpu_percentage = data.cpu;
                 memory_used = data.memory[0];

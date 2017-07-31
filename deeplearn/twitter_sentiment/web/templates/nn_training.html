@@ -43,23 +43,23 @@
       {{ supervisor._meta.name }}
     </div>
     <div class="ui horizontal segments">
-        <div class="ui compact segment">
-            Graph type:
+        <div class="ui segment">
+          <div class="ui top left attached label">
+            Type:
+          </div>
+          <p>{{ supervisor._meta.type }}</p>
         </div>
         <div class="ui segment">
-            {{ supervisor._meta.type }}
-        </div>
-        <div class="ui segment">
+          <div class="ui top left attached label">
             Dataset:
+          </div>
+          <p>{{ supervisor._meta.dataset['display_name'] }}</p>
         </div>
         <div class="ui segment">
-            {{ supervisor._meta.dataset['display_name'] }}
-        </div>
-        <div class="ui segment">
+          <div class="ui top left attached label">
             Optimizer:
-        </div>
-        <div class="ui segment">
-            {{ supervisor._meta.dataset['display_name'] }}
+          </div>
+          <p>{{ supervisor._meta.dataset['display_name'] }}</p>
         </div>
       </div>
 
@@ -183,6 +183,6 @@ $(document).ready(
 {% endblock %}
 
 {% block header_scripts %}
-  <script src="http://localhost:5000/static/js/train_update.js"></script>
-  <script src="http://localhost:5000/static/js/training_graphs.js"></script>
+  <script src="/static/js/train_update.js"></script>
+  <script src="/static/js/training_graphs.js"></script>
 {% endblock %}

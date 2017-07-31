@@ -44,7 +44,17 @@ def tokenize(text):
                 sanitized_words.append(w)
     return ' '.join(sanitized_words)
 
-
+"""
+SELECT comment.message AS text,
+                  comments_flags.flag_id AS flag_id,
+                  flag.name AS flag_name,
+                  flag.tab as tab
+           FROM (comment INNER JOIN comments_flags ON
+                    comment.id = comments_flags.comment_id)
+                    INNER JOIN flag ON
+                        flag.id = comments_flags.flag_id
+           WHERE comments_flags.flag_id between 1 and 5
+"""
 
 query = """SELECT cms_staging__comment.message AS text,
                   cms_staging__comments_flags.flag_id AS flag_id,

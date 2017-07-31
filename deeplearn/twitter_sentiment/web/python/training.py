@@ -97,8 +97,8 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
 
     def half_learning_rate(self):
         learning_rate = self._meta._model.learning_rate / 10.0
-        self._meta.build(session=None, training=True, resume=False)
-        self._meta.initialize(session=None, training=True, resume=False)
+        self._meta.build()
+        self._meta.initialize()
         self._meta.restore_last_checkpoint()
         with self._meta._graph.as_default():
             self._meta._model.train_setup(tf.train.AdamOptimizer, learning_rate=learning_rate)
@@ -109,17 +109,18 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
 
 
 class ThreadedModelTrainer(object):
-    def __init__(self, model_name, model_type, train_settings):
+    def __init__(self, model_graph=None, train_settings=None, initial_weights=None):
         super(ThreadedModelTrainer, self).__init__()
-        self.model_name = model_name
-        self.model_type = model_type
+        self.model_graph = model_graph
         self.train_settings = train_settings
+        self.initial_weights = initial_weights
         self.training_supervisor = None
-        self.model_graph = None
         self.is_running = False
         self.ready_lock = threading.Lock()
         self.ready_lock.acquire()
         self.__internal_thread = None
+
+        # print(self.model_graph)
         # Keep an internal /tmp folder to save models before stopping
         # if there is one in there, resume training
         # add a 'reset' function, which deletes the saved image, and
@@ -128,19 +129,14 @@ class ThreadedModelTrainer(object):
     def __is_nan_of_infinite(self, num):
         return (np.isnan([num]) or np.isinf([num]))
 
+    def prefix_exists(self, prefix):
+        return len(glob.glob("{p}*".format(p=prefix))) > 0
+
     def run(self):
         self.is_running = True
-        self.model_graph = PersistentGraph.load(name=self.model_name, type_=self.model_type)
-        self.model_graph.build(session=None, training=True, resume=False)
-        train_settings = self.model_graph.load_train_settings()
-        train_settings = train_settings or {}
-        model_saved_settings = self.model_graph.load_train_settings()
-        model_saved_settings = model_saved_settings or {}
-        train_settings.update(model_saved_settings)
+        self.model_graph.build(training=True)
         self.training_supervisor = PersistentTrainingSupervisor(self.model_graph, **self.train_settings)
-        self.model_graph.initialize(session=None, training=True, resume=False)
-        self.model_graph.save_training_state()  # NOTE This will wipe previous training!!!
-        #self.model_graph.restore_last_checkpoint()
+        self.model_graph.initialize()
         self.ready_lock.release()
         for training_loss in self.training_supervisor.do_train_model():
             if self.__is_nan_of_infinite(training_loss):
@@ -151,7 +147,7 @@ class ThreadedModelTrainer(object):
                 break
             print(training_loss)
 
-    def start(self):
+    def start(self, initial_weights=None):
         if self.__internal_thread is None:
             self.__internal_thread = threading.Thread(target=self.run)
             self.__internal_thread.start()

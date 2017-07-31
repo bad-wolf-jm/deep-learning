@@ -8,10 +8,6 @@ class ByteCNN(BaseClassifier):
                  sub_levels=[2, 2, 2, 2], classifier_layers=[4096, 2048, 2048]):
         super(ByteCNN, self).__init__(seq_length=seq_length, embedding_dimension=embedding_dimension, num_classes=num_classes)
         assert len(sub_levels) == len(level_features) - 1
-        #self.input_width = seq_length
-        #self.seq_length = seq_length
-        #self.input_depth = input_depth
-        #self.num_classes = num_classes
         self.level_features = level_features
         self.sub_levels = sub_levels
         self.classifier_layers = classifier_layers

@@ -14,9 +14,13 @@
         <title>Neuronet Training Tool</title>
     </head>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="http://localhost:5000/static/js/highcharts.js"></script>
+    <script src="/static/js/highcharts.js"></script>
+    <script src="/static/js/semantic.min.js"></script>
+    <script src="/static/js/utilities.js"></script>
+    <!-- <script src="http://localhost:5000/static/js/highcharts.js"></script>
     <script src="http://localhost:5000/static/js/semantic.min.js"></script>
-    <script src="http://localhost:5000/static/js/utilities.js"></script>
+    <script src="http://localhost:5000/static/js/utilities.js"></script>-->
+
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
     <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
     {% block header_scripts %}
@@ -24,9 +28,14 @@
     <script type="text/javascript" async
       src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
-    <link rel="stylesheet" href="http://localhost:5000/static/css/icon.min.css">
+    <!-- <link rel="stylesheet" href="http://localhost:5000/static/css/icon.min.css">
     <link rel="stylesheet" href="http://localhost:5000/static/css/semantic.min.css">
-    <link rel="stylesheet" href="http://localhost:5000/static/css/style.css">
+    <link rel="stylesheet" href="http://localhost:5000/static/css/style.css"> -->
+    <link rel="stylesheet" href="/static/css/icon.min.css">
+    <link rel="stylesheet" href="/static/css/semantic.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+
     <style type="text/css">
       .ui.menu .item img.logo {
         margin-right: 1.5em;
@@ -71,7 +80,7 @@
         <script>
             function update_cpuinfo()
             {
-                $.getJSON('http://localhost:5000/status/system_stats.json',
+                $.getJSON('/status/system_stats.json',
                         function(data) {
                             cpu_percentage = data.cpu;
                             memory_used = data.memory[0];

@@ -34,7 +34,8 @@ def list_model_types():
     return types
 
 
-def list_model_instances():
+def list_model_instances():            # , kwargs={'initial_weights': initial_weights})
+
     m_list = []
     for name in os.listdir(APP_MODELS_FOLDER):
         path = os.path.join(APP_MODELS_FOLDER, name)
@@ -181,7 +182,7 @@ class PersistentGraph(object):
         f = open(self.training_settings_file, 'w')
         return f.write(json.dumps(kwargs))
 
-    def build(self, session, training=True, resume=False):
+    def build(self, training=True):  # , resume=False):
         new_graph = tf.Graph()
         new_session = tf.Session(graph=new_graph)
         g = graphs.build_skeleton(self.type, **self.hyperparameters)
@@ -194,16 +195,18 @@ class PersistentGraph(object):
         self._graph = new_graph
         self._session = new_session
 
-    def initialize(self, session, training=True, resume=False):
-        weight_root = self.weight_root if not resume else self.train_root
+    def prefix_exists(self, prefix):
+        return len(glob.glob("{p}*".format(p=prefix))) > 0
+
+    def initialize(self): #, session, training=True, resume=False):
+        weight_root = self.weight_root #if not resume else self.train_root
         with self._graph.as_default():
             if os.path.exists(os.path.join(weight_root, 'model.ckpt.meta')):
                 saver = tf.train.Saver()
                 saver.restore(self._session, os.path.join(weight_root, "model.ckpt"))
-                restored_from_file = True
             else:
                 self._session.run(tf.global_variables_initializer())
-                # self.save_training_state()
+                self.save()
 
     def save(self):
         self.save_metadata()
@@ -217,9 +220,11 @@ class PersistentGraph(object):
             saver = tf.train.Saver()
             saver.save(self._session, path)
 
-    def save_training_state(self):
+    def get_weight_file_prefix(self):
+        return os.path.join(self.train_root, "model.ckpt")
+
+    def save_training_state(self, path=None):
         self.save_metadata()
-        # self.save_train_settings()
         with self._graph.as_default():
             saver = tf.train.Saver()
             saver.save(self._session, os.path.join(self.train_root, "model.ckpt"))
@@ -228,6 +233,11 @@ class PersistentGraph(object):
         with self._graph.as_default():
             saver = tf.train.Saver()
             saver.restore(self._session, os.path.join(self.train_root, "model.ckpt"))
+
+    def load_initial_weights(self, w_prefix):
+        with self._graph.as_default():
+            saver = tf.train.Saver()
+            saver.restore(self._session, w_prefix)
 
     def restore_weights(self):
         with self._graph.as_default():

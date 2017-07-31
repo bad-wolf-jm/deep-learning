@@ -1,7 +1,7 @@
 import argparse
 from web.python.bootstrap import PersistentGraph
-from web.python.datasources import generator_specs
-from web.python.graphs import model_specs
+from train.datasources import generator_specs
+from train.graphs import model_specs
 
 
 flags = argparse.ArgumentParser()
@@ -26,5 +26,6 @@ flags = flags.parse_args()
 for m in model_specs:
     for n in generator_specs:
         p = PersistentGraph.new(name="Model_{type}_{name}".format(type=m, name=n), model_type=m, dataset_type=n)
-        p.initialize(session=None)
+        p.build()#session=None)
+        p.initialize()#session=None)
         p.save_metadata()

@@ -27,8 +27,8 @@ from web.python.training import PersistentTrainingSupervisor, ThreadedModelTrain
 from notify.send_mail import EmailNotification
 
 TEMPLATES_ROOT = os.path.join(os.path.expanduser('~'),
-                              #'python',
-                              'Python', 'DJ',
+                              'python',
+                              #'Python', 'DJ',
                               'deep-learning',
                               'deeplearn',
                               'twitter_sentiment', 'web')
@@ -40,6 +40,7 @@ environment = jinja2.Environment(loader=loader)
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 CORS(app)
+
 
 def render_template(template_filename, **context):
     return environment.get_template(template_filename).render(context)
@@ -109,6 +110,7 @@ def get_training_graph_series():
 #    return Response(content, mimetype=mimetype)
 #
 
+
 @app.route('/static/<string:page_folder>/<path:page_name>')
 def get_page(page_folder, page_name):
     dir_name = TEMPLATES_ROOT
@@ -164,17 +166,17 @@ def display_training_status():
                            supervisor=supervisor,
                            model_types=model_types)
 
+
 @app.route('/action/stop_training')
 def stop_training():
     training_thread.stop()
-    #training_thread.join()
     print('TRAINING STOPPED')
     return json.dumps({'status': 'ok'})
+
 
 @app.route('/action/start_training')
 def start_training():
     training_thread.start()
-#    training_thread.join()
     print('TRAINING STARTED')
     return json.dumps({'status': 'ok'})
 
@@ -184,7 +186,7 @@ def send_email_every_minute():
         print('Sending email')
         try:
             EmailNotification.sendEmail(get_report_email(), subject="Training report")
-            time.sleep(3600)
+            time.sleep(1)
         except:
             time.sleep(6)
 
@@ -213,14 +215,20 @@ train_settings = {
 }
 
 if __name__ == '__main__':
-    #training_thread = ThreadedModelTrainer(model_name='Model_Tweet2Vec_BiGRU_CMSDataset',
-    #                                       model_type='Tweet2Vec_BiGRU',
-    #                                       train_settings=train_settings)
-    training_thread = ThreadedModelTrainer(model_name='Model_Tweet2Vec_BiGRU_SSTBDataset_5',
-                                           model_type='Tweet2Vec_BiGRU',
+    model_name = ['Model_Tweet2Vec_BiGRU_CMSDataset',
+                  'Model_Tweet2Vec_BiGRU_BuzzometerDatasetVader']
+    model_name = model_name[1]
+    model_type = 'Tweet2Vec_BiGRU'
+    model_graph = PersistentGraph.load(name=model_name, type_=model_type)
+    model_saved_settings = model_graph.load_train_settings()
+    model_saved_settings = model_saved_settings or {}
+    train_settings.update(model_saved_settings)
+    model_weight_prefix = model_graph.get_weight_file_prefix()
+    training_thread = ThreadedModelTrainer(model_graph=model_graph,
+                                           initial_weights=model_weight_prefix,
                                            train_settings=train_settings)
-
     training_thread.start()
-    #training_thread.ready_lock.acquire()
     supervisor = training_thread.training_supervisor
+    thr = threading.Thread(target=send_email_every_minute)
+    thr.start()
     app.run(host='0.0.0.0')
