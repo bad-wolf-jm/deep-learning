@@ -7,6 +7,7 @@ import datetime
 import train.graphs as graphs
 import train.datasources as datasources
 import tensorflow as tf
+import yaml
 
 APP_ROOT_FOLDER = os.path.expanduser("~/.sentiment-analysis/nn")
 APP_MODELS_FOLDER = os.path.expanduser("~/.sentiment-analysis/nn/models")
@@ -105,6 +106,31 @@ class PersistentGraph(object):
         x.construct()
         return x
 
+#    def construct_yaml(self, root):
+#        self.model_root = os.path.join(root, self.name)
+#        self.weight_root = os.path.join(self.model_root, 'weights')
+#        #self.train_root = os.path.join(self.model_root, 'training')
+#        #self.notes_root = os.path.join(self.model_root, 'notes')
+#        self.test_root = os.path.join(self.model_root, 'tests')
+#        for p in [self.model_root, self.weight_root, #self.train_root, self.notes_root,
+#                  self.test_root]:
+#            if not os.path.exists(p):
+#                os.makedirs(p)
+#        self.metadata_file = os.path.join(self.model_root, 'model.json')
+#        self.training_settings_file = os.path.join(self.model_root, 'training.json')
+
+#    @classmethod
+#    def new_yaml(cls, name, model_type, dataset_type, description="", **hyper):
+#        specs = graphs.get_default_model_specs(model_type)
+#        data_specs = datasources.get_dataset_specs(dataset_type)
+#        parameters = {name: specs['hyperparameters'][name]['default'] for name in specs['hyperparameters']}
+#        parameters.update(hyper)
+#        pprint.pprint(parameters)
+#        x = cls(name, model_type, dataset_type, description, **parameters)
+#        x.construct()
+#        return x
+
+
     def __get_files(self, root, template='*.json', min_date=None, max_date=None):
         x = []
         files = [[f, os.stat(f).st_ctime] for f in glob.glob("{root}/{template}".format(root=root, template=template))]
@@ -146,11 +172,64 @@ class PersistentGraph(object):
         metadata['hyperparameters'] = self.hyperparameters
         metadata['model_root'] = self.model_root
         metadata['weight_root'] = self.weight_root
-        metadata['train_root'] = self.train_root
-        metadata['notes_root'] = self.notes_root
+        #metadata['train_root'] = self.train_root
+        #metadata['notes_root'] = self.notes_root
         metadata['test_root'] = self.test_root
         metadata['dataset'] = self.dataset_type
         return metadata
+
+
+#    @classmethod
+#    def compile_yaml(cls, file_name):
+#        file_content = open(file_name).read()
+#        full_model_description = yaml.load(file_content)
+#        model_root = os.path.dirname(file_name)
+#        model_root = os.path.join(model_root, '.bin')
+#        model_name = full_model_description['name']
+#        model_type = full_model_description['type']
+#        model_dataset = full_model_description['dataset']
+#        model_description = full_model_description['description']
+#        model_hyperparameters = full_model_description['hyperparameters']
+#        model_train_settings = full_model_description['training']
+#        specs = graphs.get_default_model_specs(model_type)
+#        data_specs = datasources.get_dataset_specs(model_dataset)
+#        parameters = {name: specs['hyperparameters'][name]['default'] for name in specs['hyperparameters']}
+#        parameters.update(model_hyperparameters)
+#        x = cls(model_name, model_type, model_dataset, model_description, **parameters)
+#        x.construct_yaml(model_root)
+#        x.yaml_train_settings = model_train_settings
+#        x.save_metadata()
+#        pprint.pprint(parameters)
+#        return x
+
+    #@classmethod
+    #def load_yaml(cls, file_name):
+    #    file_content = open(file_name).read()
+    #    full_model_description = yaml.load(file_content)
+    #    model_root = os.path.dirname(file_name)
+    #    model_root = os.path.join(model_root, '.bin')
+    #    model_root = os.path.join(model_root, full_model_description['name'])
+    #    if not os.path.exists(model_root):
+    #        return cls.compile_yaml(file_name)
+    #    else:
+    #        m_path = os.path.join(model_root, 'model.json')
+    #        model_metadata_file = open(m_path)
+    #        model_metadata = json.loads(model_metadata_file.read())
+    #        new_instance = cls(model_metadata['name'],
+    #                           model_metadata['type'],
+    #                           model_metadata['dataset'],
+    #                           model_metadata['description'],
+    #                           **model_metadata['hyperparameters'])
+    #        new_instance.metadata_file = m_path
+    #        #new_instance.training_settings_file = t_path
+    #        new_instance.model_root = model_metadata['model_root']
+    #        new_instance.weight_root = model_metadata['weight_root']
+    #        new_instance.test_root = model_metadata['test_root']
+    #        new_instance.yaml_train_settings = full_model_description['training']
+    #        pprint.pprint(model_metadata)
+    #        return new_instance
+
+
 
     @classmethod
     def load(cls, type_, name):
@@ -166,8 +245,8 @@ class PersistentGraph(object):
         new_instance.training_settings_file = t_path
         new_instance.model_root = model_metadata['model_root']
         new_instance.weight_root = model_metadata['weight_root']
-        new_instance.train_root = model_metadata['train_root']
-        new_instance.notes_root = model_metadata['notes_root']
+        #new_instance.train_root = model_metadata['train_root']
+        #new_instance.notes_root = model_metadata['notes_root']
         new_instance.test_root = model_metadata['test_root']
         pprint.pprint(model_metadata)
         return new_instance
@@ -204,6 +283,7 @@ class PersistentGraph(object):
             if os.path.exists(os.path.join(weight_root, 'model.ckpt.meta')):
                 saver = tf.train.Saver()
                 saver.restore(self._session, os.path.join(weight_root, "model.ckpt"))
+                print('model restored')
             else:
                 self._session.run(tf.global_variables_initializer())
                 self.save()
@@ -221,18 +301,18 @@ class PersistentGraph(object):
             saver.save(self._session, path)
 
     def get_weight_file_prefix(self):
-        return os.path.join(self.train_root, "model.ckpt")
+        return os.path.join(self.weight_root, "model.ckpt")
 
     def save_training_state(self, path=None):
         self.save_metadata()
         with self._graph.as_default():
             saver = tf.train.Saver()
-            saver.save(self._session, os.path.join(self.train_root, "model.ckpt"))
+            saver.save(self._session, os.path.join(self.weight_root, "model.ckpt"))
 
     def restore_last_checkpoint(self):
         with self._graph.as_default():
             saver = tf.train.Saver()
-            saver.restore(self._session, os.path.join(self.train_root, "model.ckpt"))
+            saver.restore(self._session, os.path.join(self.weight_root, "model.ckpt"))
 
     def load_initial_weights(self, w_prefix):
         with self._graph.as_default():
@@ -250,3 +330,7 @@ class PersistentGraph(object):
         uninitialized_variables = [x for (x, v) in zip(global_variables, is_initialized) if not v]
         if len(uninitialized_variables) > 0:
             self._session.run(tf.variables_initializer(uninitialized_variables))
+
+if __name__ == '__main__':
+    fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/tests/test2.yaml')
+    PersistentGraph.load_yaml(fil) # works

@@ -2,6 +2,7 @@ import copy
 from train.data import vader_sentiment_training_generator
 from train.data import sentiwordnet_sentiment_training_generator
 from train.data import cms_training_generator
+from train.data import user_cms_training_generator
 from train.data import sstb3_training_generator
 from train.data import sstb5_training_generator
 
@@ -54,6 +55,24 @@ generator_specs = {
                             3:'Positive feedback',
                             4:'Negative feedback'}
     },
+
+    "CMSUserInputDataset": {
+        'name': "CMSUserInputDataset",
+        'display_name': "User Input and CMS Flagging Dataset",
+        'description': 'Flagging data from the CMS comment flagging system. The comments are flagged according '
+                        'to their general topic.  This dataset consists of the five most popular categories in '
+                        'the database.',
+        'type': 'categorical_data',
+        'language': 'en',
+        'constructor': user_cms_training_generator,
+        'number_of_classes': 4,
+        'category_labels': {0:'Negative',
+                            1:'Neutral',
+                            2:'Positive',
+                            3:'Irrelevant'}
+    },
+
+
 
     "SSTBDataset_3": {
         'name': "SSTBDataset_3",

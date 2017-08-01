@@ -205,18 +205,18 @@ class TrainingSupervisor(object):
                 test_batch = next(test_iterator)
                 x = self.validate_on_batch(train_x=test_batch['train_x'], train_y=test_batch['train_y'])
                 if not (np.isnan(x['loss']) or np.isinf(x['loss'])):
-                    if (current_min_loss > x['loss']) or (current_best_accuracy < x['loss']):
-                        path = self.save_training_checkpoint()
-                        last_checkpoint_time = time.time()
-                        current_min_loss = x['loss']
-                        current_best_accuracy = x['loss']
-                    else:
-                        if num_failed_checkpoints > 3:
-                            yield np.nan
-                            num_failed_checkpoints = 0
-                            continue
-                        else:
-                            num_failed_checkpoints += 1
+                    #if (current_min_loss > x['loss']) or (current_best_accuracy < x['loss']):
+                    path = self.save_training_checkpoint()
+                    last_checkpoint_time = time.time()
+                    #    current_min_loss = x['loss']
+                    #    current_best_accuracy = x['loss']
+                    #else:
+                    #    if num_failed_checkpoints > 3:
+                    #        yield np.nan
+                    #        num_failed_checkpoints = 0
+                    #        continue
+                    #    else:
+                    #        num_failed_checkpoints += 1
 
             if (self.validation_interval is not None) and \
                     ((training_batch['batch_index'] % self.validation_interval) == 0):

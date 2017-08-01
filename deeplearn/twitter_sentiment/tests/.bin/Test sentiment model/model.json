@@ -1,0 +1,21 @@
+{
+    "type": "Tweet2Vec_BiGRU",
+    "hyperparameters": {
+        "number_of_layers": 3,
+        "hidden_states": 128,
+        "embedding_dimension": 256,
+        "seq_length": 256,
+        "num_classes": 5,
+        "classifier_layers": [
+            4096,
+            2048,
+            2048
+        ]
+    },
+    "description": "A promising model, using a one-layer bidirectional Gated Recurrent Unit.\n",
+    "weight_root": "/home/jalbert/python/deep-learning/deeplearn/twitter_sentiment/tests/.bin/Test sentiment model/weights",
+    "dataset": "CMSDataset",
+    "model_root": "/home/jalbert/python/deep-learning/deeplearn/twitter_sentiment/tests/.bin/Test sentiment model",
+    "name": "Test sentiment model",
+    "test_root": "/home/jalbert/python/deep-learning/deeplearn/twitter_sentiment/tests/.bin/Test sentiment model/tests"
+}

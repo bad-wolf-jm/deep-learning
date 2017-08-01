@@ -109,11 +109,63 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
 
 
 class ThreadedModelTrainer(object):
-    def __init__(self, model_graph=None, train_settings=None, initial_weights=None):
+    def __init__(self, model_graph=None, train_settings=None): #, initial_weights=None):
         super(ThreadedModelTrainer, self).__init__()
         self.model_graph = model_graph
         self.train_settings = train_settings
-        self.initial_weights = initial_weights
+        #self.initial_weights = initial_weights
+        self.training_supervisor = None
+        self.is_running = False
+        self.ready_lock = threading.Lock()
+        self.ready_lock.acquire()
+        self.__internal_thread = None
+
+        # print(self.model_graph)
+        # Keep an internal /tmp folder to save models before stopping
+        # if there is one in there, resume training
+        # add a 'reset' function, which deletes the saved image, and
+        # forces the training to reinitialize everything.
+
+    def __is_nan_of_infinite(self, num):
+        return (np.isnan([num]) or np.isinf([num]))
+
+    def prefix_exists(self, prefix):
+        return len(glob.glob("{p}*".format(p=prefix))) > 0
+
+    def run(self):
+        self.is_running = True
+        self.model_graph.build(training=True)
+        self.training_supervisor = PersistentTrainingSupervisor(self.model_graph, **self.train_settings)
+        self.model_graph.initialize()
+        self.ready_lock.release()
+        for training_loss in self.training_supervisor.do_train_model():
+            if self.__is_nan_of_infinite(training_loss):
+                self.training_supervisor.half_learning_rate()
+                print("rate lowered... using new learning rate", self.model_graph._model.learning_rate)
+                print("using new learning rate")
+            if not self.is_running:
+                break
+            print(training_loss)
+
+    def start(self, initial_weights=None):
+        if self.__internal_thread is None:
+            self.__internal_thread = threading.Thread(target=self.run)
+            self.__internal_thread.start()
+            self.ready_lock.acquire()
+
+    def stop(self):
+        if self.__internal_thread is not None:
+            self.is_running = False
+            self.__internal_thread.join()
+            self.__internal_thread = None
+
+
+class ThreadedModelTrainer_XXX(object):
+    def __init__(self, model_graph=None, train_settings=None): #, initial_weights=None):
+        super(ThreadedModelTrainer, self).__init__()
+        self.model_graph = model_graph
+        self.train_settings = train_settings
+        #self.initial_weights = initial_weights
         self.training_supervisor = None
         self.is_running = False
         self.ready_lock = threading.Lock()

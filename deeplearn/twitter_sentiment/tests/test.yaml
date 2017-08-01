@@ -1,0 +1,19 @@
+ByteCNN:
+  name: "ByteCNN"
+  display_name: 'Byte level convolutional network'
+  type: 'classifier'
+  constructor: ByteCNN
+  description: "Byte level very deep convolutional neural network for text sentiment analysis"
+  citation:
+    title: 'Very Deep Convolutional Networks for Text Classification'
+    date: None
+    author: None
+    link: None
+  input_type: 'Byte arrays'
+  hyperparameters:
+    seq_length: 512
+    embedding_dimension: 256
+    num_classes: 3
+    level_features: [64, 64, 128, 256, 512]
+    sub_levels: [2, 2, 2, 2]
+    classifier_layers: [4096, 2048, 2048]

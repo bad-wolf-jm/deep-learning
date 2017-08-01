@@ -115,6 +115,42 @@ def cms_training_generator(batch_size=10, epochs=None, validation_size=None, tes
             'test': test_iterator}
 
 
+
+def generate_user_cms_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
+    for i in _generate_batches(min_id=min_id, max_id=max_id, batch_size=batch_size, epochs=epochs,
+                               table='user_cms_sentiment_dataset', field_name='sentiment'):
+        yield i
+
+
+def user_cms_training_generator(batch_size=10, epochs=None, validation_size=None, test_size=None):
+    if validation_size is not None:
+        N = count_rows('user_cms_sentiment_dataset')
+        test = N // 50
+        validation_iterator = generate_user_cms_batches(min_id=0, max_id=test, batch_size=validation_size, epochs=None)
+    else:
+        N = None
+        test = 0
+        validation_iterator = None
+    if test_size is not None:
+        N = count_rows('user_cms_sentiment_dataset')
+        test = N // 50
+        test_iterator = generate_user_cms_batches(min_id=0, max_id=test, batch_size=test_size, epochs=None)
+    else:
+        N = None
+        test = 0
+        test_iterator = None
+    batch_generator = generate_user_cms_batches(min_id=test + 1, batch_size=batch_size, epochs=epochs)
+    return {'train': batch_generator,
+            'validation': validation_iterator,
+            'test': test_iterator}
+
+
+
+
+
+
+
+
 def generate_sstb_batches(min_id=0, max_id=None, batch_size=10, epochs=None, field_name=None):
     for i in _generate_batches(min_id=min_id, max_id=max_id, batch_size=batch_size, epochs=epochs,
                                table='sst_phrase_dataset', field_name=field_name, text_column='text'):

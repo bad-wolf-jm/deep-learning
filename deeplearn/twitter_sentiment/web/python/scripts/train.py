@@ -186,7 +186,7 @@ def send_email_every_minute():
         print('Sending email')
         try:
             EmailNotification.sendEmail(get_report_email(), subject="Training report")
-            time.sleep(1)
+            time.sleep(3600)
         except:
             time.sleep(6)
 
@@ -216,6 +216,7 @@ train_settings = {
 
 if __name__ == '__main__':
     model_name = ['Model_Tweet2Vec_BiGRU_CMSDataset',
+                  'Model_Tweet2Vec_BiGRU_UserCMSDataset',
                   'Model_Tweet2Vec_BiGRU_BuzzometerDatasetVader']
     model_name = model_name[1]
     model_type = 'Tweet2Vec_BiGRU'
@@ -225,7 +226,6 @@ if __name__ == '__main__':
     train_settings.update(model_saved_settings)
     model_weight_prefix = model_graph.get_weight_file_prefix()
     training_thread = ThreadedModelTrainer(model_graph=model_graph,
-                                           initial_weights=model_weight_prefix,
                                            train_settings=train_settings)
     training_thread.start()
     supervisor = training_thread.training_supervisor

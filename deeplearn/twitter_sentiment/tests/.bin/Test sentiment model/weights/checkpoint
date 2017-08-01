@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/jalbert/python/deep-learning/deeplearn/twitter_sentiment/tests/.bin/Test sentiment model/weights/model.ckpt"
+all_model_checkpoint_paths: "/home/jalbert/python/deep-learning/deeplearn/twitter_sentiment/tests/.bin/Test sentiment model/weights/model.ckpt"
