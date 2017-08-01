@@ -84,6 +84,12 @@ model_specs = {
                 'description': "The dimension of the recurrent unit internal state",
                 'default': 128
             },
+            'number_of_layers': {
+                'type': int,
+                'display': 'Internal state dimension',
+                'description': "The dimension of the recurrent unit internal state",
+                'default': 1
+            },
             'num_classes': {
                 'type': int,
                 'display': 'Number of categories',
