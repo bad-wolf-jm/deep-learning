@@ -6,7 +6,6 @@ from train.data import user_cms_training_generator
 from train.data import sstb3_training_generator
 from train.data import sstb5_training_generator
 
-# NOTE: THIS IS INCOMPLETE, some of the cataset consrtuctors are missing
 
 generator_specs = {
     "BuzzometerDatasetVader": {

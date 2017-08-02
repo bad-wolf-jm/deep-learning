@@ -1,74 +1,20 @@
 import os
 import json
-import pprint
 import glob
 import time
-import datetime
 import train.graphs as graphs
 import train.datasources as datasources
 import tensorflow as tf
 import yaml
-
-APP_ROOT_FOLDER = os.path.expanduser("~/.sentiment-analysis/nn")
-APP_MODELS_FOLDER = os.path.expanduser("~/.sentiment-analysis/nn/models")
-APP_LOG_FOLDER = os.path.expanduser("~/.sentiment-analysis/nn/logs")
-
-for p in [APP_ROOT_FOLDER, APP_MODELS_FOLDER, APP_LOG_FOLDER]:
-    if not os.path.exists(p):
-        os.makedirs(p)
-
-
-def list_model_types():
-    keys = sorted(graphs.model_specs.keys())
-    types = []
-    for key in keys:
-        type_desc = {
-            'name': graphs.model_specs[key]['name'],
-            'display_name': graphs.model_specs[key]['display_name'],
-            'description': graphs.model_specs[key]['description'],
-            'citation': graphs.model_specs[key]['citation'],
-            'input_type': graphs.model_specs[key]['input_type'],
-            'type': graphs.model_specs[key]['type'],
-            'instance_count': count_models(graphs.model_specs[key]['name'])
-        }
-        types.append(type_desc)
-    return types
-
-
-def list_model_instances():            # , kwargs={'initial_weights': initial_weights})
-
-    m_list = []
-    for name in os.listdir(APP_MODELS_FOLDER):
-        path = os.path.join(APP_MODELS_FOLDER, name)
-        model_desc = os.path.join(path, 'model.json')
-        m_list.append(json.loads(open(model_desc).read()))
-    return m_list
-
-
-def count_models(type):
-    folder = os.path.join(APP_MODELS_FOLDER, type)
-    print (folder)
-    if os.path.exists(folder):
-        print('Path Exists', len([x for x in os.listdir(folder) if os.path.isdir(os.path.join(folder, x))]))
-        return len([x for x in os.listdir(folder) if os.path.isdir(os.path.join(folder, x))])
-    return None
-
-
-def get_type_specs(type_name):
-    return graphs.model_specs.get(type_name, None)
-
-
-def list_type_instances(type_name):
-    return []
 
 
 # TODO Class should be able to test if training is resumable
 # TODO Class should save the training status and graphs
 
 
-class PersistentGraph(object):
+class CompiledModel(object):
     def __init__(self, name, model_type, dataset, description="", **hyperparameters):
-        super(PersistentGraph, self).__init__()
+        super(CompiledModel, self).__init__()
         self.type = model_type
         self.name = name
         self.hyperparameters = hyperparameters
@@ -83,53 +29,16 @@ class PersistentGraph(object):
     def graph(self):
         return self._graph
 
-    #def construct(self):
-    #    self.model_root = os.path.join(APP_MODELS_FOLDER, self.name)
-    #    self.weight_root = os.path.join(self.model_root, 'weights')
-    #    self.train_root = os.path.join(self.model_root, 'training')
-    #    self.notes_root = os.path.join(self.model_root, 'notes')
-    #    self.test_root = os.path.join(self.model_root, 'tests')
-    #    for p in [self.model_root, self.weight_root, self.train_root, self.notes_root, self.test_root]:
-    #        if not os.path.exists(p):
-    #            os.makedirs(p)
-    #    self.metadata_file = os.path.join(self.model_root, 'model.json')
-    #    self.training_settings_file = os.path.join(self.model_root, 'training.json')
-#
-#    @classmethod
-#    def new(cls, name, model_type, dataset_type, description="", **hyper):
-#        specs = graphs.get_default_model_specs(model_type)
-#        data_specs = datasources.get_dataset_specs(dataset_type)
-#        parameters = {name: specs['hyperparameters'][name]['default'] for name in specs['hyperparameters']}
-#        parameters.update(hyper)
-#        pprint.pprint(parameters)
-#        x = cls(name, model_type, dataset_type, description, **parameters)
-#        x.construct()
-#        return x
-#
     def construct_yaml(self, root):
         self.model_root = os.path.join(root, self.name)
         self.weight_root = os.path.join(self.model_root, 'weights')
-        #self.train_root = os.path.join(self.model_root, 'training')
-        #self.notes_root = os.path.join(self.model_root, 'notes')
         self.test_root = os.path.join(self.model_root, 'tests')
-        for p in [self.model_root, self.weight_root, #self.train_root, self.notes_root,
+        for p in [self.model_root, self.weight_root,  # self.train_root, self.notes_root,
                   self.test_root]:
             if not os.path.exists(p):
                 os.makedirs(p)
         self.metadata_file = os.path.join(self.model_root, 'model.json')
         self.training_settings_file = os.path.join(self.model_root, 'training.json')
-
-#    @classmethod
-#    def new_yaml(cls, name, model_type, dataset_type, description="", **hyper):
-#        specs = graphs.get_default_model_specs(model_type)
-#        data_specs = datasources.get_dataset_specs(dataset_type)
-#        parameters = {name: specs['hyperparameters'][name]['default'] for name in specs['hyperparameters']}
-#        parameters.update(hyper)
-#        pprint.pprint(parameters)
-#        x = cls(name, model_type, dataset_type, description, **parameters)
-#        x.construct()
-#        return x
-
 
     def __get_files(self, root, template='*.json', min_date=None, max_date=None):
         x = []
@@ -145,17 +54,11 @@ class PersistentGraph(object):
             x += 1
         return x
 
-    def get_notes(self, min_date=None, max_date=None):
-        return self.__get_files(self.notes_root, min_date, max_date)
-
     def get_tests(self, min_date=None, max_date=None):
         return self.__get_files(self.test_root, min_date, max_date)
 
     def get_confusion_matrices(self, min_date=None, max_date=None):
         return self.__get_files(self.test_root, "test-output-matrix*.json", min_date, max_date)
-
-    def count_notes(self):
-        return self.__count_files(self.notes_root)
 
     def count_tests(self):
         return self.__count_files(self.test_root)
@@ -176,13 +79,12 @@ class PersistentGraph(object):
         metadata['dataset'] = self.dataset_type
         return metadata
 
-
     @classmethod
     def compile_yaml(cls, file_name):
         file_content = open(file_name).read()
         full_model_description = yaml.load(file_content)
-        model_root = os.path.dirname(file_name)
-        model_root = os.path.join(model_root, '.bin')
+        model_root = os.path.expanduser('~') #os.path.dirname(file_name)
+        model_root = os.path.join(model_root, '.nn_models', 'bin')
         model_name = full_model_description['name']
         model_type = full_model_description['type']
         model_dataset = full_model_description['dataset']
@@ -207,8 +109,7 @@ class PersistentGraph(object):
         full_model_description = yaml.load(file_content)
         model_root = os.path.dirname(file_name)
         model_root = os.path.join(model_root, '.bin')
-        model_root_name = "{file_name}-{name}".format(file_name=file_name, name= full_model_description['name'])
-        model_root = os.path.join(model_root, model_root_name)
+        model_root = os.path.join(model_root, file_name)
         if not os.path.exists(model_root):
             return cls.compile_yaml(file_name)
         else:
@@ -221,7 +122,6 @@ class PersistentGraph(object):
                                model_metadata['description'],
                                **model_metadata['hyperparameters'])
             new_instance.metadata_file = m_path
-            #new_instance.training_settings_file = t_path
             new_instance.model_root = model_metadata['model_root']
             new_instance.weight_root = model_metadata['weight_root']
             new_instance.test_root = model_metadata['test_root']
@@ -230,38 +130,7 @@ class PersistentGraph(object):
             return new_instance
 
 
-
-#    @classmethod
-#    def load(cls, type_, name):
-#        model_root = os.path.join(APP_MODELS_FOLDER, name)
-#        m_path = os.path.join(model_root, 'model.json')
-#        t_path = os.path.join(model_root, 'train.json')
-#        model_metadata_file = open(m_path)
-#        model_metadata = json.loads(model_metadata_file.read())
-#        new_instance = cls(model_metadata['name'], model_metadata['type'],
-#                           model_metadata['dataset'], model_metadata['description'],
-#                           **model_metadata['hyperparameters'])
-#        new_instance.metadata_file = m_path
-#        new_instance.training_settings_file = t_path
-#        new_instance.model_root = model_metadata['model_root']
-#        new_instance.weight_root = model_metadata['weight_root']
-#        #new_instance.train_root = model_metadata['train_root']
-#        #new_instance.notes_root = model_metadata['notes_root']
-#        new_instance.test_root = model_metadata['test_root']
-#        pprint.pprint(model_metadata)
-#        return new_instance
-#
-#    def load_train_settings(self):
-#        try:
-#            return json.loads(open(self.training_settings_file).read())
-#        except:
-#            return None
-
-#    def save_train_settings(self, *kwargs):
-#        f = open(self.training_settings_file, 'w')
-#        return f.write(json.dumps(kwargs))
-
-    def build(self, training=True):  # , resume=False):
+    def build(self, training=True):
         new_graph = tf.Graph()
         new_session = tf.Session(graph=new_graph)
         g = graphs.build_skeleton(self.type, **self.hyperparameters)
@@ -277,8 +146,8 @@ class PersistentGraph(object):
     def prefix_exists(self, prefix):
         return len(glob.glob("{p}*".format(p=prefix))) > 0
 
-    def initialize(self): #, session, training=True, resume=False):
-        weight_root = self.weight_root #if not resume else self.train_root
+    def initialize(self):  # , session, training=True, resume=False):
+        weight_root = self.weight_root  # if not resume else self.train_root
         with self._graph.as_default():
             if os.path.exists(os.path.join(weight_root, 'model.ckpt.meta')):
                 saver = tf.train.Saver()
@@ -331,6 +200,7 @@ class PersistentGraph(object):
         if len(uninitialized_variables) > 0:
             self._session.run(tf.variables_initializer(uninitialized_variables))
 
+
 if __name__ == '__main__':
     fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/tests/test2.yaml')
-    PersistentGraph.load_yaml(fil) # works
+    PersistentGraph.load_yaml(fil)  # works

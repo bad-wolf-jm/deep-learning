@@ -5,6 +5,7 @@ from graphs.bidirectional_gru import Tweet2Vec_BiGRU
 from graphs.simple_gru import SimpleGRUClassifier
 from graphs.simple_gru_convolution import SimpleGRUClassifierConv
 
+# this file should disappear in favor of documentation in the graph definitions themselves
 
 model_specs = {
     "ByteCNN": {
