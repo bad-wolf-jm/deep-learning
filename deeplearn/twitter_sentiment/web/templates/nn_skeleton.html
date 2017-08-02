@@ -17,10 +17,6 @@
     <script src="/static/js/highcharts.js"></script>
     <script src="/static/js/semantic.min.js"></script>
     <script src="/static/js/utilities.js"></script>
-    <!-- <script src="http://localhost:5000/static/js/highcharts.js"></script>
-    <script src="http://localhost:5000/static/js/semantic.min.js"></script>
-    <script src="http://localhost:5000/static/js/utilities.js"></script>-->
-
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
     <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
     {% block header_scripts %}
@@ -28,9 +24,6 @@
     <script type="text/javascript" async
       src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
-    <!-- <link rel="stylesheet" href="http://localhost:5000/static/css/icon.min.css">
-    <link rel="stylesheet" href="http://localhost:5000/static/css/semantic.min.css">
-    <link rel="stylesheet" href="http://localhost:5000/static/css/style.css"> -->
     <link rel="stylesheet" href="/static/css/icon.min.css">
     <link rel="stylesheet" href="/static/css/semantic.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
@@ -48,7 +41,7 @@
     <body>
         <div class="ui fixed grey inverted menu">
                 <div class="ui header item">
-                    <a href="http://localhost:5000/ui">Neuronet Training Tool</a>
+                    <a href="http://localhost:5000/ui">Neuronet Training Monitor</a>
                 </div>
                 <div class="right menu">
                     <div class="ui item">
@@ -67,9 +60,9 @@
                         </div>
                       </div>
                     </div>
-                    <a class="ui item" href="http://localhost:5000/ui/training">
+                    <div class="ui item">
                         {% block  current_model_name %} {% endblock %}
-                    </a>
+                    </div>
                 </div>
 
         </div>

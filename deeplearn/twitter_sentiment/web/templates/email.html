@@ -21,9 +21,15 @@
   </table>
 {% endmacro%}
 
-{% macro render_confusion_matrix(time, matrix_entries) %}
+{% macro render_confusion_matrix(loss, accuracy, time, matrix_entries) %}
   {% set labels = supervisor._meta.category_labels %}
   <table style="width:100%; border: 2px solid black;">
+    <tr>
+      <td colspan={{ labels.keys()|length +1 }}>
+        <span>Loss: {{ "{:.3f}".format(loss) }}</span>
+        <span>Accuracy: {{ "{:.2f}".format(100*accuracy) }}%</span>
+      </td>
+    </tr>
     <tr>
       <td class="empty-cell" style="background: rgb(70,70,70); color:rgb(180,180,180); font-size:12px;"><b>{{ time[:19] }}</b></td>
       {% for label in labels.keys()|sort() %}
@@ -68,7 +74,8 @@
   <body>
     <h1>Training Report for <b>{{ supervisor._meta.name }}</b></h1>
       {% for matrix in test_matrices %}
-        {{ render_confusion_matrix(matrix['time'], matrix['matrix']) }}
+
+        {{ render_confusion_matrix(matrix['loss'], matrix['accuracy'], matrix['time'], matrix['matrix']) }}
         <p></p>
       {% endfor %}
   </body>

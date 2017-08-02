@@ -1,5 +1,6 @@
 import os
 import json
+import pprint
 import glob
 import time
 import train.graphs as graphs
@@ -13,8 +14,9 @@ import yaml
 
 
 class CompiledModel(object):
-    def __init__(self, name, model_type, dataset, description="", **hyperparameters):
+    def __init__(self, id_,  name, model_type, dataset, description="", **hyperparameters):
         super(CompiledModel, self).__init__()
+        self.id_=id_
         self.type = model_type
         self.name = name
         self.hyperparameters = hyperparameters
@@ -30,7 +32,7 @@ class CompiledModel(object):
         return self._graph
 
     def construct_yaml(self, root):
-        self.model_root = os.path.join(root, self.name)
+        self.model_root = os.path.join(root, self.id_)
         self.weight_root = os.path.join(self.model_root, 'weights')
         self.test_root = os.path.join(self.model_root, 'tests')
         for p in [self.model_root, self.weight_root,  # self.train_root, self.notes_root,
@@ -55,7 +57,7 @@ class CompiledModel(object):
         return x
 
     def get_tests(self, min_date=None, max_date=None):
-        return self.__get_files(self.test_root, min_date, max_date)
+        return self.__get_files(self.test_root, "test-tag*.json", min_date, max_date)
 
     def get_confusion_matrices(self, min_date=None, max_date=None):
         return self.__get_files(self.test_root, "test-output-matrix*.json", min_date, max_date)
@@ -82,8 +84,9 @@ class CompiledModel(object):
     @classmethod
     def compile_yaml(cls, file_name):
         file_content = open(file_name).read()
+        model_id = os.path.basename(file_name)
         full_model_description = yaml.load(file_content)
-        model_root = os.path.expanduser('~') #os.path.dirname(file_name)
+        model_root = os.path.expanduser('~')
         model_root = os.path.join(model_root, '.nn_models', 'bin')
         model_name = full_model_description['name']
         model_type = full_model_description['type']
@@ -95,7 +98,7 @@ class CompiledModel(object):
         data_specs = datasources.get_dataset_specs(model_dataset)
         parameters = {name: specs['hyperparameters'][name]['default'] for name in specs['hyperparameters']}
         parameters.update(model_hyperparameters)
-        x = cls(model_name, model_type, model_dataset, model_description, **parameters)
+        x = cls(model_id, model_name, model_type, model_dataset, model_description, **parameters)
         x.construct_yaml(model_root)
         x.yaml_train_settings = model_train_settings
         x.save_metadata()
@@ -103,15 +106,15 @@ class CompiledModel(object):
         return x
 
     @classmethod
-    def load_yaml(cls, file_name):
-        file_content = open(file_name).read()
-        file_name = os.path.basename(file_name)
+    def load_yaml(cls, file_path):
+        file_content = open(file_path).read()
+        file_name = os.path.basename(file_path)
         full_model_description = yaml.load(file_content)
         model_root = os.path.dirname(file_name)
         model_root = os.path.join(model_root, '.bin')
         model_root = os.path.join(model_root, file_name)
         if not os.path.exists(model_root):
-            return cls.compile_yaml(file_name)
+            return cls.compile_yaml(file_path)
         else:
             m_path = os.path.join(model_root, 'model.json')
             model_metadata_file = open(m_path)
@@ -202,5 +205,5 @@ class CompiledModel(object):
 
 
 if __name__ == '__main__':
-    fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/tests/test2.yaml')
-    PersistentGraph.load_yaml(fil)  # works
+    fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/yaml/bigru_cms_user.yaml')
+    CompiledModel.load_yaml(fil)  # works

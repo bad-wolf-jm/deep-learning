@@ -2,7 +2,7 @@ import tensorflow as tf
 
 optimizer_specs = {
     'gradient_descent': {
-        'display_name': 'Stocastic gradient descent',
+        'display_name': 'Stochastic gradient descent',
         'description': 'Optimizer that implements the gradient descent algorithm.',
         'docs': 'https://www.tensorflow.org/api_docs/python/tf/train/GradientDescentOptimizer',
         'constructor': tf.train.GradientDescentOptimizer,

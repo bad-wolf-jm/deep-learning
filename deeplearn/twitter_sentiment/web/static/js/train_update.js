@@ -81,6 +81,7 @@ function progress_chart_track(inner_radius, outer_radius, color)
 
 var training_progress_chart;
 
+/*
 $(document).ready(
 function (){
 training_progress_chart = new Highcharts.Chart({
@@ -151,8 +152,7 @@ training_progress_chart = new Highcharts.Chart({
     }]
 }
 );})
-
-
+*/
 
 function update_stats()
 {
@@ -169,16 +169,17 @@ function update_stats()
 
 function update_progress()
 {
-    $.getJSON('/json/training_progress.json',
+    $.getJSON('/json/training_status.json',
             function(data) {
                 $('#stats-batch-time').html(format_seconds_short(data.batch_time.toFixed(2)));
                 $('#stats-epoch-time').html(format_seconds_short(data.epoch_time.toFixed(2)));
                 $('#elapsed-time').html(format_seconds_long(data.elapsed_time.toFixed(2)));
                 $('#remaining-time').html(format_seconds_long(data.remaining_time.toFixed(2)));
+                $('#epoch-remaining-time').html(format_seconds_short(data.epoch_remaining_time.toFixed(2)));
                 $('#epoch-number').text(data.epoch_number);
                 $('#total-epochs').text(data.total_epochs);
-                training_progress_chart.series[1].points[0].update(data.percent_epoch_complete);
-                training_progress_chart.series[0].points[0].update(data.percent_training_complete);
+                //training_progress_chart.series[1].points[0].update(data.percent_epoch_complete);
+                //training_progress_chart.series[0].points[0].update(data.percent_training_complete);
             }
         );
 }

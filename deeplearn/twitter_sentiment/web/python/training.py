@@ -11,7 +11,7 @@ import threading
 from train import optimizers
 from train.supervisor import TrainingSupervisor
 from train.datasources import get_dataset_specs
-from web.python.bootstrap import PersistentGraph
+#from web.python.bootstrap import PersistentGraph
 
 
 class PersistentTrainingSupervisor(TrainingSupervisor):
@@ -25,9 +25,13 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
         self.test_size = test_size
         self.epochs = epochs
         self.e_mail_interval = e_mail_interval
+        self.test_index = 0
+
+
         with self._meta._graph.as_default():
             optimizer_id = self.optimizer['name']
             optimizer = optimizers.get_by_id(optimizer_id)
+            self.optimizer['display_name'] = optimizer['display_name']
             optimizer['learning_rate'] = self.optimizer['learning_rate']
             optimizer['optimizer_parameters'].update(self.optimizer['optimizer_parameters'])
             self._meta._model.train_setup(optimizer['constructor'],
@@ -54,14 +58,23 @@ class PersistentTrainingSupervisor(TrainingSupervisor):
         test_root = self._meta.test_root
         test_result = {'train': train, 'test': test}
         test_confusion_result = self.make_test_output_matrix(train, test)
+        test_tag_name = "test-tag-{date}.json".format(date=datetime.datetime.today().isoformat())
         test_file_name = "test-output-raw-{date}.json".format(date=datetime.datetime.today().isoformat())
         test_confusion_name = "test-output-matrix-{date}.json".format(date=datetime.datetime.today().isoformat())
         test_path = os.path.join(test_root, test_file_name)
+        test_tag_path = os.path.join(test_root, test_tag_name)
         test_confusion_path = os.path.join(test_root, test_confusion_name)
         with open(test_path, 'w') as test_file:
             test_file.write(json.dumps(test_result))
         with open(test_confusion_path, 'w') as test_file:
             test_file.write(json.dumps(test_confusion_result))
+        test_pack = {'loss': test['loss'],
+                     'accuracy': test['accuracy'],
+                     'date': time.time(),
+                     'confusion_file': test_confusion_path,
+                     'output_file': test_path}
+        with open(test_tag_path, 'w') as test_file:
+            test_file.write(json.dumps(test_pack))
         # also save loss and accuracy graphs
 
     def save_training_checkpoint(self):

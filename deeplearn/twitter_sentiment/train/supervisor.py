@@ -70,6 +70,19 @@ class TrainingSupervisor(object):
         return datetime.timedelta(seconds=self.batches_per_epoch * x)
 
     @property
+    def epoch_elapsed_time(self):
+        x = self.training_time_summary.stats(fields=['time'], backlog=20)
+        x = x['time']['mean']
+        return datetime.timedelta(seconds=time.time() - self._epoch_start_time)
+
+    @property
+    def epoch_remaining_time(self):
+        x = self.training_time_summary.stats(fields=['time'], backlog=20)
+        x = x['time']['mean']
+        remaining_batches = self.batches_per_epoch - self._batch_number
+        return datetime.timedelta(seconds=remaining_batches * x)
+
+    @property
     def elapsed_time(self):
         return datetime.timedelta(seconds=time.time() - self._training_start_time)
 
@@ -171,14 +184,18 @@ class TrainingSupervisor(object):
         test_iterator = test_data_generator or self.__default_validation_iterator()
         self._session = session
         self._training_start_time = time.time()
+        self._epoch_start_time = time.time()
+
         last_test_time = self._training_start_time
         last_checkpoint_time = self._training_start_time
         num_failed_checkpoints = 0
         current_min_loss = np.inf
         current_best_accuracy = 0
-
+        current_epoch=1
         test_index = 1
         for training_batch in training_data_generator:
+            if training_batch['epoch_number'] != current_epoch:
+                self._epoch_start_time = time.time()
             self._update_progress_info(training_batch)
             batch_t_0 = time.time()
             test_result_on_train = None
@@ -205,18 +222,8 @@ class TrainingSupervisor(object):
                 test_batch = next(test_iterator)
                 x = self.validate_on_batch(train_x=test_batch['train_x'], train_y=test_batch['train_y'])
                 if not (np.isnan(x['loss']) or np.isinf(x['loss'])):
-                    #if (current_min_loss > x['loss']) or (current_best_accuracy < x['loss']):
                     path = self.save_training_checkpoint()
                     last_checkpoint_time = time.time()
-                    #    current_min_loss = x['loss']
-                    #    current_best_accuracy = x['loss']
-                    #else:
-                    #    if num_failed_checkpoints > 3:
-                    #        yield np.nan
-                    #        num_failed_checkpoints = 0
-                    #        continue
-                    #    else:
-                    #        num_failed_checkpoints += 1
 
             if (self.validation_interval is not None) and \
                     ((training_batch['batch_index'] % self.validation_interval) == 0):

@@ -69,6 +69,8 @@ class SimpleGRUClassifierConv(BaseClassifier):
                 i_features = self.convolutional_features[layer_index]
             D = pool_layer.shape[1].value * pool_layer.shape[2].value * pool_layer.shape[3].value
             pool_layer = tf.reshape(pool_layer, [-1, D])
+            print('D=', D)
+            #sys.exit(0)
             _weights = self.var(input_shape=[D, self.num_classes],
                                 name='final_weights',
                                 scope=scope,

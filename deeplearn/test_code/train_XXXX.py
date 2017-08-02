@@ -207,7 +207,7 @@ train_settings = {
     'test_interval': 1 * 60,
     'e_mail_interval': 1.5 * 3600,
     'summary_span': None,
-    'checkpoint_interval': 45 * 60,
+    'checkpoint_interval': 450 * 60,
     'batch_size': 100,
     'validation_size': 100,
     'test_size': 1000,
