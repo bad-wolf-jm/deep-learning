@@ -29,23 +29,27 @@ class SimpleGRUClassifier(BaseClassifier):
             print('Yr=', encoded_text.get_shape())
 
         with tf.variable_scope('dense_classifier', reuse=None) as scope:
-            _weights = self.var(input_shape=[self.hidden_states * self.seq_length, self.seq_length],
-                                name='final_weights',
-                                scope=scope,
-                                trainable=True)
-            _biases = self.var(input_shape=[1, self.seq_length],
-                               name='final_biases',
-                               scope=scope,
-                               trainable=True)
-            _weights_2 = self.var(input_shape=[self.seq_length, self.num_classes],
-                                  name='final_weights_2',
-                                  scope=scope,
-                                  trainable=True)
-            _biases_2 = self.var(input_shape=[1, self.num_classes],
-                                 name='final_biases_2',
-                                 scope=scope,
-                                 trainable=True)
-            self.graph_output = tf.matmul(tf.nn.sigmoid(tf.matmul(encoded_text, _weights) + _biases), _weights_2) + _biases_2
+            FC = tf.contrib.layers.fully_connected
+            x = FC(inputs=encoded_text, num_outputs=self.seq_len)
+            self.graph_output = FC(inputs = x, num_outputs=num_classes)
+
+            #_weights = self.var(input_shape=[self.hidden_states * self.seq_length, self.seq_length],
+            #                    name='final_weights',
+            #                    scope=scope,
+            #                    trainable=True)
+            #_biases = self.var(input_shape=[1, self.seq_length],
+            #                   name='final_biases',
+            #                   scope=scope,
+            #                   trainable=True)
+            #_weights_2 = self.var(input_shape=[self.seq_length, self.num_classes],
+            #                      name='final_weights_2',
+            #                      scope=scope,
+            #                      trainable=True)
+            #_biases_2 = self.var(input_shape=[1, self.num_classes],
+            #                     name='final_biases_2',
+            #                     scope=scope,
+            #                     trainable=True)
+            #self.graph_output = tf.matmul(tf.nn.sigmoid(tf.matmul(encoded_text, _weights) + _biases), _weights_2) + _biases_2
 
     def build_inference_model(self, trainable=False):
         super(SimpleGRUClassifier, self).build_inference_model()

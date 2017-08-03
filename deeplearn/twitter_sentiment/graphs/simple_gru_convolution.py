@@ -14,10 +14,10 @@ class SimpleGRUClassifierConv(BaseClassifier):
                  embedding_dimension=512,
                  num_classes=3,
                  num_rnn_layers=3,
-                 convolutional_features = [32, 64, 128, 512],
-                 window_sizes = [3, 3, 3, 3],
-                 pooling_sizes = [5, 5, 5, 5],
-                 pooling_strides = [2, 2, 2, 2], **kwargs):
+                 convolutional_features=[32, 64, 128, 512],
+                 window_sizes=[3, 3, 3, 3],
+                 pooling_sizes=[5, 5, 5, 5],
+                 pooling_strides=[2, 2, 2, 2], **kwargs):
         super(SimpleGRUClassifierConv, self).__init__(seq_length=seq_length, embedding_dimension=embedding_dimension, num_classes=num_classes)
         self._input_dtype = tf.int32
         self.hidden_states = hidden_states
@@ -55,22 +55,22 @@ class SimpleGRUClassifierConv(BaseClassifier):
         with tf.variable_scope('convolutional_classifier', reuse=None) as scope:
             i_features = 1
             conv_input = encoded_text
-            for layer_index in range(len(self.convolutional_features)-1):
+            for layer_index in range(len(self.convolutional_features) - 1):
                 conv_layer = self.convolutional_block(i_tensor=conv_input,
-                                                  i_features=i_features,
-                                                  o_features=self.convolutional_features[layer_index],
-                                                  window_size=self.window_sizes[layer_index],
-                                                  scope='layer_{}'.format(layer_index))
+                                                      i_features=i_features,
+                                                      o_features=self.convolutional_features[layer_index],
+                                                      window_size=self.window_sizes[layer_index],
+                                                      scope='layer_{}'.format(layer_index))
                 pool_layer = self.max_pool_layer(i_tensor=conv_layer,
-                                             window_size=self.pooling_sizes[layer_index],
-                                             strides=self.pooling_strides[layer_index],
-                                             scope='layer_{}'.format(layer_index))
+                                                 window_size=self.pooling_sizes[layer_index],
+                                                 strides=self.pooling_strides[layer_index],
+                                                 scope='layer_{}'.format(layer_index))
                 conv_input = pool_layer
                 i_features = self.convolutional_features[layer_index]
             D = pool_layer.shape[1].value * pool_layer.shape[2].value * pool_layer.shape[3].value
             pool_layer = tf.reshape(pool_layer, [-1, D])
             print('D=', D)
-            #sys.exit(0)
+            # sys.exit(0)
             _weights = self.var(input_shape=[D, self.num_classes],
                                 name='final_weights',
                                 scope=scope,
@@ -90,4 +90,4 @@ class SimpleGRUClassifierConv(BaseClassifier):
 if __name__ == '__main__':
     from graphs.base.test import test_graph_type
     test_graph_type(SimpleGRUClassifierConv)
-    #test the graph
+    # test the graph
