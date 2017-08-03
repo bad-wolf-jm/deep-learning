@@ -1,0 +1,378 @@
+Created by PLY version 3.10 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> sexps
+Rule 1     sexps -> sexp sexps
+Rule 2     sexp -> KEYWORD
+Rule 3     sexp -> INT
+Rule 4     sexp -> FLOAT
+Rule 5     sexp -> STRING
+Rule 6     sexp -> SYMBOL
+Rule 7     sexp -> LBRACKET sexps RBRACKET
+Rule 8     sexp -> LPAREN sexps RPAREN
+Rule 9     sexp -> LBRACE sexps RBRACE
+Rule 10    sexps -> empty
+Rule 11    empty -> <empty>
+
+Terminals, with rules where they appear
+
+FLOAT                : 4
+INT                  : 3
+KEYWORD              : 2
+LBRACE               : 9
+LBRACKET             : 7
+LPAREN               : 8
+RBRACE               : 9
+RBRACKET             : 7
+RPAREN               : 8
+STRING               : 5
+SYMBOL               : 6
+error                : 
+
+Nonterminals, with rules where they appear
+
+empty                : 10
+sexp                 : 1
+sexps                : 1 7 8 9 0
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . sexps
+    (1) sexps -> . sexp sexps
+    (10) sexps -> . empty
+    (2) sexp -> . KEYWORD
+    (3) sexp -> . INT
+    (4) sexp -> . FLOAT
+    (5) sexp -> . STRING
+    (6) sexp -> . SYMBOL
+    (7) sexp -> . LBRACKET sexps RBRACKET
+    (8) sexp -> . LPAREN sexps RPAREN
+    (9) sexp -> . LBRACE sexps RBRACE
+    (11) empty -> .
+
+    KEYWORD         shift and go to state 10
+    INT             shift and go to state 9
+    FLOAT           shift and go to state 2
+    STRING          shift and go to state 1
+    SYMBOL          shift and go to state 11
+    LBRACKET        shift and go to state 3
+    LPAREN          shift and go to state 8
+    LBRACE          shift and go to state 7
+    $end            reduce using rule 11 (empty -> .)
+
+    sexp                           shift and go to state 4
+    empty                          shift and go to state 5
+    sexps                          shift and go to state 6
+
+state 1
+
+    (5) sexp -> STRING .
+
+    KEYWORD         reduce using rule 5 (sexp -> STRING .)
+    INT             reduce using rule 5 (sexp -> STRING .)
+    FLOAT           reduce using rule 5 (sexp -> STRING .)
+    STRING          reduce using rule 5 (sexp -> STRING .)
+    SYMBOL          reduce using rule 5 (sexp -> STRING .)
+    LBRACKET        reduce using rule 5 (sexp -> STRING .)
+    LPAREN          reduce using rule 5 (sexp -> STRING .)
+    LBRACE          reduce using rule 5 (sexp -> STRING .)
+    RPAREN          reduce using rule 5 (sexp -> STRING .)
+    RBRACKET        reduce using rule 5 (sexp -> STRING .)
+    $end            reduce using rule 5 (sexp -> STRING .)
+    RBRACE          reduce using rule 5 (sexp -> STRING .)
+
+
+state 2
+
+    (4) sexp -> FLOAT .
+
+    KEYWORD         reduce using rule 4 (sexp -> FLOAT .)
+    INT             reduce using rule 4 (sexp -> FLOAT .)
+    FLOAT           reduce using rule 4 (sexp -> FLOAT .)
+    STRING          reduce using rule 4 (sexp -> FLOAT .)
+    SYMBOL          reduce using rule 4 (sexp -> FLOAT .)
+    LBRACKET        reduce using rule 4 (sexp -> FLOAT .)
+    LPAREN          reduce using rule 4 (sexp -> FLOAT .)
+    LBRACE          reduce using rule 4 (sexp -> FLOAT .)
+    RPAREN          reduce using rule 4 (sexp -> FLOAT .)
+    RBRACKET        reduce using rule 4 (sexp -> FLOAT .)
+    $end            reduce using rule 4 (sexp -> FLOAT .)
+    RBRACE          reduce using rule 4 (sexp -> FLOAT .)
+
+
+state 3
+
+    (7) sexp -> LBRACKET . sexps RBRACKET
+    (1) sexps -> . sexp sexps
+    (10) sexps -> . empty
+    (2) sexp -> . KEYWORD
+    (3) sexp -> . INT
+    (4) sexp -> . FLOAT
+    (5) sexp -> . STRING
+    (6) sexp -> . SYMBOL
+    (7) sexp -> . LBRACKET sexps RBRACKET
+    (8) sexp -> . LPAREN sexps RPAREN
+    (9) sexp -> . LBRACE sexps RBRACE
+    (11) empty -> .
+
+    KEYWORD         shift and go to state 10
+    INT             shift and go to state 9
+    FLOAT           shift and go to state 2
+    STRING          shift and go to state 1
+    SYMBOL          shift and go to state 11
+    LBRACKET        shift and go to state 3
+    LPAREN          shift and go to state 8
+    LBRACE          shift and go to state 7
+    RBRACKET        reduce using rule 11 (empty -> .)
+
+    sexp                           shift and go to state 4
+    empty                          shift and go to state 5
+    sexps                          shift and go to state 12
+
+state 4
+
+    (1) sexps -> sexp . sexps
+    (1) sexps -> . sexp sexps
+    (10) sexps -> . empty
+    (2) sexp -> . KEYWORD
+    (3) sexp -> . INT
+    (4) sexp -> . FLOAT
+    (5) sexp -> . STRING
+    (6) sexp -> . SYMBOL
+    (7) sexp -> . LBRACKET sexps RBRACKET
+    (8) sexp -> . LPAREN sexps RPAREN
+    (9) sexp -> . LBRACE sexps RBRACE
+    (11) empty -> .
+
+    KEYWORD         shift and go to state 10
+    INT             shift and go to state 9
+    FLOAT           shift and go to state 2
+    STRING          shift and go to state 1
+    SYMBOL          shift and go to state 11
+    LBRACKET        shift and go to state 3
+    LPAREN          shift and go to state 8
+    LBRACE          shift and go to state 7
+    $end            reduce using rule 11 (empty -> .)
+    RBRACKET        reduce using rule 11 (empty -> .)
+    RBRACE          reduce using rule 11 (empty -> .)
+    RPAREN          reduce using rule 11 (empty -> .)
+
+    sexp                           shift and go to state 4
+    empty                          shift and go to state 5
+    sexps                          shift and go to state 13
+
+state 5
+
+    (10) sexps -> empty .
+
+    RPAREN          reduce using rule 10 (sexps -> empty .)
+    RBRACE          reduce using rule 10 (sexps -> empty .)
+    $end            reduce using rule 10 (sexps -> empty .)
+    RBRACKET        reduce using rule 10 (sexps -> empty .)
+
+
+state 6
+
+    (0) S' -> sexps .
+
+
+
+state 7
+
+    (9) sexp -> LBRACE . sexps RBRACE
+    (1) sexps -> . sexp sexps
+    (10) sexps -> . empty
+    (2) sexp -> . KEYWORD
+    (3) sexp -> . INT
+    (4) sexp -> . FLOAT
+    (5) sexp -> . STRING
+    (6) sexp -> . SYMBOL
+    (7) sexp -> . LBRACKET sexps RBRACKET
+    (8) sexp -> . LPAREN sexps RPAREN
+    (9) sexp -> . LBRACE sexps RBRACE
+    (11) empty -> .
+
+    KEYWORD         shift and go to state 10
+    INT             shift and go to state 9
+    FLOAT           shift and go to state 2
+    STRING          shift and go to state 1
+    SYMBOL          shift and go to state 11
+    LBRACKET        shift and go to state 3
+    LPAREN          shift and go to state 8
+    LBRACE          shift and go to state 7
+    RBRACE          reduce using rule 11 (empty -> .)
+
+    sexp                           shift and go to state 4
+    empty                          shift and go to state 5
+    sexps                          shift and go to state 14
+
+state 8
+
+    (8) sexp -> LPAREN . sexps RPAREN
+    (1) sexps -> . sexp sexps
+    (10) sexps -> . empty
+    (2) sexp -> . KEYWORD
+    (3) sexp -> . INT
+    (4) sexp -> . FLOAT
+    (5) sexp -> . STRING
+    (6) sexp -> . SYMBOL
+    (7) sexp -> . LBRACKET sexps RBRACKET
+    (8) sexp -> . LPAREN sexps RPAREN
+    (9) sexp -> . LBRACE sexps RBRACE
+    (11) empty -> .
+
+    KEYWORD         shift and go to state 10
+    INT             shift and go to state 9
+    FLOAT           shift and go to state 2
+    STRING          shift and go to state 1
+    SYMBOL          shift and go to state 11
+    LBRACKET        shift and go to state 3
+    LPAREN          shift and go to state 8
+    LBRACE          shift and go to state 7
+    RPAREN          reduce using rule 11 (empty -> .)
+
+    sexp                           shift and go to state 4
+    empty                          shift and go to state 5
+    sexps                          shift and go to state 15
+
+state 9
+
+    (3) sexp -> INT .
+
+    KEYWORD         reduce using rule 3 (sexp -> INT .)
+    INT             reduce using rule 3 (sexp -> INT .)
+    FLOAT           reduce using rule 3 (sexp -> INT .)
+    STRING          reduce using rule 3 (sexp -> INT .)
+    SYMBOL          reduce using rule 3 (sexp -> INT .)
+    LBRACKET        reduce using rule 3 (sexp -> INT .)
+    LPAREN          reduce using rule 3 (sexp -> INT .)
+    LBRACE          reduce using rule 3 (sexp -> INT .)
+    RPAREN          reduce using rule 3 (sexp -> INT .)
+    RBRACKET        reduce using rule 3 (sexp -> INT .)
+    $end            reduce using rule 3 (sexp -> INT .)
+    RBRACE          reduce using rule 3 (sexp -> INT .)
+
+
+state 10
+
+    (2) sexp -> KEYWORD .
+
+    KEYWORD         reduce using rule 2 (sexp -> KEYWORD .)
+    INT             reduce using rule 2 (sexp -> KEYWORD .)
+    FLOAT           reduce using rule 2 (sexp -> KEYWORD .)
+    STRING          reduce using rule 2 (sexp -> KEYWORD .)
+    SYMBOL          reduce using rule 2 (sexp -> KEYWORD .)
+    LBRACKET        reduce using rule 2 (sexp -> KEYWORD .)
+    LPAREN          reduce using rule 2 (sexp -> KEYWORD .)
+    LBRACE          reduce using rule 2 (sexp -> KEYWORD .)
+    RPAREN          reduce using rule 2 (sexp -> KEYWORD .)
+    RBRACKET        reduce using rule 2 (sexp -> KEYWORD .)
+    $end            reduce using rule 2 (sexp -> KEYWORD .)
+    RBRACE          reduce using rule 2 (sexp -> KEYWORD .)
+
+
+state 11
+
+    (6) sexp -> SYMBOL .
+
+    KEYWORD         reduce using rule 6 (sexp -> SYMBOL .)
+    INT             reduce using rule 6 (sexp -> SYMBOL .)
+    FLOAT           reduce using rule 6 (sexp -> SYMBOL .)
+    STRING          reduce using rule 6 (sexp -> SYMBOL .)
+    SYMBOL          reduce using rule 6 (sexp -> SYMBOL .)
+    LBRACKET        reduce using rule 6 (sexp -> SYMBOL .)
+    LPAREN          reduce using rule 6 (sexp -> SYMBOL .)
+    LBRACE          reduce using rule 6 (sexp -> SYMBOL .)
+    RPAREN          reduce using rule 6 (sexp -> SYMBOL .)
+    RBRACKET        reduce using rule 6 (sexp -> SYMBOL .)
+    $end            reduce using rule 6 (sexp -> SYMBOL .)
+    RBRACE          reduce using rule 6 (sexp -> SYMBOL .)
+
+
+state 12
+
+    (7) sexp -> LBRACKET sexps . RBRACKET
+
+    RBRACKET        shift and go to state 16
+
+
+state 13
+
+    (1) sexps -> sexp sexps .
+
+    RPAREN          reduce using rule 1 (sexps -> sexp sexps .)
+    RBRACE          reduce using rule 1 (sexps -> sexp sexps .)
+    $end            reduce using rule 1 (sexps -> sexp sexps .)
+    RBRACKET        reduce using rule 1 (sexps -> sexp sexps .)
+
+
+state 14
+
+    (9) sexp -> LBRACE sexps . RBRACE
+
+    RBRACE          shift and go to state 17
+
+
+state 15
+
+    (8) sexp -> LPAREN sexps . RPAREN
+
+    RPAREN          shift and go to state 18
+
+
+state 16
+
+    (7) sexp -> LBRACKET sexps RBRACKET .
+
+    KEYWORD         reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    INT             reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    FLOAT           reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    STRING          reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    SYMBOL          reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    LBRACKET        reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    LPAREN          reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    LBRACE          reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    RPAREN          reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    RBRACKET        reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    $end            reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+    RBRACE          reduce using rule 7 (sexp -> LBRACKET sexps RBRACKET .)
+
+
+state 17
+
+    (9) sexp -> LBRACE sexps RBRACE .
+
+    KEYWORD         reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    INT             reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    FLOAT           reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    STRING          reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    SYMBOL          reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    LBRACKET        reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    LPAREN          reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    LBRACE          reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    RPAREN          reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    RBRACKET        reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    $end            reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+    RBRACE          reduce using rule 9 (sexp -> LBRACE sexps RBRACE .)
+
+
+state 18
+
+    (8) sexp -> LPAREN sexps RPAREN .
+
+    KEYWORD         reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    INT             reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    FLOAT           reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    STRING          reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    SYMBOL          reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    LBRACKET        reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    LPAREN          reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    LBRACE          reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    RPAREN          reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    RBRACKET        reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    $end            reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+    RBRACE          reduce using rule 8 (sexp -> LPAREN sexps RPAREN .)
+

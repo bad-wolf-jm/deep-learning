@@ -73,7 +73,7 @@ with connection.cursor() as cursor:
     for index, row in enumerate(entries):
         tweet = row['text']
         sent = row['flag_id'] - 1
-        if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= 1024:
+        if len(tweet) >= LENGTH_CUTOFF and len(tweet) <= 2048:
             tweet_stats = {'char_length': len(tweet),
                            'byte_length': len(tweet.encode('utf8'))}
             sanitized_tweet = tokenize(tweet)

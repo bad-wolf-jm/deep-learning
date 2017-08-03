@@ -99,18 +99,32 @@ def get_latest_test():
 
 
 def get_training_status_struct():
-    return {'batch_number': supervisor.batch_number,
-            'batches_per_epoch': supervisor.batches_per_epoch,
-            'epoch_number': supervisor.epoch_number,
-            'percent_epoch_complete': supervisor.epoch_percent,
-            'percent_training_complete': supervisor.training_percent,
-            'total_epochs': supervisor.number_of_epochs,
-            'batch_time': supervisor.batch_time.total_seconds(),
-            'epoch_time': supervisor.epoch_time.total_seconds(),
-            'epoch_elapsed_time': supervisor.epoch_elapsed_time.total_seconds(),
-            'epoch_remaining_time': supervisor.epoch_remaining_time.total_seconds(),
-            'elapsed_time': supervisor.elapsed_time.total_seconds(),
-            'remaining_time': supervisor.remaining_time.total_seconds()}
+    if supervisor is not None:
+        return {'batch_number': supervisor.batch_number,
+                'batches_per_epoch': supervisor.batches_per_epoch,
+                'epoch_number': supervisor.epoch_number,
+                'percent_epoch_complete': supervisor.epoch_percent,
+                'percent_training_complete': supervisor.training_percent,
+                'total_epochs': supervisor.number_of_epochs,
+                'batch_time': supervisor.batch_time.total_seconds(),
+                'epoch_time': supervisor.epoch_time.total_seconds(),
+                'epoch_elapsed_time': supervisor.epoch_elapsed_time.total_seconds(),
+                'epoch_remaining_time': supervisor.epoch_remaining_time.total_seconds(),
+                'elapsed_time': supervisor.elapsed_time.total_seconds(),
+                'remaining_time': supervisor.remaining_time.total_seconds()}
+    else:
+        return {'batch_number': 0, #
+                'batches_per_epoch': 0, #supervisor.batches_per_epoch,
+                'epoch_number': 0, #supervisor.epoch_number,
+                'percent_epoch_complete': 0, #supervisor.epoch_percent,
+                'percent_training_complete': 0, #supervisor.training_percent,
+                'total_epochs': 0, #supervisor.number_of_epochs,
+                'batch_time': 0, #supervisor.batch_time.total_seconds(),
+                'epoch_time': 0, #supervisor.epoch_time.total_seconds(),
+                'epoch_elapsed_time': 0, #supervisor.epoch_elapsed_time.total_seconds(),
+                'epoch_remaining_time': 0, #supervisor.epoch_remaining_time.total_seconds(),
+                'elapsed_time': 0, #supervisor.elapsed_time.total_seconds(),
+                'remaining_time': 0} #, #supervisor.remaining_time.total_seconds()}
 
 @app.route('/json/training_status.json')
 def get_training_status():
@@ -258,7 +272,9 @@ train_settings = {
 
 if __name__ == '__main__':
 #    fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/tests/test2.yaml')
-    fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/yaml/bigru_cms_user_3.yaml')
+    #fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/yaml/bigru_cms_user_3.yaml')
+    fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/yaml/bigru_cms_user_2.yaml')
+
     #fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/yaml/gru_cms_user_2.yaml')
     #fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/yaml/gru_conv_cms_user_2.yaml')
 #    fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/tests/test2.yaml')
