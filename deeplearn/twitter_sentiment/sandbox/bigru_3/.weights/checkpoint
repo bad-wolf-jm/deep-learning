@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/jalbert/.nn_models/bin/bigru_cms_user_3.yaml/weights/model.ckpt"
+all_model_checkpoint_paths: "/home/jalbert/.nn_models/bin/bigru_cms_user_3.yaml/weights/model.ckpt"
