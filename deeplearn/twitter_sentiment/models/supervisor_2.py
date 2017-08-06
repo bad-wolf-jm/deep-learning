@@ -1,24 +1,42 @@
 import time
 import numpy as np
+import tensorflow as tf
 from train.summary import StreamSummary
 import datetime
+from train.datasources import get_dataset_specs
 
 
 class InfiniteLoss(Exception):
     pass
 
+class BatchData(object):
+    def __init__(self, loss=0.0, accuracy=0.0, output=None):
+        super(BatchData, self).__init__()
+        self.loss = loss
+        self.accuracy = accuracy
+        self.output = output
+
+class TrainData(BatchData):
+    pass
+
+class ValidationData(BatchData):
+    pass
+
+class TestData(BatchData):
+    pass
+
 
 class TrainingSupervisor(object):
-    def __init__(self, model=None, validation_interval=None, test_interval=None,
-                 summary_span=None, checkpoint_interval=None):  # , test_keep=None, checkpoint_keep=None):
+    def __init__(self, session = None, model=None,
+                 validation_interval=None, test_interval=None,
+                 summary_span=None):
         super(TrainingSupervisor).__init__()
         self.model = model
         self.batch_index = 0
         self.validation_interval = validation_interval
-        self.checkpoint_interval = checkpoint_interval  # in seconds
         self.test_interval = test_interval  # test_interval in seconds
 
-        fields = ['loss', 'accuracy', 'time']
+        fields = ['loss', 'accuracy']
         self.train_summary = StreamSummary(summary_span, fields)
         self.validation_summary = StreamSummary(summary_span, fields)
         self.training_time_summary = StreamSummary(summary_span, ['time'])
@@ -29,7 +47,9 @@ class TrainingSupervisor(object):
         self._batches_per_epoch = None
         self._batch_index = None
         self._total_batches = None
-        self._session = None
+        self._session = session
+        self.data = get_dataset_specs(self.model.data)
+
 
     @property
     def batch_number(self):
@@ -115,51 +135,37 @@ class TrainingSupervisor(object):
         while True:
             yield None
 
+    def __float_dict(self, d):
+        return {'accuracy': float(d['accuracy']),
+                'loss': float(d['loss']),
+                'output': d.get('output', None)}
+
     def train_on_batch(self, train_x, train_y):
         self.batch_index += 1
         d = self.model.train(train_x, train_y, session=self._session)
-        d['time']=0
-        d = {'accuracy': float(d['accuracy']),
-             'loss': float(d['loss']),
-             'time': float(d['time'])}
+        d = self.__float_dict(d)
         self.train_summary.add(self.batch_index, **d)
-        print (d)
         return d
 
     def validate_on_batch(self, train_x, train_y):
         d = self.model.validate(train_x, train_y, session=self._session)
-        d['time']=0
-        d = {'accuracy': float(d['accuracy']),
-             'loss': float(d['loss']),
-             'time': float(d['time'])}
+        d = self.__float_dict(d)
         self.validation_summary.add(self.batch_index, **d)
         return d
 
     def test_on_batch(self, train_x, train_y):
         d = self.model.test(train_x, train_y, session=self._session)
-        d['time']=0
-        d = {'accuracy': float(d['accuracy']),
-             'loss': float(d['loss']),
-             'time': float(d['time']),
-             'output': d['output']}
+        d = self.__float_dict(d)
         return d
 
     def get_loss_summary(self, min_batch_index=None, max_batch_index=None):
-        x = self.train_summary.get(fields=['loss'],
-                                   min_batch_index=min_batch_index,
-                                   max_batch_index=max_batch_index)
-        y = self.validation_summary.get(fields=['loss'],
-                                        min_batch_index=min_batch_index,
-                                        max_batch_index=max_batch_index)
+        x = self.train_summary.get(fields=['loss'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+        y = self.validation_summary.get(fields=['loss'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
         return {'train': x['loss'], 'validation': y['loss']}
 
     def get_accuracy_summary(self, min_batch_index=None, max_batch_index=None):
-        x = self.train_summary.get(fields=['accuracy'],
-                                   min_batch_index=min_batch_index,
-                                   max_batch_index=max_batch_index)
-        y = self.validation_summary.get(fields=['accuracy'],
-                                        min_batch_index=min_batch_index,
-                                        max_batch_index=max_batch_index)
+        x = self.train_summary.get(fields=['accuracy'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
+        y = self.validation_summary.get(fields=['accuracy'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
         return {'train': x['accuracy'], 'validation': y['accuracy']}
 
     def _update_progress_info(self, training_batch):
@@ -176,18 +182,14 @@ class TrainingSupervisor(object):
                  'predicted': int(predicted)}
                 for string, truth, predicted in out]
 
-    def run_training(self, training_data_generator, validation_data_generator=None, test_data_generator=None, session=None):
-        validation_iterator = validation_data_generator or self.__default_validation_iterator()
-        test_iterator = test_data_generator or self.__default_validation_iterator()
-        self._session = session
+    def run_training(self, epochs=10, train_batch_size=100, validation_batch_size=100, test_batch_size=500):
+        data_generator = self.data['constructor'](batch_size=train_batch_size, epochs=epochs, validation_size=validation_batch_size, test_size=test_batch_size)
+        training_data_generator = data_generator['train']
+        validation_iterator = data_generator['validation']  or self.__default_validation_iterator()
+        test_iterator = data_generator['test']  or self.__default_validation_iterator()
         self._training_start_time = time.time()
         self._epoch_start_time = time.time()
-
         last_test_time = self._training_start_time
-        last_checkpoint_time = self._training_start_time
-        num_failed_checkpoints = 0
-        current_min_loss = np.inf
-        current_best_accuracy = 0
         current_epoch = 1
         test_index = 1
         for training_batch in training_data_generator:
@@ -198,8 +200,6 @@ class TrainingSupervisor(object):
             test_result_on_train = None
             if (self.test_interval is not None) and \
                     (time.time() - last_test_time >= self.test_interval):
-                test_result_on_train = self.test_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
-                test_result_on_train['output'] = self.__process_output(test_result_on_train['output'])
                 test_batch = next(test_iterator)
                 result = None
                 if test_batch is not None:
@@ -207,36 +207,27 @@ class TrainingSupervisor(object):
                     result['output'] = self.__process_output(result['output'])
                     last_test_time = time.time()
                     test_index += 1
-                self.save_test(train=test_result_on_train, test=result)
+                yield TestData(**result)
 
             d = self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
-            train_loss = d['loss']
+            yield TrainData(**d)
 
             self.batch_index += 1
-
-            if (self.checkpoint_interval is not None) and \
-                    (time.time() - last_checkpoint_time >= self.checkpoint_interval):
-                test_batch = next(test_iterator)
-                x = self.validate_on_batch(train_x=test_batch['train_x'], train_y=test_batch['train_y'])
-                if not (np.isnan(x['loss']) or np.isinf(x['loss'])):
-                    path = self.save_training_checkpoint()
-                    last_checkpoint_time = time.time()
 
             if (self.validation_interval is not None) and \
                     ((training_batch['batch_index'] % self.validation_interval) == 0):
                 validation_batch = next(validation_iterator)
                 if validation_batch is not None:
-                    self.validate_on_batch(train_x=validation_batch['train_x'], train_y=validation_batch['train_y'])
-            self.housekeeping()
+                    d = self.validate_on_batch(train_x=validation_batch['train_x'], train_y=validation_batch['train_y'])
+                    yield ValidationData(**d)
             batch_time = time.time() - batch_t_0
             self.training_time_summary.add(self.batch_index, time=batch_time)
-            yield train_loss
 
-    def save_test(self, *args, **kwargs):
-        pass
+#    def save_test(self, *args, **kwargs):
+#        pass
 
-    def save_training_checkpoint(self, *args, **kwargs):
-        pass
+#    def save_training_checkpoint(self, *args, **kwargs):
+#        pass
 
-    def housekeeping(self):
-        pass
+#    def housekeeping(self):
+#        pass
