@@ -66,7 +66,7 @@ def make_test_output_matrix(test):
 
 
 def send_report_email():
-    global _last_email_time
+    global _last_email_time, tests
     test_matrices = []
     for test_data in tests:
         matrix = make_test_output_matrix(test_data)
@@ -74,6 +74,7 @@ def send_report_email():
     _last_email_time = time.time()
     x = render_template('email.html', test_matrices=test_matrices, supervisor=supervisor)
     EmailNotification.sendEmail(x, subject="Training report")
+    tests = []
 
 
 def save_checkpoint():
@@ -83,7 +84,8 @@ def save_checkpoint():
 x = CompiledTrainingModel(model_path)
 with tf.Session(graph=x._graph) as _session:
     x.initialize(_session)
-    supervisor = TrainingSupervisor(session=_session, model=x,
+    supervisor = TrainingSupervisor(session=_session,
+                                    model=x,
                                     test_interval=test_interval,
                                     validation_interval=validation_interval,
                                     summary_span=summary_span)

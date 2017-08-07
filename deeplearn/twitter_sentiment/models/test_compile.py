@@ -10,7 +10,7 @@ class CompiledModel(object):
         self._script_globals = globals()
         with self._graph.as_default():
             exec(script, self._script_globals)
-            self.name = self._script_globals.get('__name__', None)
+            self.name = self._script_globals.get('__model_name__', None)
             self.version = self._script_globals.get('__version__', None)
             self.author = self._script_globals.get('__author__', None)
             self.date = self._script_globals.get('__date__', None)
@@ -61,8 +61,7 @@ class CompiledTrainingModel(CompiledModel):
         session.run(self._train_op, feed_dict = self._process_batch(train_x, train_y))
 
     def evaluate_batch(self, batch_x, batch_y, session=None):
-        #print(session)
-        d = self._evaluate_batch(batch_y, batch_y, session)
+        d = self._evaluate_batch(batch_x, batch_y, session)
         return d
 
     def half_learning_rate(self):
