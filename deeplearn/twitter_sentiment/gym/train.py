@@ -66,17 +66,19 @@ with tf.Session(graph=x._graph) as _session:
     start(supervisor)
     for loss in supervisor.run_training(epochs=epochs, train_batch_size=train_batch_size, validation_batch_size=validation_batch_size, test_batch_size=test_batch_size):
         try:
+            if isinstance(loss, TestData):
+                tests.append(loss)
+                post_test(loss)
             current_time = time.time()
             time_since_last_email = current_time - _last_email_time
             time_since_last_checkpoint = current_time - _last_checkpoint_time
             if time_since_last_email > e_mail_interval:
                 send_report_email()
+                _last_email_time = time.time()
             if time_since_last_checkpoint > checkpoint_interval:
                 save_checkpoint()
-            if isinstance(loss, TestData):
-                tests.append(loss)
-                post_test(loss)
-        except:
-            print('ERROR')
+                _last_checkpoint_time = time.time()
+        except Exception as error:
+            print('ERROR', error)
 if __name__ == '__main__':
     sys.exit(0)
