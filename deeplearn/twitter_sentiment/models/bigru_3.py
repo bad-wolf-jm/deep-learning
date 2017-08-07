@@ -38,7 +38,7 @@ def multi_layer_rnn(n_layers, hidden_states):
 def project(input_, output_dim):
     op = tf.contrib.layers.fully_connected
     return op(input_, output_dim,
-              weights_initializer=tf.nn.random_normal_initializer(),
+              #weights_initializer=tf.random_normal_initializer(),
               biases_initializer=None)
 
 

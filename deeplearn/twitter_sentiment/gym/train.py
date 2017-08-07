@@ -27,7 +27,7 @@ SECONDS = 1
 
 validation_interval = 5
 test_interval = 2 * MINUTES
-e_mail_interval = 1.5 * HOURS
+e_mail_interval = 1 * HOURS
 summary_span = None
 checkpoint_interval = 45 * MINUTES
 train_batch_size = 100
