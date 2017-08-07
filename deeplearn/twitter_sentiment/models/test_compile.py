@@ -48,8 +48,8 @@ class CompiledTrainingModel(CompiledModel):
         super(CompiledTrainingModel, self).__init__(file_path)
         with self._graph.as_default():
             self._script_globals['loss']()
-        self._train_setup = self._script_globals.get('begin_training', None)
         self._loss = self._script_globals.get('loss', None)
+        self._process_batch = self._script_globals.get('prepare_batch', None)
         self._train = self._script_globals.get('train', None)
         self._test = self._script_globals.get('test', None)
         self._validate = self._script_globals.get('validate', None)
@@ -63,18 +63,17 @@ class CompiledTrainingModel(CompiledModel):
         self._optimizer_args = self._script_optimizer_args
         with self._graph.as_default():
             self._optimizer = get_by_id(self._script_optimizer)['constructor'](self._learning_rate, **self._optimizer_args)
-            self._train_setup(self._optimizer.minimize(self._loss()))
+            self._train_op = self._optimizer.minimize(self._loss())
 
     def test(self, train_x, train_y, session=None):
         d = self._test(train_x, train_y, session)
         return d
 
     def train(self, train_x, train_y, session=None):
-        d = self._train(train_x, train_y, session)
-        return d
+        session.run(self._train_op, feed_dict = self._process_batch(train_x, train_y))
 
     def validate(self, train_x, train_y, session=None):
-        d = self._test(train_x, train_y, session)
+        d = self._validate(train_x, train_y, session)
         return d
 
     def half_learning_rate(self):

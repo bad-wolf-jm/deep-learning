@@ -5,7 +5,7 @@ from models.supervisor_2 import TrainingSupervisor
 from models.supervisor_2 import TrainData, TestData, ValidationData
 from models.test_compile import CompiledTrainingModel
 from notify.send_mail import EmailNotification
-from gym.webmon import render_template, start
+from gym.webmon import render_template, start, post_test
 
 
 model_path = 'models/bigru_3.py'
@@ -16,8 +16,12 @@ weight_dir = os.path.join(train_dir, 'weights')
 log_dir = os.path.join(train_dir, 'logs')
 weight_file = os.path.join(weight_dir, model_name)
 
+for d in [train_dir, weight_dir, log_dir]:
+    if not os.path.exists(d):
+        os.makedirs(d)
+
 validation_interval = 5
-test_interval = 1 * 60
+test_interval = 5 * 60
 e_mail_interval = 1.5 * 3600
 summary_span = None
 checkpoint_interval = 45 * 60
@@ -26,6 +30,8 @@ validation_batch_size = 100
 test_batch_size = 1000
 epochs = 50
 
+
+tests = []
 
 _last_email_time = time.time()
 _last_checkpoint_time = time.time()
@@ -55,20 +61,22 @@ def save_checkpoint():
 
 x = CompiledTrainingModel('models/bigru_3.py')
 with tf.Session(graph=x._graph) as _session:
-    #x.train_setup(tf.train.AdamOptimizer, 0.001)
     x.initialize(_session)
     supervisor = TrainingSupervisor(session=_session, model=x, test_interval=test_interval, validation_interval=validation_interval, summary_span=summary_span)
     start(supervisor)
     for loss in supervisor.run_training(epochs=epochs, train_batch_size=train_batch_size, validation_batch_size=validation_batch_size, test_batch_size=test_batch_size):
-        current_time = time.time()
-        time_since_last_email = current_time - _last_email_time
-        time_since_last_checkpoint = current_time - _last_checkpoint_time
-        if time_since_last_email > e_mail_interval:
-            send_report_email()
-        if time_since_last_checkpoint > checkpoint_interval:
-            save_checkpoint()
-        print(loss)
-
-
+        try:
+            current_time = time.time()
+            time_since_last_email = current_time - _last_email_time
+            time_since_last_checkpoint = current_time - _last_checkpoint_time
+            if time_since_last_email > e_mail_interval:
+                send_report_email()
+            if time_since_last_checkpoint > checkpoint_interval:
+                save_checkpoint()
+            if isinstance(loss, TestData):
+                tests.append(loss)
+                post_test(loss)
+        except:
+            print('ERROR')
 if __name__ == '__main__':
     sys.exit(0)

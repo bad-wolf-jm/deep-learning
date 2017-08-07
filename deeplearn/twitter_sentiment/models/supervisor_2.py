@@ -141,16 +141,16 @@ class TrainingSupervisor(object):
                 'output': d.get('output', None)}
 
     def train_on_batch(self, train_x, train_y):
-        self.batch_index += 1
+        #self.batch_index += 1
         d = self.model.train(train_x, train_y, session=self._session)
-        d = self.__float_dict(d)
-        self.train_summary.add(self.batch_index, **d)
+        #d = self.__float_dict(d)
+        #self.train_summary.add(self.batch_index, **d)
         return d
 
     def validate_on_batch(self, train_x, train_y):
         d = self.model.validate(train_x, train_y, session=self._session)
         d = self.__float_dict(d)
-        self.validation_summary.add(self.batch_index, **d)
+
         return d
 
     def test_on_batch(self, train_x, train_y):
@@ -191,13 +191,12 @@ class TrainingSupervisor(object):
         self._epoch_start_time = time.time()
         last_test_time = self._training_start_time
         current_epoch = 1
-        test_index = 1
+        #test_index = 1
         for training_batch in training_data_generator:
             if training_batch['epoch_number'] != current_epoch:
                 self._epoch_start_time = time.time()
             self._update_progress_info(training_batch)
             batch_t_0 = time.time()
-            test_result_on_train = None
             if (self.test_interval is not None) and \
                     (time.time() - last_test_time >= self.test_interval):
                 test_batch = next(test_iterator)
@@ -206,28 +205,21 @@ class TrainingSupervisor(object):
                     result = self.test_on_batch(train_x=test_batch['train_x'], train_y=test_batch['train_y'])
                     result['output'] = self.__process_output(result['output'])
                     last_test_time = time.time()
-                    test_index += 1
-                yield TestData(**result)
+                    #test_index += 1
+                    yield TestData(**result)
 
-            d = self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
-            yield TrainData(**d)
-
-            self.batch_index += 1
+            self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
+            if training_batch['batch_index'] % 3 == 0:
+                d = self.validate_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
+                self.train_summary.add(training_batch['batch_index'], **d)
+                yield TrainData(**d)
 
             if (self.validation_interval is not None) and \
                     ((training_batch['batch_index'] % self.validation_interval) == 0):
                 validation_batch = next(validation_iterator)
                 if validation_batch is not None:
                     d = self.validate_on_batch(train_x=validation_batch['train_x'], train_y=validation_batch['train_y'])
+                    self.validation_summary.add(training_batch['batch_index'], **d)
                     yield ValidationData(**d)
             batch_time = time.time() - batch_t_0
-            self.training_time_summary.add(self.batch_index, time=batch_time)
-
-#    def save_test(self, *args, **kwargs):
-#        pass
-
-#    def save_training_checkpoint(self, *args, **kwargs):
-#        pass
-
-#    def housekeeping(self):
-#        pass
+            self.training_time_summary.add(training_batch['batch_index'], time=batch_time)

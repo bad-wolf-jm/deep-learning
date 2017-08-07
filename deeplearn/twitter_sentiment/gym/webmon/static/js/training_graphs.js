@@ -54,7 +54,7 @@ function update_graphs()
 {
     $.getJSON('/json/training_graphs.json?min_timestamp='+Math.round(max_displayed_time),
         function(data) {
-            console.log(data)
+            //console.log(data)
             var loss_training_timestamps = data.loss.train.map((p)=> p[0]);
             var loss_validation_timestamps = data.loss.validation.map((p)=> p[0]);
             var max_1 = Math.max.apply(null, loss_training_timestamps);

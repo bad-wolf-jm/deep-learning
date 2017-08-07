@@ -74,7 +74,6 @@
   <body>
     <h1>Training Report for <b>{{ supervisor._meta.name }}</b></h1>
       {% for matrix in test_matrices %}
-
         {{ render_confusion_matrix(matrix['loss'], matrix['accuracy'], matrix['time'], matrix['matrix']) }}
         <p></p>
       {% endfor %}

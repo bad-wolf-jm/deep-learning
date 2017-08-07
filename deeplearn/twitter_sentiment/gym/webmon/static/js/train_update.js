@@ -81,79 +81,6 @@ function progress_chart_track(inner_radius, outer_radius, color)
 
 var training_progress_chart;
 
-/*
-$(document).ready(
-function (){
-training_progress_chart = new Highcharts.Chart({
-    chart: {
-        renderTo:'progress-meter',
-        type: 'solidgauge',
-        margin: 0,
-        padding: 0,
-        horizontalAlign:'center'
-    },
-
-    title: {text: ''},
-    tooltip: { enabled: false },
-
-    pane: {
-        startAngle: 0,
-        endAngle: 360,
-              background: [{ // Track for Move
-                    outerRadius: '100%',
-                    innerRadius: '85%',
-                    backgroundColor: Highcharts.Color(Highcharts.getOptions().colors[1])
-                        .setOpacity(0.3)
-                        .get(),
-                    borderWidth: 0
-                }, { // Track for Exercise
-                    outerRadius: '80%',
-                    innerRadius: '65%',
-                    backgroundColor: Highcharts.Color(Highcharts.getOptions().colors[1])
-                        .setOpacity(0.3)
-                        .get(),
-                    borderWidth: 0
-                }]},
-
-    yAxis: {
-        min: 0,
-        max: 100,
-        lineWidth: 0,
-        tickPositions: []
-    },
-
-    plotOptions: {
-        solidgauge: {
-            dataLabels: {
-                enabled: false
-            },
-            linecap: 'square',
-            stickyTracking: false,
-            rounded: false
-        }
-    },
-
-    series: [{
-        name: 'Move',
-        data: [{
-            color: Highcharts.getOptions().colors[9],
-            radius: '100%',
-            innerRadius: '85%',
-            y: 0
-        }]
-    }, {
-        name: 'Exercise',
-        data: [{
-            color: Highcharts.getOptions().colors[1],
-            radius: '80%',
-            innerRadius: '65%',
-            y: 0
-        }]
-    }]
-}
-);})
-*/
-
 function update_stats()
 {
     $.getJSON('/json/training_stats.json',
@@ -178,8 +105,6 @@ function update_progress()
                 $('#epoch-remaining-time').html(format_seconds_short(data.epoch_remaining_time.toFixed(2)));
                 $('#epoch-number').text(data.epoch_number);
                 $('#total-epochs').text(data.total_epochs);
-                //training_progress_chart.series[1].points[0].update(data.percent_epoch_complete);
-                //training_progress_chart.series[0].points[0].update(data.percent_training_complete);
             }
         );
 }
@@ -188,7 +113,7 @@ function update_confusion_matrix()
 {
     $.getJSON('/json/latest_test.json',
             function(data) {
-              var test_data = data.test;
+              var test_data = data;
               var test_batch_size =0;
               $('#current-test-loss').text(test_data.loss.toFixed(2));
               $('#current-test-accuracy').text((100*test_data.accuracy).toFixed(2)+"%");

@@ -5,7 +5,7 @@ __name__ = "3 layer bidirectional GRU model"
 __version__ = '1.0'
 __author__ = 'Jean-Martin Albert'
 __date__ = 'Aug 4th, 2017'
-__doc__ = "A recurrent neural network for sentiment analysis of short texts"
+__doc__ = "A 3 layer bidirectional recurrent neural network for sentiment analysis of short texts"
 __type__ = 'classifier'
 __data__ = 'CMSDataset'
 __categories__ = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant', 4: 'Irrelevant'}
@@ -23,7 +23,6 @@ __loss__ = None
 __optimizer__ = 'adam'
 __learning_rate__ = 0.001
 __optimizer_args__ = {}
-
 
 
 def multi_layer_rnn(n_layers, hidden_states):
@@ -50,9 +49,10 @@ def inference():
     v_1 = project(fw_output, embedding_dimension)
     v_2 = project(bw_output, embedding_dimension)
     e = tf.add(v_1, v_2)
-    __output__ = tf.contrib.layers.fully_connected(e, num_classes)
+    __output__ = project(e, num_classes)
     __prediction__ = tf.cast(tf.argmax(__output__, 1), tf.uint8)
     return __input__, __output__
+
 
 def loss():
     global __truth__, __loss__, __batch_loss__, __batch_accuracy__, __prediction__
@@ -60,10 +60,11 @@ def loss():
     _ = tf.one_hot(__truth__, depth=num_classes, axis=-1)
     SXEWL = tf.nn.softmax_cross_entropy_with_logits
     __loss__ = SXEWL(logits=__output__, labels=_)
-    _ = tf.reshape(_, [-1])
+    _ = tf.reshape(__truth__, [-1])
     __batch_loss__ = tf.reduce_mean(__loss__, axis=0)
-    __batch_accuracy__ = tf.reduce_mean(tf.cast(tf.equal(__truth__, __prediction__), tf.float32))
+    __batch_accuracy__ = tf.reduce_mean(tf.cast(tf.equal(__prediction__, _), tf.float32))
     return __loss__
+
 
 def pad(array, length, padding_value=0):
     array = list(array[:length])
@@ -76,23 +77,6 @@ def prepare_batch(batch_x, batch_y):
     batch_y = [element for element in batch_y]
     return {__input__: batch_x,
             __truth__: batch_y}
-
-
-#def begin_training(optimizer, learning_rate, **kwargs):
-#    global __optimizer__, __learning_rate__, __optimizer_args__, __train_step__
-#    __optimizer__ = optimizer
-#    __learning_rate__ = learning_rate
-#    __optimizer_args__ = kwargs
-#    _ = __optimizer__(learning_rate=__learning_rate__, **__optimizer_args__)
-#    __train_step__ = _.minimize(__loss__)
-
-def begin_training(train_step):
-    global __optimizer__, __learning_rate__, __optimizer_args__, __train_step__
-    #__optimizer__ = optimizer
-    #__learning_rate__ = learning_rate
-    #__optimizer_args__ = kwargs
-    #_ = __optimizer__(learning_rate=__learning_rate__, **__optimizer_args__)
-    __train_step__ = train_step
 
 
 def test(train_x, train_y, session=None):
