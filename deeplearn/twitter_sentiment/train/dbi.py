@@ -63,7 +63,7 @@ class DBConnection(object):
             remaining = batch_size
             select_columns = ', '.join([index_column] + select_columns) or "*"
             while remaining > 0:
-                sql = "SELECT {select_columns} FROM {table_name} WHERE {index_column} BETWEEN {start_id} AND {end_id}"
+                sql = "SELECT {select_columns} FROM {table_name} WHERE {index_column} BETWEEN {start_id} AND {end_id} ORDER BY {index_column} "
                 sql = sql.format(select_columns=select_columns,
                                  table_name=table_name,
                                  index_column=index_column,

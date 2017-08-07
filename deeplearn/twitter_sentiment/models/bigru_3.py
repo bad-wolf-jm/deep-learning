@@ -8,6 +8,9 @@ __date__ = 'Aug 4th, 2017'
 __doc__ = "A 3 layer bidirectional recurrent neural network for sentiment analysis of short texts"
 __type__ = 'classifier'
 __data__ = 'CMSDataset'
+__optimizer__ = tf.train.AdamOptimizer
+__learning_rate__ = 0.001
+__optimizer_args__ = {}
 __categories__ = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant', 4: 'Irrelevant'}
 
 hidden_states = 128
@@ -20,10 +23,6 @@ __output__ = None
 __truth__ = None
 __loss__ = None
 
-__optimizer__ = 'adam'
-__learning_rate__ = 0.001
-__optimizer_args__ = {}
-
 
 def multi_layer_rnn(n_layers, hidden_states):
     layers = [tf.nn.rnn_cell.GRUCell(hidden_states) for _ in range(n_layers)]
@@ -33,8 +32,9 @@ def multi_layer_rnn(n_layers, hidden_states):
         return layers[0]
 
 
-def project(x, n_dims):
-    return tf.contrib.layers.fully_connected(x, n_dims, biases_initializer=None)
+def project(input_dim, output_dim):
+    initializer = tf.random_normal([input_dim, output_dim], stddev=0.35)
+    return tf.Variable(initializer, name='W_P')
 
 
 def inference():
@@ -46,10 +46,11 @@ def inference():
     output, _ = tf.nn.bidirectional_dynamic_rnn(fw, bw, _, dtype=tf.float32)
     fw_output = tf.reshape(output[0][:, -1:], [-1, hidden_states])
     bw_output = tf.reshape(output[1][:, :1], [-1, hidden_states])
-    v_1 = project(fw_output, embedding_dimension)
-    v_2 = project(bw_output, embedding_dimension)
-    e = tf.add(v_1, v_2)
-    __output__ = project(e, num_classes)
+    w_1 = project(hidden_states, embedding_dimension)
+    w_2 = project(hidden_states, embedding_dimension)
+    w_3 = project(embedding_dimension, num_classes)
+    e = tf.add(tf.matmul(bw_output, w_1), tf.matmul(fw_output, w_2))
+    __output__ = tf.matmul(e, w_3)
     __prediction__ = tf.cast(tf.argmax(__output__, 1), tf.uint8)
     return __input__, __output__
 
@@ -79,23 +80,16 @@ def prepare_batch(batch_x, batch_y):
             __truth__: batch_y}
 
 
-def test(train_x, train_y, session=None):
-    feed_dict = prepare_batch(train_x, train_y)
-    p_v, lo, acc = session.run([__prediction__, __batch_loss__, __batch_accuracy__], feed_dict=feed_dict)
-    _ = [x[0] for x in train_y]
-    d = {'loss': lo, 'accuracy': acc, 'output': zip(train_x, _, p_v)}
+def evaluate_batch(batch_x, batch_y, session=None):
+    feed_dict = prepare_batch(batch_x, batch_y)
+    p, loss, accuracy = session.run([__prediction__, __batch_loss__, __batch_accuracy__],
+                                    feed_dict=feed_dict)
+    _ = [x[0] for x in batch_y]
+    d = {'loss': loss, 'accuracy': accuracy, 'output': zip(batch_x, _, p)}
     return d
 
 
-def train(train_x, train_y, session=None):
-    feed_dict = prepare_batch(train_x, train_y)
-    _, b_loss, b_accuracy = session.run([__train_step__, __batch_loss__, __batch_accuracy__], feed_dict=feed_dict)
-    d = {'loss': b_loss, 'accuracy': b_accuracy, 'output': []}
-    return d
-
-
-def validate(train_x, train_y, session=None):
-    feed_dict = prepare_batch(train_x, train_y)
-    loss, accuracy = session.run([__batch_loss__, __batch_accuracy__], feed_dict=feed_dict)
-    d = {'loss': loss, 'accuracy': accuracy, 'output': []}
-    return d
+def compute(batch_x, session=None):
+    feed_dict = prepare_batch(batch_x, [])
+    p = session.run([__prediction__], feed_dict=feed_dict)
+    return p[0]

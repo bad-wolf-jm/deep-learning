@@ -84,8 +84,8 @@
             Optimizer:
           </div>
           <p>
-            {# {{ supervisor.optimizer['display_name'] }} ,
-            \(\ell={{supervisor.optimizer['learning_rate']}}\) #}
+            {{ supervisor.model._optimizer_type.__name__ }},
+            \(\ell={{supervisor.model._learning_rate}}\)
           </p>
         </div>
       </div>

@@ -22,6 +22,7 @@ def _generate_batches(field_name=None, text_column='sanitized_text', min_id=0, m
             bytes_ = [ord(x) for x in row[text_column] if 0 < ord(x) < 256]
             batch_x.append(bytes_)
             batch_y.append([sentiment_map.get(row[field_name], row[field_name])])
+        #print([row['shuffle_id'] for row in b]) 
         yield {'train_x': batch_x,
                'train_y': batch_y,
                'batch_number': gen.current_epoch_batch_number,

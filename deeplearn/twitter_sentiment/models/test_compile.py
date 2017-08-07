@@ -1,5 +1,3 @@
-#import os
-#import time
 import tensorflow as tf
 import sys
 from train.optimizers import get_by_id
@@ -50,30 +48,21 @@ class CompiledTrainingModel(CompiledModel):
             self._script_globals['loss']()
         self._loss = self._script_globals.get('loss', None)
         self._process_batch = self._script_globals.get('prepare_batch', None)
-        self._train = self._script_globals.get('train', None)
-        self._test = self._script_globals.get('test', None)
-        self._validate = self._script_globals.get('validate', None)
-
-
-        self._script_optimizer = self._script_globals.get('__optimizer__', 'gradient_descent')
-        self._script_learning_rate = self._script_globals.get('__learning_rate__', 0.0001)
-        self._script_optimizer_args = self._script_globals.get('__optimizer_args__', {})
-
-        self._learning_rate = self._script_learning_rate
-        self._optimizer_args = self._script_optimizer_args
+        self._evaluate_batch = self._script_globals.get('evaluate_batch', None)
+        self._optimizer_type = self._script_globals.get('__optimizer__', tf.train.AdamOptimizer)
+        self._learning_rate = self._script_globals.get('__learning_rate__', 0.0001)
+        self._optimizer_args = self._script_globals.get('__optimizer_args__', {})
         with self._graph.as_default():
-            self._optimizer = get_by_id(self._script_optimizer)['constructor'](self._learning_rate, **self._optimizer_args)
+            self._optimizer = self._optimizer_type(self._learning_rate, **self._optimizer_args)
             self._train_op = self._optimizer.minimize(self._loss())
 
-    def test(self, train_x, train_y, session=None):
-        d = self._test(train_x, train_y, session)
-        return d
-
     def train(self, train_x, train_y, session=None):
+        #print(session)
         session.run(self._train_op, feed_dict = self._process_batch(train_x, train_y))
 
-    def validate(self, train_x, train_y, session=None):
-        d = self._validate(train_x, train_y, session)
+    def evaluate_batch(self, batch_x, batch_y, session=None):
+        #print(session)
+        d = self._evaluate_batch(batch_y, batch_y, session)
         return d
 
     def half_learning_rate(self):
@@ -86,7 +75,8 @@ if __name__ == '__main__':
     with tf.Session(graph=x._graph) as _session:
         x.train_setup(tf.train.AdamOptimizer, 0.001)
         x.initialize(_session)
-        supervisor = TrainingSupervisor(session=_session, model=x, test_interval=1, validation_interval=1, summary_span=1000)
+        supervisor = TrainingSupervisor(session=_session, model=x, test_interval=1,
+                                        validation_interval=1, summary_span=1000)
         for loss in supervisor.run_training():
             print(loss)
     sys.exit(0)

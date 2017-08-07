@@ -6,6 +6,7 @@ from models.supervisor_2 import TrainData, TestData, ValidationData
 from models.test_compile import CompiledTrainingModel
 from notify.send_mail import EmailNotification
 from gym.webmon import render_template, start, post_test
+import traceback
 
 
 model_path = 'models/bigru_3.py'
@@ -20,11 +21,15 @@ for d in [train_dir, weight_dir, log_dir]:
     if not os.path.exists(d):
         os.makedirs(d)
 
+MINUTES = 60
+HOURS = 3600
+SECONDS = 1
+
 validation_interval = 5
-test_interval = 5 * 60
-e_mail_interval = 1.5 * 3600
+test_interval = 2 * MINUTES
+e_mail_interval = 1.5 * HOURS
 summary_span = None
-checkpoint_interval = 45 * 60
+checkpoint_interval = 45 * MINUTES
 train_batch_size = 100
 validation_batch_size = 100
 test_batch_size = 1000
@@ -37,34 +42,56 @@ _last_email_time = time.time()
 _last_checkpoint_time = time.time()
 
 
+def __format_confusion_matrix(labels, true_labels, predicted_labels):
+    matrix = {}
+    for i in labels:
+        for j in labels:
+            matrix[i, j] = 0
+    for t_l, p_l in zip(true_labels, predicted_labels):
+        if (t_l, p_l) not in matrix:
+            matrix[(p_l, t_l)] = 0
+        matrix[(p_l, t_l)] += 1
+    return matrix
+
+
+def make_test_output_matrix(test):
+    labels = sorted(supervisor.model.categories.keys())
+    test_true_values = [x['truth'] for x in test.output]
+    test_predicted_values = [x['predicted'] for x in test.output]
+    test_confusion_matrix = __format_confusion_matrix(labels, test_true_values, test_predicted_values)
+    return {'loss': test.loss,
+            'accuracy': test.accuracy,
+            'result': test.output,
+            'matrix': test_confusion_matrix}
+
+
 def send_report_email():
-    def __matrix_to_dict(ll):
-        return {(i, j): n for i, j, n in ll}
-    foo = supervisor._meta.get_confusion_matrices(min_date=last_email_time)
-    bar = [json.loads(open(x).read()) for x in foo]
+    global _last_email_time
     test_matrices = []
-    for file_path in foo:
-        matrix = json.loads(open(file_path).read())
-        test_time = datetime.datetime.fromtimestamp(os.stat(file_path).st_ctime)
-        t = matrix['test']
-        t['time'] = test_time.isoformat()
-        t['matrix'] = __matrix_to_dict(t['matrix'])
-        test_matrices.append(t)
-    last_email_time = time.time()
+    for test_data in tests:
+        matrix = make_test_output_matrix(test_data)
+        test_matrices.append(matrix)
+    _last_email_time = time.time()
     x = render_template('email.html', test_matrices=test_matrices, supervisor=supervisor)
     EmailNotification.sendEmail(x, subject="Training report")
 
 
 def save_checkpoint():
-    x.save(_session, weight_file)
+    x.save(weight_file, session=_session)
 
 
-x = CompiledTrainingModel('models/bigru_3.py')
+x = CompiledTrainingModel(model_path)
 with tf.Session(graph=x._graph) as _session:
     x.initialize(_session)
-    supervisor = TrainingSupervisor(session=_session, model=x, test_interval=test_interval, validation_interval=validation_interval, summary_span=summary_span)
+    supervisor = TrainingSupervisor(session=_session, model=x,
+                                    test_interval=test_interval,
+                                    validation_interval=validation_interval,
+                                    summary_span=summary_span)
     start(supervisor)
-    for loss in supervisor.run_training(epochs=epochs, train_batch_size=train_batch_size, validation_batch_size=validation_batch_size, test_batch_size=test_batch_size):
+    for loss in supervisor.run_training(epochs=epochs,
+                                        train_batch_size=train_batch_size,
+                                        validation_batch_size=validation_batch_size,
+                                        test_batch_size=test_batch_size):
         try:
             if isinstance(loss, TestData):
                 tests.append(loss)
@@ -79,6 +106,7 @@ with tf.Session(graph=x._graph) as _session:
                 save_checkpoint()
                 _last_checkpoint_time = time.time()
         except Exception as error:
+            traceback.print_exc()
             print('ERROR', error)
 if __name__ == '__main__':
     sys.exit(0)

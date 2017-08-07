@@ -9,6 +9,7 @@ from train.datasources import get_dataset_specs
 class InfiniteLoss(Exception):
     pass
 
+
 class BatchData(object):
     def __init__(self, loss=0.0, accuracy=0.0, output=None):
         super(BatchData, self).__init__()
@@ -16,25 +17,28 @@ class BatchData(object):
         self.accuracy = accuracy
         self.output = output
 
+
 class TrainData(BatchData):
     pass
 
+
 class ValidationData(BatchData):
     pass
+
 
 class TestData(BatchData):
     pass
 
 
 class TrainingSupervisor(object):
-    def __init__(self, session = None, model=None,
+    def __init__(self, session=None, model=None,
                  validation_interval=None, test_interval=None,
                  summary_span=None):
         super(TrainingSupervisor).__init__()
         self.model = model
         self.batch_index = 0
         self.validation_interval = validation_interval
-        self.test_interval = test_interval  # test_interval in seconds
+        self.test_interval = test_interval
 
         fields = ['loss', 'accuracy']
         self.train_summary = StreamSummary(summary_span, fields)
@@ -49,7 +53,6 @@ class TrainingSupervisor(object):
         self._total_batches = None
         self._session = session
         self.data = get_dataset_specs(self.model.data)
-
 
     @property
     def batch_number(self):
@@ -141,20 +144,11 @@ class TrainingSupervisor(object):
                 'output': d.get('output', None)}
 
     def train_on_batch(self, train_x, train_y):
-        #self.batch_index += 1
         d = self.model.train(train_x, train_y, session=self._session)
-        #d = self.__float_dict(d)
-        #self.train_summary.add(self.batch_index, **d)
         return d
 
-    def validate_on_batch(self, train_x, train_y):
-        d = self.model.validate(train_x, train_y, session=self._session)
-        d = self.__float_dict(d)
-
-        return d
-
-    def test_on_batch(self, train_x, train_y):
-        d = self.model.test(train_x, train_y, session=self._session)
+    def evaluate_batch(self, train_x, train_y):
+        d = self.model.evaluate_batch(train_x, train_y, session=self._session)
         d = self.__float_dict(d)
         return d
 
@@ -183,42 +177,49 @@ class TrainingSupervisor(object):
                 for string, truth, predicted in out]
 
     def run_training(self, epochs=10, train_batch_size=100, validation_batch_size=100, test_batch_size=500):
-        data_generator = self.data['constructor'](batch_size=train_batch_size, epochs=epochs, validation_size=validation_batch_size, test_size=test_batch_size)
+        #num_dataset_categories = len(self.data['category_labels'].keys())
+        #num_model_categories = len(self.model.categories.keys())
+        #assert num_dataset_categories == num_model_categories
+        data_generator = self.data['constructor'](batch_size=train_batch_size,
+                                                  epochs=epochs,
+                                                  validation_size=validation_batch_size,
+                                                  test_size=test_batch_size)
         training_data_generator = data_generator['train']
-        validation_iterator = data_generator['validation']  or self.__default_validation_iterator()
-        test_iterator = data_generator['test']  or self.__default_validation_iterator()
+        validation_iterator = data_generator['validation'] or self.__default_validation_iterator()
+        test_iterator = data_generator['test'] or self.__default_validation_iterator()
         self._training_start_time = time.time()
         self._epoch_start_time = time.time()
         last_test_time = self._training_start_time
         current_epoch = 1
-        #test_index = 1
         for training_batch in training_data_generator:
             if training_batch['epoch_number'] != current_epoch:
                 self._epoch_start_time = time.time()
             self._update_progress_info(training_batch)
             batch_t_0 = time.time()
+            #print(training_batch['train_y'])
+            self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
+            if training_batch['batch_index'] % 3 == 0:
+                d = self.evaluate_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
+                self.train_summary.add(training_batch['batch_index'], **d)
+                yield TrainData(**d)
+
             if (self.test_interval is not None) and \
                     (time.time() - last_test_time >= self.test_interval):
                 test_batch = next(test_iterator)
                 result = None
                 if test_batch is not None:
-                    result = self.test_on_batch(train_x=test_batch['train_x'], train_y=test_batch['train_y'])
+                    result = self.evaluate_batch(train_x=test_batch['train_x'],
+                                                 train_y=test_batch['train_y'])
                     result['output'] = self.__process_output(result['output'])
                     last_test_time = time.time()
-                    #test_index += 1
                     yield TestData(**result)
 
-            self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
-            if training_batch['batch_index'] % 3 == 0:
-                d = self.validate_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
-                self.train_summary.add(training_batch['batch_index'], **d)
-                yield TrainData(**d)
 
             if (self.validation_interval is not None) and \
                     ((training_batch['batch_index'] % self.validation_interval) == 0):
                 validation_batch = next(validation_iterator)
                 if validation_batch is not None:
-                    d = self.validate_on_batch(train_x=validation_batch['train_x'], train_y=validation_batch['train_y'])
+                    d = self.evaluate_batch(train_x=validation_batch['train_x'], train_y=validation_batch['train_y'])
                     self.validation_summary.add(training_batch['batch_index'], **d)
                     yield ValidationData(**d)
             batch_time = time.time() - batch_t_0

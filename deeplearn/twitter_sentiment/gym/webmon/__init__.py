@@ -13,6 +13,7 @@ import psutil
 import threading
 import logging
 import socket
+import tensorflow as tf
 
 
 log = logging.getLogger('werkzeug')
@@ -102,7 +103,9 @@ def get_latest_test():
 
 
 def get_training_status_struct():
-    return {'batch_number': supervisor.batch_number if supervisor is not None else 0,
+    return {#'optimizer': optimizers[type(supervisor.model._optimizer)] if supervisor is not None else None,
+            #'learning_rate': supervisor.model._learning_rate if supervisor is not None else None,
+            'batch_number': supervisor.batch_number if supervisor is not None else 0,
             'batches_per_epoch': supervisor.batches_per_epoch if supervisor is not None else 0,
             'epoch_number': supervisor.epoch_number if supervisor is not None else 0,
             'percent_epoch_complete': supervisor.epoch_percent if supervisor is not None else 0,
