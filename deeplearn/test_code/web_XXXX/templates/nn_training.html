@@ -1,0 +1,312 @@
+{% extends "nn_skeleton.html" %}
+
+{% macro render_confusion_matrix(matrix_entries) %}
+  {% set labels = supervisor._meta.category_labels %}
+  <table style="ui celled table">
+    <tr>
+      <td class="empty-cell"></td>
+      {% for label in labels.keys()|sort() %}
+        <td  class="confusion-matrix-label-cell" style="text-align:center"><b>{{ labels[label] }}</b></td>
+      {% endfor%}
+    </tr>
+    {% for label_r in labels.keys()|sort() %}
+      <tr>
+        <td class="confusion-matrix-label-cell"><b>{{ labels[label_r] }}</b></td>
+        {% for label_c in labels.keys()|sort() %}
+          {% if label_c == label_r: %}
+            <td class="confusion-matrix-entry-cell positive" id='c-cell-{{label_r}}-{{label_c}}'> ... </td>
+          {% else %}
+            <td class="confusion-matrix-entry-cell negative" id='c-cell-{{label_r}}-{{label_c}}'> ... </td>
+          {% endif %}
+        {% endfor%}
+      </tr>
+    {% endfor%}
+  </table>
+{% endmacro %}
+
+{% macro render_confusion_matrix_d(matrix_entries) %}
+  {% set labels = supervisor._meta.category_labels %}
+  <table style="ui celled table">
+    <tr>
+      <td class="empty-cell"></td>
+      {% for label in labels.keys()|sort() %}
+        <td  class="confusion-matrix-label-cell" style="text-align:center"><b>{{ labels[label] }}</b></td>
+      {% endfor%}
+    </tr>
+    {% for label_r in labels.keys()|sort() %}
+      <tr>
+        <td class="confusion-matrix-label-cell"><b>{{ labels[label_r] }}</b></td>
+        {% for label_c in labels.keys()|sort() %}
+          {% if label_c == label_r: %}
+            <td class="confusion-matrix-entry-cell positive" id='d-c-cell-{{label_r}}-{{label_c}}'> ... </td>
+          {% else %}
+            <td class="confusion-matrix-entry-cell negative" id='d-c-cell-{{label_r}}-{{label_c}}'> ... </td>
+          {% endif %}
+        {% endfor%}
+      </tr>
+    {% endfor%}
+  </table>
+{% endmacro %}
+
+{% block current_model_name %}
+  HOST: <b>{{ host }}</b>
+{% endblock %}
+
+{% block page_content %}
+  {# <div class='ui container' style="height:200px">
+      <h2 class="ui icon header" style="width:100%; padding:40px">
+      <i class="desktop icon"></i>
+      <div class="content">
+        Training monitor
+      </div>
+    </h2>
+  </div> #}
+  <div class="ui attached segments">
+     <div class="ui block header segment">
+      <i class="left floated desktop icon"></i>
+      {{ supervisor._meta.name }}
+    </div>
+    <div class="ui horizontal segments">
+        <div class="ui segment">
+          <div class="ui top left attached label">
+            Type:
+          </div>
+          <p>{{ supervisor._meta.type }}</p>
+        </div>
+        <div class="ui segment">
+          <div class="ui top left attached label">
+            Dataset:
+          </div>
+          <p>{{ supervisor._meta.dataset['display_name'] }}</p>
+        </div>
+        <div class="ui segment">
+          <div class="ui top left attached label">
+            Optimizer:
+          </div>
+          <p>
+            {{ supervisor.optimizer['display_name'] }},
+            \(\ell={{supervisor.optimizer['learning_rate']}}\)
+          </p>
+        </div>
+      </div>
+
+
+    <div class="ui horizontal segments">
+      <div class="ui segment">
+          <div class="ui top left attached label">
+              <div class="progress-text" style="width:100px; text-align:center; font-size:10px"><b>Epoch</b>
+                  <div id="epoch-number" style="display: inline">2534</div> of <div id='total-epochs' style="display: inline">5000</div>
+              </div>
+          </div>
+          <div id='epoch-remaining-time'></div>
+          <!-- <div id='progress-meter' style="width:50px; height:50px;margin:0px;padding:0px"></div> -->
+      </div>
+      <div class="ui segment">
+          <div class="ui top left attached label">
+            Epoch time:
+          </div>
+        <p class="" id="stats-epoch-time">NAN</p>
+      </div>
+
+      <div class="ui segment">
+          <div class="ui top left attached label">
+            Elapsed time:
+          </div>
+          <p class="" id='elapsed-time'>NAN</p>
+      </div>
+
+      <div class="ui segment">
+        <div class="ui top left attached label">
+          Remaining time:
+        </div>
+        <p class="" id='remaining-time'>NAN</p>
+      </div>
+  </div>
+
+
+</div>
+<div class='ui container'>
+    <div class="ui one column equal height grid">
+        <div class="column sixteen wide">
+            <h4 class="ui top attached small block header">
+                Loss
+                <div class="ui top left green label">
+                  Avg. training:
+                  <div class="detail"  id="stats-training-loss">
+                    foo
+                  </div>
+                </div>
+                <div class="ui top right green label">
+                  Avg. validation:
+                  <div class="detail"  id="stats-validation-loss">
+                    foo
+                  </div>
+                </div>
+              </h4>
+              <div class="ui bottom attached segment", id="loss-graph-content" style="height:190px">
+                Segment
+              </div>
+
+              <h4 class="ui top attached block header">
+                  Accuracy
+                  <div class="ui top right green label">
+                    Avg. training:
+                    <div class="detail" id="stats-training-accuracy">
+                      foo
+                    </div>
+                  </div>
+                  <div class="ui top right green label">
+                    Avg. validation:
+                    <div class="detail" id="stats-validation-accuracy">
+                      foo
+                    </div>
+                  </div>
+
+                </h4>
+                <div class="ui bottom attached segment", id="acc-graph-content" style="height:190px">
+                  Segment
+                </div>
+        </div>
+
+    </div>
+    <div class="ui top attached block header">
+      Model performance
+      <div class="ui grey right floated label">
+        Test loss:
+        <div class="detail" id='current-test-loss'>
+          .445
+        </div>
+      </div>
+      <div class="ui grey right floated label">
+        Test accuracy:
+        <div class="detail" id='current-test-accuracy'>
+          22.3%
+        </div>
+      </div>
+        <button class="ui small right floated labeled icon button", onClick="show_all_tests()">
+          <i class="list icon"></i>
+          View
+        </button>
+    </div>
+    <div class="ui bottom attached segment">
+      {{ render_confusion_matrix() }}
+    </div>
+
+</div>
+
+<div class="ui modal" id='test-chooser-modal'>
+  <div class="header">Tests performed:</div>
+  <div class="content">
+    <div class="ui fluid scrolling dropdown labeled icon button" id='test-chooser-dropdown'>
+      <input type="hidden" name="selected-text">
+      <i class="world icon"></i>
+      <span class="text">Select the test to display:</span>
+      <div class="menu" id='test-selection'>
+      </div>
+    </div>
+    <p></p>
+    <div class="ui bottom attached segment">
+      {{ render_confusion_matrix_d() }}
+    </div>
+    <div class="" style="width:100%; height:700px; overflow-y: auto;">
+      <table class="ui fixed single line celled scrolling table">
+        <thead>
+          <tr>
+            <th>
+              Text
+            </th>
+            <th style='width:15%; text-align:right'>
+              Predicted
+            </th>
+            <th  style='width:15%; text-align:right'>
+              True
+            </th>
+          </tr>
+        </thead>
+        <tbody id="test-result-table">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts%}
+<script type="text/javascript">
+setInterval(update_stats, 2000);
+setInterval(update_progress, 2000);
+setInterval(update_graphs, 2000);
+setInterval(update_confusion_matrix, 2000);
+
+var tests =[];
+
+$(document).ready(
+    function ()
+    {
+        loss_graph = make_graph($('#graph').height(), 'loss-graph-content');
+        accuracy_graph = make_graph($('#graph').height(), 'acc-graph-content');
+    }
+);
+
+$('#test-chooser-dropdown').dropdown({
+ onChange: function(value) {
+   console.log(value);
+
+   $.getJSON(`/fs${tests[value].confusion_file}`,
+     function (data){
+      console.log(data);
+       var test_data = data.test;
+       var test_batch_size =0;
+       for (var i=0; i<test_data.matrix.length; i++){
+         var cell_entry = test_data.matrix[i];
+         var cell_id = `#d-c-cell-${cell_entry[0]}-${cell_entry[1]}`;
+         $(cell_id).text(cell_entry[2]);
+       }
+     }
+   );
+   $.getJSON(`/fs${tests[value].output_file}`,
+     function (data) {
+       var table_entries = data.test.output;
+       var table_desc = "";
+       for (var i=0; i<table_entries.length; i++){
+          text = table_entries[i].input;
+          truth = table_entries[i].truth;
+          predicted = table_entries[i].predicted;
+          class_value = (truth==predicted) ? "" : "negative";
+          table_row = `<tr class=${class_value}><td>${text}</td><td  style='width:15%; text-align:right'>${truth}</td><td  style='width:15%; text-align:right'>${predicted}</td></tr>`
+          table_desc += table_row
+       }
+       $('#test-result-table').html(table_desc)
+     }
+   )
+  }
+}
+);
+
+function show_all_tests(){
+  $.getJSON("/json/tests.json",
+  function (data){
+    var dropdown_items = "";
+    tests=data;
+    for(var index = 0; index < data.length; index++){
+      //console.log(data[index])
+      item = `<div class="item" data-value="${index}"><i class="list icon"></i>${data[index].date}<br/>Loss: ${data[index].loss}, Accuracy: ${data[index].accuracy}</div>`
+      dropdown_items += item;
+    }
+    $('#test-selection').html(dropdown_items);
+    //console.log(dropdown_items)
+
+    //console.log(data)
+    $('#test-chooser-modal').modal('show')
+  }
+)
+}
+
+</script>
+{% endblock %}
+
+{% block header_scripts %}
+  <script src="/static/js/train_update.js"></script>
+  <script src="/static/js/training_graphs.js"></script>
+{% endblock %}

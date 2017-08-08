@@ -1,0 +1,96 @@
+{% extends "nn_skeleton.html" %}
+{% macro format_citation(citation_data) %}
+  From: <i><b>{{ citation_data['title'] }}</b></i>
+  {% if citation_data['author'] is not none %}
+    , by {{ citation_data['author'] }}
+  {% endif %}
+  {% if citation_data['date'] is not none %}
+    , {{ citation_data['date'] }}
+  {% endif %}
+  {% if citation_data['link'] is not none %}
+    , {{ citation_data['link'] }}
+  {% endif %}
+{% endmacro %}
+
+{% block page_content %}
+
+{# <h2 class='ui top attached block header'>
+    {{ model_type['display_name'] }}
+    <div class="ui right floated purple basic button">
+        Create new instance
+    </div>
+</h2>
+<p class='ui attached segment'>
+    {{ model_type['description'] }}
+</p>
+<p class='ui bottom attached segment'>
+  {% if model_type['citation'] is not none %}
+      {{ format_citation(model_type['citation']) }}
+  {% else %}
+      <i>(No citation provided)</i>
+  {% endif %}
+</p>
+#}
+
+
+<div class="ui contents">
+  <div class="ui fluid items">
+      {% for model_type in model_types%}
+        <h3 class="ui top attached block segment">
+            {{ model_type['name'] }}
+            <div class="ui label">
+                Type:
+                <div class="detail">
+                  {{ model_type['type'] }}
+                </div>
+            </div>
+        </h3>
+
+        <div class="ui attached segment">
+            The description of the model
+          <div class="item">
+              <div class="content">
+                  <div class="meta">
+                      <span>{{ model_type['description'] }}</span>
+                  </div>
+                  <div class="description">
+                      <p></p>
+                  </div>
+                  <div class="extra">
+                      {# Model inputs go here #}
+                      <div class="ui blue label">
+                          Input:
+                          <div class="detail">
+                            {{ model_type['input_type'] }} Input dataset
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div class="ui bottom attached segment">
+            <div class="ui mini button">
+                Edit
+            </div>
+            <div class="ui right floated mini red button" onClick="">
+                Train
+            </div>
+            <div class="ui right floated mini green button" onClick="">
+                Test
+            </div>
+
+        </div>
+      {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+  function train_model(model_name, model_type) {
+    var url = `http://localhost:5000/actions/train_model?name=${model_name}&type=${model_type}`;
+    location.replace(url);
+
+  }
+</script>
+{% endblock %}
