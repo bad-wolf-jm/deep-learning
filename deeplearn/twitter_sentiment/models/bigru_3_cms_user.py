@@ -10,13 +10,14 @@ class Metadata:
     doc = "A 3 layer bidirectional recurrent neural network for sentiment analysis of short texts"
     type = 'classifier'
     data = 'CMSDataset'
-    categories = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant', 4:"OTHER"}
+    categories = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant', 4: "OTHER"}
 
 
 class Optimizer:
     name = tf.train.AdamOptimizer
     learning_rate = 0.001
     optimizer_args = {}
+    minimize = None
 
 
 class Hyperparameters:
@@ -35,6 +36,7 @@ class Globals:
     loss = None
     batch_loss = None
     batch_accuracy = None
+    minimize = None
 
 
 def multi_layer_rnn(n_layers, hidden_states):
@@ -77,6 +79,13 @@ def loss():
     return Globals.loss
 
 
+def train():
+    optimizer = Optimizer.name
+    learning_rate = Optimizer.learning_rate
+    args = Optimizer.optimizer_args
+    Globals.minimize = optimizer(learning_rate, **args).minimize(loss())
+
+
 def pad(array, length, padding_value=0):
     array = list(array[:length])
     array += [padding_value] * (length - len(array))
@@ -97,6 +106,10 @@ def evaluate_batch(batch_x, batch_y, session=None):
     _ = [x[0] for x in batch_y]
     d = {'loss': loss, 'accuracy': accuracy, 'output': zip(batch_x, _, p)}
     return d
+
+
+def train_batch(batch_x, batch_y, session=None):
+    return session.run(Globals.minimize, feed_dict = prepare_batch(batch_x, batch_y))
 
 
 def compute(batch_x, session=None):

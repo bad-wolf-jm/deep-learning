@@ -1,9 +1,9 @@
 import tensorflow as tf
 import time
 import os
-from models.supervisor_2 import TrainingSupervisor
-from models.supervisor_2 import TrainData, TestData, ValidationData
-from models.test_compile import CompiledTrainingModel
+from train.supervisor import TrainingSupervisor
+from train.supervisor import TrainData, TestData, ValidationData
+from train.compile import CompiledTrainingModel
 from notify.send_mail import EmailNotification
 from gym.webmon import render_template, start, post_test
 import traceback

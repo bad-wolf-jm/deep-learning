@@ -1,0 +1,2 @@
+model_checkpoint_path: "bigru_3.py"
+all_model_checkpoint_paths: "bigru_3.py"
