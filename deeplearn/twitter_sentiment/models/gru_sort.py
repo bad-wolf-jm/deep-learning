@@ -3,14 +3,13 @@ import numpy as np
 
 
 class Metadata:
-    model_name = "3 layer bidirectional GRU model"
+    model_name = "Sorting function based on recurrent neural networks"
     version = '1.0'
     author = 'Jean-Martin Albert'
-    date = 'Aug 4th, 2017'
-    doc = "A 3 layer bidirectional recurrent neural network for sentiment analysis of short texts."
-    type = 'classifier'
-    data = 'CMSUserInputDataset'
-    categories = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant'}
+    date = 'Aug 8th, 2017'
+    doc = "This network sorts short sequences of integers"
+    type = 'encoder'
+    data = 'ShortSequenceSorter'
 
 
 class Optimizer:
@@ -22,10 +21,9 @@ class Optimizer:
 
 class Hyperparameters:
     n_layers = 3
-    hidden_states = 128
+    hidden_states = 512
     sequence_length = 256
-    embedding_dimension = 256
-    num_classes = 5
+    embedding_dimension = 128
 
 
 class Globals:
@@ -47,9 +45,9 @@ def multi_layer_rnn(n_layers, hidden_states):
         return layers[0]
 
 
-def project(input_, output_dim):
-    op = tf.contrib.layers.fully_connected
-    return op(input_, output_dim, biases_initializer=None)
+#def project(input_, output_dim):
+#    op = tf.contrib.layers.fully_connected
+#    return op(input_, output_dim, biases_initializer=None)
 
 
 def inference():

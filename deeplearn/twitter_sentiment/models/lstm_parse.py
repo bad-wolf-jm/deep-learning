@@ -7,10 +7,10 @@ class Metadata:
     version = '1.0'
     author = 'Jean-Martin Albert'
     date = 'Aug 4th, 2017'
-    doc = "A 3 layer bidirectional recurrent neural network for sentiment analysis of short texts."
+    doc = "A 3 layer bidirectional recurrent neural network for sentiment analysis of short texts"
     type = 'classifier'
-    data = 'CMSUserInputDataset'
-    categories = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant'}
+    data = 'CMSDataset'
+    categories = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant', 4: "OTHER"}
 
 
 class Optimizer:

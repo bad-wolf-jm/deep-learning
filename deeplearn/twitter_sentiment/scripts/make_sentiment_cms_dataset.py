@@ -61,7 +61,6 @@ convert={-1:0, 0:1, 1:2, -2:3}
 
 with feed_connection.cursor() as feed_cursor:
     for table in tables:
-        #sql = """SELECT message, vader, sentiwordnet FROM {table} WHERE lang='en'"""
         sql = sql_base.format(table=table)
         feed_cursor.execute(sql)
         data = feed_cursor.fetchall()
