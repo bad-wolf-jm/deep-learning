@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 
+
+
 __model_name__ = "3 layer bidirectional GRU model"
 __version__ = '1.0'
 __author__ = 'Jean-Martin Albert'
@@ -13,10 +15,6 @@ __learning_rate__ = 0.001
 __optimizer_args__ = {}
 __categories__ = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant'}
 
-hidden_states = 128
-sequence_length = 256
-embedding_dimension = 256
-num_classes = 5
 
 __input__ = tf.placeholder('uint8', shape=[None, sequence_length], name="INPUT")
 __output__ = None
@@ -25,6 +23,14 @@ __truth__ = None
 __loss__ = None
 __batch_loss__ = None
 __batch_accuracy__ = None
+
+
+n_layers = 3
+hidden_states = 128
+sequence_length = 256
+embedding_dimension = 256
+num_classes = 5
+
 
 
 def multi_layer_rnn(n_layers, hidden_states):
@@ -37,17 +43,15 @@ def multi_layer_rnn(n_layers, hidden_states):
 
 def project(input_, output_dim):
     op = tf.contrib.layers.fully_connected
-    return op(input_, output_dim,
-              #weights_initializer=tf.random_normal_initializer(),
-              biases_initializer=None)
+    return op(input_, output_dim, biases_initializer=None)
 
 
 def inference():
     global __input__, __output__, __prediction__
     _ = tf.one_hot(__input__, depth=embedding_dimension, axis=-1)
     _ = tf.reshape(_, [-1, sequence_length, embedding_dimension])
-    fw = multi_layer_rnn(3, hidden_states)
-    bw = multi_layer_rnn(3, hidden_states)
+    fw = multi_layer_rnn(n_layers, hidden_states)
+    bw = multi_layer_rnn(n_layers, hidden_states)
     output, _ = tf.nn.bidirectional_dynamic_rnn(fw, bw, _, dtype=tf.float32)
     fw_output = tf.reshape(output[0][:, -1:], [-1, hidden_states])
     bw_output = tf.reshape(output[1][:, :1], [-1, hidden_states])
@@ -86,9 +90,7 @@ def prepare_batch(batch_x, batch_y):
 
 def evaluate_batch(batch_x, batch_y, session=None):
     feed_dict = prepare_batch(batch_x, batch_y)
-    p, loss, accuracy = session.run([__prediction__,
-                                     __batch_loss__,
-                                     __batch_accuracy__],
+    p, loss, accuracy = session.run([__prediction__, __batch_loss__, __batch_accuracy__],
                                     feed_dict=feed_dict)
     _ = [x[0] for x in batch_y]
     d = {'loss': loss, 'accuracy': accuracy, 'output': zip(batch_x, _, p)}

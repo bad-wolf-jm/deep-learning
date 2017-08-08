@@ -3,13 +3,8 @@ from flask_cors import CORS
 import jinja2
 import json
 import os
-#import re
-#import random
-#import time
 from threading import Lock
 import psutil
-#import glob
-#import datetime
 import threading
 import logging
 import socket
@@ -20,25 +15,11 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.DEBUG)
 
 
-#from web.python import bootstrap_yaml as bootstrap
-# from web.python.bootstrap_yaml import CompiledModel  # , list_model_types
-#from web.python.training import PersistentTrainingSupervisor, ThreadedModelTrainer
-#from notify.send_mail import EmailNotification
-
-
-D = os.path.dirname(__file__)  # os.path.dirname(os.path.dirname(__file__)))
+D = os.path.dirname(__file__)
 print(__file__)
 print(D)
-# sys.exit(0)
 
 TEMPLATES_ROOT = D
-
-# os.path.join(os.path.expanduser('~'),
-#                              'python',
-#                              #'Python', 'DJ',
-#                              'deep-learning',
-#                              'deeplearn',
-#                              'twitter_sentiment', 'web')
 
 loader = jinja2.FileSystemLoader(
     [os.path.join(TEMPLATES_ROOT, "static"),
@@ -96,16 +77,13 @@ def make_test_output_matrix(test):
 @app.route('/json/latest_test.json')
 def get_latest_test():
     global latest_test
-    #print (latest_test)
     with latest_test_lock:
         _ = make_test_output_matrix(latest_test)
     return json.dumps(_)
 
 
 def get_training_status_struct():
-    return {#'optimizer': optimizers[type(supervisor.model._optimizer)] if supervisor is not None else None,
-            #'learning_rate': supervisor.model._learning_rate if supervisor is not None else None,
-            'batch_number': supervisor.batch_number if supervisor is not None else 0,
+    return {'batch_number': supervisor.batch_number if supervisor is not None else 0,
             'batches_per_epoch': supervisor.batches_per_epoch if supervisor is not None else 0,
             'epoch_number': supervisor.epoch_number if supervisor is not None else 0,
             'percent_epoch_complete': supervisor.epoch_percent if supervisor is not None else 0,
@@ -129,22 +107,20 @@ def get_path(path):
     return open('/' + path).read()
 
 
+def get_float_arg(request):
+    try:
+        return float(request.args.get('min_timestamp'))
+    except:
+        return None
+
+
 @app.route('/json/training_graphs.json')
 def get_training_graph_series():
-    try:
-        min_timestamp = float(request.args.get('min_timestamp'))
-    except:
-        min_timestamp = None
-    try:
-        max_timestamp = float(request.args.get('max_timestamp'))
-    except:
-        max_timestamp = None
-
+    min_timestamp = get_float_arg('min_timestamp')
+    max_timestamp = get_float_arg('max_timestamp')
     loss = supervisor.get_loss_summary(min_timestamp, max_timestamp)
     accuracy = supervisor.get_accuracy_summary(min_timestamp, max_timestamp)
-    #print ('XXX')
-    return json.dumps({'loss': loss,
-                       'accuracy': accuracy})
+    return json.dumps({'loss': loss, 'accuracy': accuracy})
 
 
 @app.route('/static/<string:page_folder>/<path:page_name>')
@@ -159,8 +135,6 @@ def get_page(page_folder, page_name):
 
     ext = os.path.splitext(page_name)[1]
     mimetype = mimetypes.get(ext, "application/octet-stream")
-
-    print(page_path, mimetype)
     try:
         return Response(open(page_path).read(), mimetype=mimetype)
     except Exception as e:
@@ -168,20 +142,10 @@ def get_page(page_folder, page_name):
         return app.send_static_file(page_path)
 
 
-@app.route('/json/tests.json')
-def list_tests(min_date=None, max_date=None):
-    test_list = supervisor._meta.get_tests()
-    list_ = []
-    for file_ in test_list:
-        x = json.loads(open(file_).read())
-        list_.append(x)
-    return json.dumps(list_)
-
-
 @app.route('/ui/training')
 def display_training_status():
     template = 'nn_training.html'
-    model_types = []  # bootstrap.list_model_types()
+    model_types = []
     return render_template(template,
                            host=socket.gethostname(),
                            initial_state=get_training_status_struct(),
@@ -189,55 +153,9 @@ def display_training_status():
                            model_types=model_types)
 
 
-#@app.route('/action/stop_training')
-#def stop_training():
-#    training_thread.stop()
-#    print('TRAINING STOPPED')
-#    return json.dumps({'status': 'ok'})
-
-
-#@app.route('/action/start_training')
-#def start_training():
-#    training_thread.start()
-#    print('TRAINING STARTED')
-#    return json.dumps({'status': 'ok'})
-
-
-# def send_email_every_minute():
-#    while True:
-#        print('Sending email')
-#        try:
-#            EmailNotification.sendEmail(get_report_email(), subject="Training report")
-#            time.sleep(3600)
-#        except:
-#            time.sleep(6)
-
-
 supervisor = None
 latest_test = None
 latest_test_lock = threading.Lock()
-#host = os.environ['HOSTNAME']
-
-# train_settings = {
-#    'optimizer': {
-#        'name': 'adam',
-#        'learning_rate': 0.001,
-#        'optimizer_parameters': {
-#                'beta1': 0.9,
-#                'beta2': 0.999,
-#                'epsilon': 0.00000001
-#        }
-#    },
-#    'validation_interval': 5,
-#    'test_interval': 1 * 60,
-#    'e_mail_interval': 1.5 * 3600,
-#    'summary_span': None,
-#    'checkpoint_interval': 45 * 60,
-#    'batch_size': 100,
-#    'validation_size': 100,
-#    'test_size': 1000,
-#    'epochs': 50
-#}
 
 
 def post_test(test_data):
@@ -258,32 +176,3 @@ def start(supervisor_struct):
     global supervisor
     supervisor = supervisor_struct
     monitor_thread.start()
-
-# if __name__ == '__main__':
-##    fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/tests/test2.yaml')
-#    #fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/yaml/bigru_cms_user_3.yaml')
-#    fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/yaml/bigru_cms_user_2.yaml')
-#
-#    #fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/yaml/gru_cms_user_2.yaml')
-#    #fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/yaml/gru_conv_cms_user_2.yaml')
-##    fil = os.path.expanduser('~/python/deep-learning/deeplearn/twitter_sentiment/tests/test2.yaml')
-#
-#    # model_name = ['Model_Tweet2Vec_BiGRU_CMSDataset',
-#    #              'Model_Tweet2Vec_BiGRU_UserCMSDataset',
-#    #              'Model_Tweet2Vec_BiGRU_BuzzometerDatasetVader']
-#    #model_name = model_name[1]
-#    #model_type = 'Tweet2Vec_BiGRU'
-#    model_graph = CompiledModel.load_yaml(fil)
-#    model_saved_settings = model_graph.yaml_train_settings
-#    model_saved_settings = model_saved_settings or {}
-#    train_settings.update(model_saved_settings)
-#    model_weight_prefix = model_graph.get_weight_file_prefix()
-#    training_thread = ThreadedModelTrainer(model_graph=model_graph,
-#                                           # TODO initial weight is not needed
-#                                           # initial_weights=model_weight_prefix,
-#                                           train_settings=train_settings)
-#    training_thread.start()
-#    supervisor = training_thread.training_supervisor
-#    thr = threading.Thread(target=send_email_every_minute)
-#    thr.start()
-#    app.run(host='0.0.0.0', port=5000)

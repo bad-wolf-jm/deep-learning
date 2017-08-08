@@ -9,7 +9,7 @@ from gym.webmon import render_template, start, post_test
 import traceback
 
 
-model_path = 'models/bigru_3.py'
+model_path = 'models/bigru_3_cms_user.py'
 model_name = os.path.basename(model_path)
 model_dir = os.path.dirname(model_path)
 train_dir = os.path.join(model_dir, '.train', model_name)

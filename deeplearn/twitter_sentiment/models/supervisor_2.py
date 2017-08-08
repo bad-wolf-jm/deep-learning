@@ -177,9 +177,6 @@ class TrainingSupervisor(object):
                 for string, truth, predicted in out]
 
     def run_training(self, epochs=10, train_batch_size=100, validation_batch_size=100, test_batch_size=500):
-        #num_dataset_categories = len(self.data['category_labels'].keys())
-        #num_model_categories = len(self.model.categories.keys())
-        #assert num_dataset_categories == num_model_categories
         data_generator = self.data['constructor'](batch_size=train_batch_size,
                                                   epochs=epochs,
                                                   validation_size=validation_batch_size,
@@ -196,7 +193,6 @@ class TrainingSupervisor(object):
                 self._epoch_start_time = time.time()
             self._update_progress_info(training_batch)
             batch_t_0 = time.time()
-            #print(training_batch['train_y'])
             self.train_on_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
             if training_batch['batch_index'] % 3 == 0:
                 d = self.evaluate_batch(train_x=training_batch['train_x'], train_y=training_batch['train_y'])
