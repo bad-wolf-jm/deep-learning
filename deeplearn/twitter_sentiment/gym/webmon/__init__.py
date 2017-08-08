@@ -107,17 +107,17 @@ def get_path(path):
     return open('/' + path).read()
 
 
-def get_float_arg(request):
+def get_float_arg(request, arg_name):
     try:
-        return float(request.args.get('min_timestamp'))
+        return float(request.args.get(arg_name))
     except:
         return None
 
 
 @app.route('/json/training_graphs.json')
 def get_training_graph_series():
-    min_timestamp = get_float_arg('min_timestamp')
-    max_timestamp = get_float_arg('max_timestamp')
+    min_timestamp = get_float_arg(request, 'min_timestamp')
+    max_timestamp = get_float_arg(request, 'max_timestamp')
     loss = supervisor.get_loss_summary(min_timestamp, max_timestamp)
     accuracy = supervisor.get_accuracy_summary(min_timestamp, max_timestamp)
     return json.dumps({'loss': loss, 'accuracy': accuracy})

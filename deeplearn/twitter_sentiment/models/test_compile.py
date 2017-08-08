@@ -51,9 +51,10 @@ class CompiledTrainingModel(CompiledModel):
             self._script_globals['loss']()
         self._loss = self._script_globals.get('loss', None)
         self._process_batch = self._script_globals.get('prepare_batch', None)
-        self._train = self._script_globals.get('train', None)
-        self._test = self._script_globals.get('test', None)
-        self._validate = self._script_globals.get('validate', None)
+        self.evaluate_batch = self._script_globals.get('evaluate_batch', None)
+        #self._train = self._script_globals.get('train', None)
+        #self._test = self._script_globals.get('test', None)
+        #self._validate = self._script_globals.get('validate', None)
 
         optimizer = self._script_globals.get('Optimizer', None)
         self._optimizer_type = optimizer.name
@@ -63,16 +64,16 @@ class CompiledTrainingModel(CompiledModel):
             self._optimizer = self._optimizer_type(self._learning_rate, **self._optimizer_args)
             self._train_op = self._optimizer.minimize(self._loss())
 
-    def test(self, train_x, train_y, session=None):
-        d = self._test(train_x, train_y, session)
-        return d
+    #def test(self, train_x, train_y, session=None):
+    #    d = self._test(train_x, train_y, session)
+    #    return d
 
     def train(self, train_x, train_y, session=None):
         session.run(self._train_op, feed_dict = self._process_batch(train_x, train_y))
 
-    def validate(self, train_x, train_y, session=None):
-        d = self._validate(train_x, train_y, session)
-        return d
+    #def validate(self, train_x, train_y, session=None):
+    #    d = self._validate(train_x, train_y, session)
+    #    return d
 
     def half_learning_rate(self):
         self.train_setup(self._optimizer, self._learning_rate / 2, **self._optimizer_args)

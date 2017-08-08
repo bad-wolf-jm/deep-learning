@@ -9,8 +9,8 @@ class Metadata:
     date = 'Aug 4th, 2017'
     doc = "A 3 layer bidirectional recurrent neural network for sentiment analysis of short texts"
     type = 'classifier'
-    data = 'CMSUserInputDataset'
-    categories = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant'}
+    data = 'CMSDataset'
+    categories = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant', 4:"OTHER"}
 
 
 class Optimizer:
@@ -24,7 +24,7 @@ class Hyperparameters:
     hidden_states = 128
     sequence_length = 256
     embedding_dimension = 256
-    num_classes = 4
+    num_classes = 5
 
 
 class Globals:
