@@ -127,6 +127,7 @@ def get_training_graph_series():
 def get_page(page_folder, page_name):
     dir_name = TEMPLATES_ROOT
     page_path = os.path.join(dir_name, 'static', page_folder, page_name)
+    print(page_path)
     mimetypes = {
         ".css": "text/css",
         ".html": "text/html",
