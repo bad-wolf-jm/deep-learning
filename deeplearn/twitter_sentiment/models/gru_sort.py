@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import sys
+import os
 
 
 class Metadata:
@@ -127,33 +128,49 @@ def compute(batch_x, session=None):
 
 
 if __name__ == '__main__':
+    save = os.path.join(os.path.expanduser('~'), '.gru_sort')
+    if not os.path.exists(save):
+        os.makedirs(save)
     from prettytable import PrettyTable
     with tf.Session() as session:
         inference()
         train()
-        # decoder()
         session.run(tf.global_variables_initializer())
-        for i in range(100000):
+        index = 1
+        for i in range(500000):
             batch = np.random.randint(1, Hyperparameters.num_classes, size=[10, Hyperparameters.sequence_length])
             batch_x = [x for x in batch]
             batch_y = [sorted(x) for x in batch]
             train_batch(batch_x, batch_y, session=session)
             sys.stderr.write('x')
             sys.stderr.flush()
-            #print (foo[0].shape)
             if i % 250 == 0:
+                batch = np.random.randint(1, Hyperparameters.num_classes, size=[100, Hyperparameters.sequence_length])
+                batch_x = [x for x in batch]
+                batch_y = [sorted(x) for x in batch]
                 d = evaluate_batch(batch_x, batch_y, session=session)
-                #foo = compute(batch_x, session=session)
                 x = PrettyTable(["Original", "Sorted"])
                 x.align["Original"] = "l"
                 x.align["Sorted"] = "l"
-                for orig, sor, q in zip(batch_x,  batch_y, [x[2] for x in d['output']]):
-                    try:
-                        str_1 = "[{}]".format(" ".join([str(x) for x in orig]))
-                        str_2 = "[{}]".format(" ".join([str(x) if sor[i] == x else '__' for i, x in enumerate(q)]))
-                        x.add_row([str_1, str_2])
-                    except:
-                        pass
+                file_name = "sort-test-{}".format(index)
+                file_name = os.path.join(save, file_name)
+                with open(file_name, 'w') as test_file:
+                    for orig, sor, q in zip(batch_x,  batch_y, [x[2] for x in d['output']]):
+                        try:
+                            str_1 = "{}".format(",".join([str(x) for x in orig]))
+                            str_2 = "{}".format(",".join([str(x) for x in q]))
+                            line = '{str_1};{str_2}\n'.format(str_1=str_1, str_2=str_2)
+                            test_file.write(line)
+                        except:
+                            pass
+
+                        try:
+                            str_1 = "[{}]".format(" ".join([str(x) for x in orig]))
+                            str_2 = "[{}]".format(" ".join([str(x) if sor[i] == x else '___' for i, x in enumerate(q)]))
+                            x.add_row([str_1, str_2])
+                        except:
+                            pass
+                index += 1
                 print('Loss:', d['loss'], ' --- ', 'Accuracy:', d['accuracy'])
                 print (x)
         # pass
