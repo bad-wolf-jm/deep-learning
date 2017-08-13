@@ -40,9 +40,16 @@ def tokenize(text):
     return ' '.join(sanitized_words)
 
 
+# Source query for the cms database
 cms_query = """ SELECT comment.message AS message, comments_flags.flag_id as sentiment
 FROM (comment INNER JOIN comments_flags ON comment.id = comments_flags.comment_id)
 WHERE comments_flags.flag_id between 1 and 5"""
+cms_query_sentiment_map = {0:0, 1:3, 2:1, 3:2, 4:0}
+
+# Source query for the user_assigned sentiments
+tren_games_query = """SELECT message, user_assigned_sentiment FROM {table} WHERE lang='en'
+AND user_assigned_sentiment IS NOT NULL and user_assigned_sentiment != -3"""
+tren_games_query_sentiment_map = {-1:0, 0:1, 1:2, -2:3}
 
 dataset_insert_query = """INSERT INTO {table_name}
 (id, sentiment, message, sanitized_message, message_length, sanitized_message_length)
@@ -87,6 +94,34 @@ def populate_table(table_name, source_query, source_connection, target_connectio
                 print(inst[:350])
                 target_cursor.execute(inst)
             target_connection.commit()
+
+def fetch_cms_data():
+    populate_table(table_name='user_cms_dataset',
+                   source_query=cms_query,
+                   source_connection=cms_connection,
+                   target_connection=buzzometer_dev_connection,
+                   sentiment_map=cms_query_sentiment_map)
+
+def fetch_buzzometer_data():
+    tables = ['amazon__reviews',
+              'facebook__comments',
+              'glforums__posts',
+              'googleplay__comments',
+              'gyoutube__comments',
+              'instagram__comments',
+              'reddit__posts',
+              'twitch__comments',
+              'twitch__posts',
+              'twitter__tweets',
+              'windows__comments',
+              'youtube__comments']
+
+    for table in tables:
+        populate_table(table_name='user_cms_dataset',
+                       source_query=tren_games_query.format(table=table),
+                       source_connection=buzzometer_beta_connection,
+                       target_connection=buzzometer_dev_connection,
+                       sentiment_map=tren_games_query_sentiment_map)
 
 
 def shuffle_table_rows(table_name, connection):

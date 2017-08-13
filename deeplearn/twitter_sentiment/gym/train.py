@@ -84,15 +84,10 @@ def save_checkpoint():
 x = CompiledTrainingModel(model_path)
 with tf.Session(graph=x._graph) as _session:
     x.initialize(_session)
-    supervisor = TrainingSupervisor(session=_session,
-                                    model=x,
-                                    test_interval=test_interval,
-                                    validation_interval=validation_interval,
+    supervisor = TrainingSupervisor(session=_session, model=x, test_interval=test_interval, validation_interval=validation_interval,
                                     summary_span=summary_span)
     start(supervisor)
-    for loss in supervisor.run_training(epochs=epochs,
-                                        train_batch_size=train_batch_size,
-                                        validation_batch_size=validation_batch_size,
+    for loss in supervisor.run_training(epochs=epochs, train_batch_size=train_batch_size, validation_batch_size=validation_batch_size,
                                         test_batch_size=test_batch_size):
         try:
             if isinstance(loss, TestData):

@@ -60,7 +60,7 @@ def inference():
     encoded_input, state = tf.nn.dynamic_rnn(encode, _, dtype=tf.float32)
     Globals.encoder_output = state
     with tf.variable_scope('decoder'):
-        training_decoder_input = tf.zeros_like(Globals.model_input) #placeholder('uint8', shape=[None, Hyperparameters.sequence_length], name="INPUT")
+        training_decoder_input = tf.zeros_like(Globals.model_input)
         _ = tf.one_hot(training_decoder_input, depth=Hyperparameters.embedding_dimension, axis=-1)
         _ = tf.reshape(_, [-1, Hyperparameters.sequence_length, Hyperparameters.embedding_dimension])
         decode = multi_layer_rnn(Hyperparameters.n_layers, Hyperparameters.hidden_states)

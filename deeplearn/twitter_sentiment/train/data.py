@@ -22,7 +22,7 @@ def _generate_batches(field_name=None, text_column='sanitized_text', min_id=0, m
             bytes_ = [ord(x) for x in row[text_column] if 0 < ord(x) < 256]
             batch_x.append(bytes_)
             batch_y.append([sentiment_map.get(row[field_name], row[field_name])])
-        #print([row['shuffle_id'] for row in b]) 
+        #print([row['shuffle_id'] for row in b])
         yield {'train_x': batch_x,
                'train_y': batch_y,
                'batch_number': gen.current_epoch_batch_number,
@@ -116,7 +116,6 @@ def cms_training_generator(batch_size=10, epochs=None, validation_size=None, tes
             'test': test_iterator}
 
 
-
 def generate_user_cms_batches(min_id=0, max_id=None, batch_size=10, epochs=None):
     for i in _generate_batches(min_id=min_id, max_id=max_id, batch_size=batch_size, epochs=epochs,
                                table='user_cms_sentiment_dataset', field_name='sentiment'):
@@ -144,12 +143,6 @@ def user_cms_training_generator(batch_size=10, epochs=None, validation_size=None
     return {'train': batch_generator,
             'validation': validation_iterator,
             'test': test_iterator}
-
-
-
-
-
-
 
 
 def generate_sstb_batches(min_id=0, max_id=None, batch_size=10, epochs=None, field_name=None):

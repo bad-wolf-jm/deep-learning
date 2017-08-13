@@ -81,6 +81,14 @@ def get_latest_test():
         _ = make_test_output_matrix(latest_test)
     return json.dumps(_)
 
+#@app.route('/json/latest_test_output.json')
+#def get_latest_test_output():
+#    global latest_test
+#    with latest_test_lock:
+#        _ = latest_test.output
+#        return json.dumps(_)
+
+
 
 def get_training_status_struct():
     return {'batch_number': supervisor.batch_number if supervisor is not None else 0,

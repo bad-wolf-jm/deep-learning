@@ -9,8 +9,8 @@ class Metadata:
     date = 'Aug 4th, 2017'
     doc = "A 3 layer bidirectional recurrent neural network for sentiment analysis of short texts."
     type = 'classifier'
-    data = 'CMSUserInputDataset'
-    categories = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant'}
+    data = 'CMSDataset'
+    categories = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant', 4:"other"}
 
 
 class Optimizer:
@@ -101,10 +101,17 @@ def prepare_batch(batch_x, batch_y):
 
 def evaluate_batch(batch_x, batch_y, session=None):
     feed_dict = prepare_batch(batch_x, batch_y)
-    p, loss, accuracy = session.run([Globals.prediction, Globals.batch_loss, Globals.batch_accuracy],
-                                    feed_dict=feed_dict)
+    p, loss, accuracy = session.run([Globals.prediction, Globals.batch_loss, Globals.batch_accuracy], feed_dict=feed_dict)
     _ = [x[0] for x in batch_y]
-    d = {'loss': loss, 'accuracy': accuracy, 'output': zip(batch_x, _, p)}
+    strings = []
+    for l in batch_x:
+        try:
+            orig_string = ''.join([chr(t) for t in l])
+        except Exception as e:
+            print (e)
+            orig_string = ''.join([chr(t) for t in l if t < 128])
+        strings.append(orig_string)
+    d = {'loss': loss, 'accuracy': accuracy, 'output': zip(strings, _, p)}
     return d
 
 
