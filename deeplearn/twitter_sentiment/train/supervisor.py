@@ -155,12 +155,14 @@ class TrainingSupervisor(object):
     def get_loss_summary(self, min_batch_index=None, max_batch_index=None):
         x = self.train_summary.get(fields=['loss'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
         y = self.validation_summary.get(fields=['loss'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
-        return {'train': x['loss'], 'validation': y['loss']}
+        return {'train': x['loss'],
+                'validation': y['loss']}
 
     def get_accuracy_summary(self, min_batch_index=None, max_batch_index=None):
         x = self.train_summary.get(fields=['accuracy'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
         y = self.validation_summary.get(fields=['accuracy'], min_batch_index=min_batch_index, max_batch_index=max_batch_index)
-        return {'train': x['accuracy'], 'validation': y['accuracy']}
+        return {'train': x['accuracy'],
+                'validation': y['accuracy']}
 
     def _update_progress_info(self, training_batch):
         self._epoch_number = training_batch.get('epoch_number', None)

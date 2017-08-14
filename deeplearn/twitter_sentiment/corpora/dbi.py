@@ -107,8 +107,6 @@ class DBConnection(object):
             total = N * epochs
             total_num_batches = total // batch_size
         batches_per_epoch = N // batch_size
-        I = 0
-        epoch = 1
         generator = self._generate_all_batches(table_name, index_column,
                                                select_columns=select_columns,
                                                min_id=min_id, max_id=max_id,
