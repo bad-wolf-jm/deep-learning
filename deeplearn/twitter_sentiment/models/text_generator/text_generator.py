@@ -178,7 +178,7 @@ def rnn_minibatch_sequencer(raw_data, batch_size, sequence_size, nb_epochs):
                    'train_y':  y,
                    'validate': None,
                    'batch_number':  batch,
-                   'epoch_number':  epoch,
+                   'epoch_number':  epoch+1,
                    'batch_index':   I,
                    'total_batches': total_num_batches,
                    'total_epochs':  nb_epochs}
@@ -186,7 +186,7 @@ def rnn_minibatch_sequencer(raw_data, batch_size, sequence_size, nb_epochs):
 
 def generate_text(length, session=None):
     generated_text = ''
-    character = [[ord('Z')]]
+    character = [[ord(' ')]]
     istate = np.zeros([Hyperparameters.n_layers, 1, Hyperparameters.hidden_states])
     while len(generated_text) < length:
         feed_dict = {Globals.model_input: character, Globals.initial_state: istate}
@@ -204,7 +204,14 @@ def generate_text(length, session=None):
 if __name__ == '__main__':
     root = os.path.dirname(__file__)
     root = os.path.join(root, 'text_gen_data')
-    data = read_data_files_from_folder(os.path.join(root, 'sicp-code-master/*.scm'))
+    save = os.path.join(os.path.expanduser('~'), '.text_gen', 'output')
+    chkpt = os.path.join(os.path.expanduser('~'), '.text_gen', 'model_chkpt')
+    if not os.path.exists(save):
+        os.makedirs(save)
+    if not os.path.exists(chkpt):
+        os.makedirs(chkpt)
+
+    data = read_data_files_from_folder(os.path.join(root, 'harry_potter/*.txt'))
 
     inference()
     train()
@@ -221,6 +228,12 @@ if __name__ == '__main__':
             _, ostate = session.run([Globals.minimize, Globals.state], feed_dict=feed_dict)
             print('x', end='', flush=True)
             istate = ostate
-            if index % 50 == 0:
-                print(generate_text(2000, session))
+            if index % batch['epoch_number']*150 == 0:
+                file_name = "sort-test-{}".format(index)
+                file_name = os.path.join(save, file_name)
+                with open(file_name, 'w') as test_file:
+                    test_file.write(generate_text(20000, session))
+            if index % 250 == 0:
+                s = tf.train.Saver()
+                s.save(session, os.path.join(chkpt, "t_gen_weights"))
             index += 1

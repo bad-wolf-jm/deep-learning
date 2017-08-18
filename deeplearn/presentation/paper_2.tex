@@ -1,0 +1,144 @@
+\documentclass[10pt]{amsart}
+\usepackage{amsmath}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathcal{C}}
+
+\begin{document}
+\title{Recurrent Neural Networks}
+\author{Jean-Martin Albert}
+\date{\today}
+\maketitle
+
+\section{Dealing with sequences}
+
+There is more than one way to extend a recurrent function to a set of sequences
+
+\section{Back Propagation}
+
+In general, in order to minimize a function $f(w)$ of one variable, we make use of the fact that
+the extreme values of $f$ all have $f'(x)=0$.  If $f$ is a function of two or more variables, then
+if $x$ is such that $f(x)$ is a local max, or minimum, then all partial derivatives
+$\frac{\partial f}{\partial w_i}(x)=0$.  If $f:\R^n\to\R$ is a function, then the
+{\em gradient} of $f$ is the vector
+$\nabla f(x) = \left(\frac{\partial f}{\partial w_1}(x),...,\frac{\partial f}{\partial w_n}(x)\right)$.
+One interesting property of $\nabla f(x)$ is that, as a vector, it ``points'' in the direction in which
+$f$ decreases the most.  That is to say, there is a good chance that $f(x-\alpha\nabla f(x))\leq f(x)$.
+The chance is better the smaller $\alpha$ is.  We see that if we iterate that process, we get a
+sequence $x_1,...,x_n,...$ such that $f(x_{i+1})\leq f(x_i)$ for every $i$.  Since $m\leq f(x_i)\leq f(x_0)$
+for every $i$, we get a bounded decreasing sequence of real number, which converges.
+
+Caveat: this ideal situation doesn't allways happen.
+
+This iterative process is {\em (Stocastic) gradient descent}.
+
+Suppose $f$ is a complsition of two functions, and that we can write $f(x,w)= g(h(x, w_1), w_2)$.
+Then we can write $\nabla_w f(x, w)=\nabla g(h(x, w_1), w_2)\cdot \nabla h(x, w_1)$. Each level
+of composition corresponds to a layer of neural network.  The chain rule transforms function composition
+into a product. If a network becomes deep, then the derivative of the loss function becomes a long
+product.  When gradients become small in norm (like they do when we approach a min), then the gradient
+becomes very close to $0$, and the update rule for gradient descent stops changing the weights.
+
+This is the vanishing gradient problem for very deep networks, and makes convergence slow.
+
+\section{The base of recurrent networks}
+
+Consider a function $f:U\times S\to V\times S$, where $U$, $V$ and $S$ are finite dimensional vector spaces.
+Note that every vector space has a a distinguished element $0$, the zero-vector.  Let $u_1,...,u_n$ be a finite
+sequence of vectors in $U$.  We construct a sequence of vectors in $V$ as follows. Write $f(u_1, 0)=(v_1, s_1)$,
+and for every $i$, if $f(u_{i}, s_{i-1})=(v_i, s_i)$. Note that this is a state machine, close to a
+deterministic finite automaton, except that here the state space $S$ is infinite.
+
+The set $\{0,1\}^*$ of all finite sequences of $0$'s and $1$'s is countable, and $S$, being a real vector space,
+is uncountable.  Therefore, we can encode every element $w\in\{0,1\}^*$ as a vector in $S$.  Informally,
+$S$ is enough to encode any finite state space, and every possible value for the content of the tape of a
+Turing machine. We get:
+
+%\begin{theorem}
+Recurrent neural networks are Turing-complete.
+%\end{theorem}
+
+which explains why recurrent neural networks seem to be able to produce results that other networks can't.
+Training a recurrent network is the same as producing a Turing machine.
+
+
+
+\section{Types of Recurrent Cells}
+
+\subsection{Basic Recurrent Cell}
+
+\subsection{Long Short-term Memory Cell}
+
+\subsection{Gated Recurrent Unit Cell}
+
+
+\section{Examples}
+
+\subsection{Many-to-One}
+
+The Buzzometer sentiment analysis tool uses a bi-directional GRU model.
+
+
+\subsection{Many-to-many}
+
+Text generator
+
+
+\subsection{Many-to-one-to-many}
+
+As an example of a recurrent neural network performing a task that ordinary neural network
+should not be able to perform, we present a sorting function which uses GRU cells. The architecture
+of the network is the reason we call it a many-to-one-to-many network.  One level takes a list
+of numbers, and produces a vector which we can see as representing all the numbers in the list,
+and a second layer uses this output vector as input, and produces the original list, sorted in
+increasing order. The training was done using sequences of natural numbers $n\in\{1,...,32\}$, and each
+of the training sequences of length $32$.  After about 6 days of training, the accuracy of the network
+stabilized at around 95\%, and it is worth noting that eventhough it took a long time to breach
+the 90\% accuracy mark, very early on in the training did the network output increasing sequences.
+
+
+% \section{The basic problem}
+%
+% Let $U=\R^n$ and $V=\R^m$ be vector spaces, and consider a function $f:U\to W$.
+% In theory, $f$ here can be any set theoretic function, but for our purpose, we
+% will assume that $f$ is at the very least square integrable. In general, we
+% consider a class $\C$ of functions $U\to V$, and try to find an element $g\in\C$
+% which is as close as possible to $f$.  In order to do so, we need a notion of distance
+% between functions.  There are many possible choices, but some of the most popular are
+% the $L^p$ norms and the $L^\infty$ norm.
+%
+% While the class $\C$ van be virtually any class of functions, we usually choose a class
+% that is somewhat definable, in the sense that there is a (differentiable) function $F:U\times\R^k\to V$
+% such that $\C=\{F(x, w): w\in \R^k\}$.  Such classes of functions have the advantage of
+% being equicontinuous.
+%
+%
+% %\begin{example}
+% Let $f(x)=x(x-1)(x+1)$.  As an example, we will try to fit a linear function
+% $\ell(x)=ux+v$ to $f$.  The class $\C$ is defined by $\C=\{ux+v:u,v\in R\}$.
+% For an element $g(x, u, v)\in\C$, we have $$f(x)-g(x,u,v) = x^3-x - ux+v$$
+% From this we get
+% \begin{eqnarray*}
+%   (f(x)-g(x,u,v))^2 &=& (x^3 - (1-u)x + v)^2 \\
+%   {} &=& x^6 - 2(1-u)x^4 + 2vx^3 + (1-u)^2x^2 - \\
+%   {} & & 2(1-u)vx + v^2
+% \end{eqnarray*}
+% If we compute $\int_{-1}^1 (f(x)-g(x,u,v))^2$, we get
+%
+% \begin{eqnarray*}
+%   \int_{-1}^1(f(x)-g(x; u,v))^2 &=& \int_{-1}^1(x^3 - (1-u)x + v)^2 \\
+%   {} &=& \int_{-1}^1x^6 - 2(1-u)x^4 + 2vx^3 + (1-u)^2x^2 - 2(1-u)vx + v^2\\
+%   {} &=& \frac{x^7}{7}-2v\frac{x^4}{4} + (1-u)^2\frac{x^3}{3} - 2(1-u)v\frac{x^2}{2}+v^2x\\
+%   {} &=& \frac{1}{7}-2v\frac{1}{4} + (1-u)^2\frac{1}{3} - 2(1-u)v\frac{1}{2}+v^2\\
+%   {} & & +\frac{1}{7}-2v\frac{1}{4} + (1-u)^2\frac{-1}{3} - 2(1-u)v\frac{1}{2}-v^2\\
+%   {} &=& \frac{2}{7} - (2-u)v+v^2 = \ell(u,v)
+% \end{eqnarray*}
+% and note that the last line above is a function of $u$ and $v$ alone, and we have to minimize it.
+% %\end{example}
+%
+%
+% \section{Dealing with sequences}
+
+
+
+\end{document}
