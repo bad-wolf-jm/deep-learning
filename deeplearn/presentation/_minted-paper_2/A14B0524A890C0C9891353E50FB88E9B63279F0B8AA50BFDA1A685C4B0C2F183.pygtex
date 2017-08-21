@@ -1,0 +1,33 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+  \PYG{n}{SEQ\PYGZus{}LENGTH} \PYG{o}{=} \PYG{l+m+mi}{256}
+  \PYG{n}{E\PYGZus{}DIM} \PYG{o}{=} \PYG{l+m+mi}{128}
+  \PYG{n}{STATE\PYGZus{}DIM} \PYG{o}{=} \PYG{l+m+mi}{512}
+  \PYG{n}{N\PYGZus{}LAYERS} \PYG{o}{=} \PYG{l+m+mi}{4}
+
+  \PYG{k}{def} \PYG{n+nf}{inference}\PYG{p}{():}
+      \PYG{n}{model\PYGZus{}input} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{placeholder}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}uint8\PYGZsq{}}\PYG{p}{,} \PYG{n}{shape}\PYG{o}{=}\PYG{p}{[}\PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{SEQ\PYGZus{}LENGTH}\PYG{p}{])}
+      \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{one\PYGZus{}hot}\PYG{p}{(}\PYG{n}{Globals}\PYG{o}{.}\PYG{n}{model\PYGZus{}input}\PYG{p}{,} \PYG{n}{depth}\PYG{o}{=}\PYG{n}{E\PYGZus{}DIM}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+      \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{SEQ\PYGZus{}LENGTH}\PYG{p}{,} \PYG{n}{E\PYGZus{}DIM}\PYG{p}{])}
+      \PYG{n}{encode} \PYG{o}{=} \PYG{n}{multi\PYGZus{}layer\PYGZus{}rnn}\PYG{p}{(}\PYG{n}{N\PYGZus{}LAYERS}\PYG{p}{,} \PYG{n}{STATE\PYGZus{}DIM}\PYG{p}{)}
+      \PYG{n}{encoded\PYGZus{}input}\PYG{p}{,} \PYG{n}{state} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{dynamic\PYGZus{}rnn}\PYG{p}{(}\PYG{n}{encode}\PYG{p}{,}
+                                               \PYG{n}{\PYGZus{}}\PYG{p}{,}
+                                               \PYG{n}{dtype}\PYG{o}{=}\PYG{n}{tf}\PYG{o}{.}\PYG{n}{float32}\PYG{p}{)}
+      \PYG{n}{Globals}\PYG{o}{.}\PYG{n}{encoder\PYGZus{}output} \PYG{o}{=} \PYG{n}{state}
+      \PYG{k}{with} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{variable\PYGZus{}scope}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}decoder\PYGZsq{}}\PYG{p}{):}
+          \PYG{n}{training\PYGZus{}decoder\PYGZus{}input} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{zeros\PYGZus{}like}\PYG{p}{(}\PYG{n}{Globals}\PYG{o}{.}\PYG{n}{model\PYGZus{}input}\PYG{p}{)}
+          \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{one\PYGZus{}hot}\PYG{p}{(}\PYG{n}{training\PYGZus{}decoder\PYGZus{}input}\PYG{p}{,} \PYG{n}{depth}\PYG{o}{=}\PYG{n}{E\PYGZus{}DIM}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+          \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{SEQ\PYGZus{}LENGTH}\PYG{p}{,} \PYG{n}{E\PYGZus{}DIM}\PYG{p}{])}
+          \PYG{n}{decode} \PYG{o}{=} \PYG{n}{multi\PYGZus{}layer\PYGZus{}rnn}\PYG{p}{(}\PYG{n}{N\PYGZus{}LAYERS}\PYG{p}{,} \PYG{n}{STATE\PYGZus{}DIM}\PYG{p}{)}
+          \PYG{n}{decoded\PYGZus{}output}\PYG{p}{,} \PYG{n}{state} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{dynamic\PYGZus{}rnn}\PYG{p}{(}\PYG{n}{decode}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,}
+                                                    \PYG{n}{dtype}\PYG{o}{=}\PYG{n}{tf}\PYG{o}{.}\PYG{n}{float32}\PYG{p}{,}
+                                                    \PYG{n}{initial\PYGZus{}state}\PYG{o}{=}\PYG{n}{state}\PYG{p}{)}
+          \PYG{n}{decoded\PYGZus{}output} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{decoded\PYGZus{}output}\PYG{p}{,} \PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{STATE\PYGZus{}DIM}\PYG{p}{])}
+          \PYG{n}{output} \PYG{o}{=} \PYG{n}{project}\PYG{p}{(}\PYG{n}{decoded\PYGZus{}output}\PYG{p}{,} \PYG{n}{E\PYGZus{}DIM}\PYG{p}{)}
+          \PYG{n}{out} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{tf}\PYG{o}{.}\PYG{n}{argmax}\PYG{p}{(}\PYG{n}{output}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{),} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{uint8}\PYG{p}{)}
+          \PYG{n}{out} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{out}\PYG{p}{,} \PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{SEQ\PYGZus{}LENGTH}\PYG{p}{])}
+          \PYG{n}{Globals}\PYG{o}{.}\PYG{n}{training\PYGZus{}decoder\PYGZus{}input} \PYG{o}{=} \PYG{n}{training\PYGZus{}decoder\PYGZus{}input}
+          \PYG{n}{Globals}\PYG{o}{.}\PYG{n}{model\PYGZus{}output} \PYG{o}{=} \PYG{n}{output}
+          \PYG{n}{Globals}\PYG{o}{.}\PYG{n}{prediction} \PYG{o}{=} \PYG{n}{out}
+          \PYG{n}{Globals}\PYG{o}{.}\PYG{n}{decoder} \PYG{o}{=} \PYG{n}{decode}
+          \PYG{n}{Globals}\PYG{o}{.}\PYG{n}{decoder\PYGZus{}input} \PYG{o}{=} \PYG{n}{\PYGZus{}}
+\end{Verbatim}

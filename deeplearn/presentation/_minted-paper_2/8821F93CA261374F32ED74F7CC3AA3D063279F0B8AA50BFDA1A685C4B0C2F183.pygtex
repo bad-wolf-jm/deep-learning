@@ -1,0 +1,22 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{generate\PYGZus{}text}\PYG{p}{(}\PYG{n}{length}\PYG{p}{,} \PYG{n}{session}\PYG{o}{=}\PYG{n+nb+bp}{None}\PYG{p}{):}
+    \PYG{n}{generated\PYGZus{}text} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}\PYGZsq{}}
+    \PYG{n}{character} \PYG{o}{=} \PYG{p}{[[}\PYG{n+nb}{ord}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{} \PYGZsq{}}\PYG{p}{)]]}
+    \PYG{n}{istate} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{([}\PYG{n}{N\PYGZus{}LAYERS}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{STATE\PYGZus{}DIM}\PYG{p}{])}
+    \PYG{k}{while} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{generated\PYGZus{}text}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{n}{length}\PYG{p}{:}
+        \PYG{n}{feed\PYGZus{}dict} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{n}{Globals}\PYG{o}{.}\PYG{n}{model\PYGZus{}input}\PYG{p}{:} \PYG{n}{character}\PYG{p}{,}
+                     \PYG{n}{Globals}\PYG{o}{.}\PYG{n}{initial\PYGZus{}state}\PYG{p}{:} \PYG{n}{istate}\PYG{p}{\PYGZcb{}}
+        \PYG{n}{next\PYGZus{}char}\PYG{p}{,} \PYG{n}{state} \PYG{o}{=} \PYG{n}{session}\PYG{o}{.}\PYG{n}{run}\PYG{p}{([}\PYG{n}{Globals}\PYG{o}{.}\PYG{n}{generated\PYGZus{}characters}\PYG{p}{,}
+                                        \PYG{n}{Globals}\PYG{o}{.}\PYG{n}{state}\PYG{p}{],}
+                                       \PYG{n}{feed\PYGZus{}dict}\PYG{o}{=}\PYG{n}{feed\PYGZus{}dict}\PYG{p}{)}
+        \PYG{n}{next\PYGZus{}char} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{asarray}\PYG{p}{(}\PYG{n}{next\PYGZus{}char}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}float64\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{next\PYGZus{}char} \PYG{o}{=} \PYG{n}{next\PYGZus{}char} \PYG{o}{/} \PYG{n}{next\PYGZus{}char}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{()}
+        \PYG{n}{op} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{multinomial}
+        \PYG{n}{next\PYGZus{}char\PYGZus{}id} \PYG{o}{=} \PYG{n}{op}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{next\PYGZus{}char}\PYG{o}{.}\PYG{n}{squeeze}\PYG{p}{(),} \PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{.}\PYG{n}{argmax}\PYG{p}{()}
+        \PYG{n}{next\PYGZus{}char\PYGZus{}id} \PYG{o}{=} \PYG{n}{next\PYGZus{}char\PYGZus{}id} \PYG{k}{if} \PYG{n+nb}{chr}\PYG{p}{(}\PYG{n}{next\PYGZus{}char\PYGZus{}id}\PYG{p}{)} \PYG{o+ow}{in} \PYGZbs{}
+                          \PYG{n}{string}\PYG{o}{.}\PYG{n}{printable} \PYG{k}{else} \PYG{n+nb}{ord}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{} \PYGZdq{}}\PYG{p}{)}
+        \PYG{n}{generated\PYGZus{}text} \PYG{o}{+=} \PYG{n+nb}{chr}\PYG{p}{(}\PYG{n}{next\PYGZus{}char\PYGZus{}id}\PYG{p}{)}
+        \PYG{n}{character} \PYG{o}{=} \PYG{p}{[[}\PYG{n}{next\PYGZus{}char\PYGZus{}id}\PYG{p}{]]}
+        \PYG{n}{istate} \PYG{o}{=} \PYG{n}{state}
+    \PYG{k}{return} \PYG{n}{generated\PYGZus{}text}
+\end{Verbatim}

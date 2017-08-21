@@ -1,0 +1,56 @@
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}
+\contentsline {section}{\numberline {2}Usage}{3}{section.2}
+\contentsline {section}{\numberline {3}General options}{4}{section.3}
+\contentsline {section}{\numberline {4}General commands}{9}{section.4}
+\contentsline {subsection}{\numberline {4.1}Line and text formatting}{9}{subsection.4.1}
+\contentsline {section}{\numberline {5}Line breaking}{9}{section.5}
+\contentsline {subsection}{\numberline {5.1}Line breaking options}{10}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Line breaking and tab expansion}{15}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Advanced line breaking}{16}{subsection.5.3}
+\contentsline {subsubsection}{\numberline {5.3.1}A few notes on algorithms}{16}{subsubsection.5.3.1}
+\contentsline {subsubsection}{\numberline {5.3.2}Breaks within macro arguments}{16}{subsubsection.5.3.2}
+\contentsline {subsubsection}{\numberline {5.3.3}Customizing break behavior}{18}{subsubsection.5.3.3}
+\contentsline {section}{\numberline {6}Pygments support}{18}{section.6}
+\contentsline {subsection}{\numberline {6.1}Options for users}{18}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}For package authors}{19}{subsection.6.2}
+\contentsline {section}{\numberline {7}Patches}{19}{section.7}
+\contentsline {subsection}{\numberline {7.1}Visible spaces}{19}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}\texttt {obeytabs} with visible tabs and with tabs inside macro arguments}{20}{subsection.7.2}
+\contentsline {subsection}{\numberline {7.3}Math mode}{20}{subsection.7.3}
+\contentsline {subsubsection}{\numberline {7.3.1}Spaces}{20}{subsubsection.7.3.1}
+\contentsline {subsubsection}{\numberline {7.3.2}Symbols and fonts}{21}{subsubsection.7.3.2}
+\contentsline {subsection}{\numberline {7.4}Orphaned labels}{21}{subsection.7.4}
+\contentsline {subsection}{\numberline {7.5}\texttt {rulecolor} and \texttt {fillcolor}}{22}{subsection.7.5}
+\contentsline {section}{\numberline {8}Additional modifications to \textsf {fancyvrb}}{22}{section.8}
+\contentsline {subsection}{\numberline {8.1}Backtick and single quotation mark}{22}{subsection.8.1}
+\contentsline {subsection}{\numberline {8.2}Line numbering}{22}{subsection.8.2}
+\contentsline {section}{\numberline {9}Undocumented features of \textsf {fancyvrb}}{22}{section.9}
+\contentsline {subsection}{\numberline {9.1}Undocumented options}{22}{subsection.9.1}
+\contentsline {subsection}{\numberline {9.2}Undocumented macros}{23}{subsection.9.2}
+\contentsline {section}{Version History}{23}{subsection.9.2}
+\contentsline {section}{\numberline {10}Implementation}{25}{section.10}
+\contentsline {subsection}{\numberline {10.1}Required packages}{25}{subsection.10.1}
+\contentsline {subsection}{\numberline {10.2}Utility macros}{25}{subsection.10.2}
+\contentsline {subsection}{\numberline {10.3}Hooks}{25}{subsection.10.3}
+\contentsline {subsection}{\numberline {10.4}Escaped characters}{26}{subsection.10.4}
+\contentsline {subsection}{\numberline {10.5}Patches}{26}{subsection.10.5}
+\contentsline {subsubsection}{\numberline {10.5.1}Visible spaces}{26}{subsubsection.10.5.1}
+\contentsline {subsubsection}{\numberline {10.5.2}\texttt {obeytabs} with visible tabs and with tabs inside macro arguments}{26}{subsubsection.10.5.2}
+\contentsline {subsubsection}{\numberline {10.5.3}Spacing in math mode}{30}{subsubsection.10.5.3}
+\contentsline {subsubsection}{\numberline {10.5.4}Fonts and symbols in math mode}{31}{subsubsection.10.5.4}
+\contentsline {subsubsection}{\numberline {10.5.5}Ophaned label}{32}{subsubsection.10.5.5}
+\contentsline {subsubsection}{\numberline {10.5.6}\texttt {rulecolor} and \texttt {fillcolor}}{32}{subsubsection.10.5.6}
+\contentsline {subsection}{\numberline {10.6}Extensions}{33}{subsection.10.6}
+\contentsline {subsubsection}{\numberline {10.6.1}New options requiring minimal implementation}{33}{subsubsection.10.6.1}
+\contentsline {subsubsection}{\numberline {10.6.2}Formatting with \texttt {\textbackslash FancyVerbFormatLine}, \texttt {\textbackslash FancyVerbFormatText}, and \texttt {\textbackslash FancyVerbHighlightLine}}{34}{subsubsection.10.6.2}
+\contentsline {subsubsection}{\numberline {10.6.3}Line numbering}{35}{subsubsection.10.6.3}
+\contentsline {subsubsection}{\numberline {10.6.4}Line highlighting or emphasis}{39}{subsubsection.10.6.4}
+\contentsline {subsection}{\numberline {10.7}Line breaking}{42}{subsection.10.7}
+\contentsline {subsubsection}{\numberline {10.7.1}Options and associated macros}{42}{subsubsection.10.7.1}
+\contentsline {subsubsection}{\numberline {10.7.2}Line breaking implementation}{51}{subsubsection.10.7.2}
+\contentsline {paragraph}{Helper macros}{51}{section*.3}
+\contentsline {paragraph}{Tab expansion}{51}{section*.4}
+\contentsline {paragraph}{Line scanning and break insertion macros}{52}{section*.5}
+\contentsline {paragraph}{Line scanning and break insertion macros for pdfTeX with UTF-8}{57}{section*.6}
+\contentsline {paragraph}{Line processing before scanning}{63}{section*.7}
+\contentsline {subsection}{\numberline {10.8}Pygments compatibility}{66}{subsection.10.8}

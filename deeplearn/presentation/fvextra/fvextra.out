@@ -1,0 +1,51 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Usage}{}% 2
+\BOOKMARK [1][-]{section.3}{General options}{}% 3
+\BOOKMARK [1][-]{section.4}{General commands}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{Line and text formatting}{section.4}% 5
+\BOOKMARK [1][-]{section.5}{Line breaking}{}% 6
+\BOOKMARK [2][-]{subsection.5.1}{Line breaking options}{section.5}% 7
+\BOOKMARK [2][-]{subsection.5.2}{Line breaking and tab expansion}{section.5}% 8
+\BOOKMARK [2][-]{subsection.5.3}{Advanced line breaking}{section.5}% 9
+\BOOKMARK [3][-]{subsubsection.5.3.1}{A few notes on algorithms}{subsection.5.3}% 10
+\BOOKMARK [3][-]{subsubsection.5.3.2}{Breaks within macro arguments}{subsection.5.3}% 11
+\BOOKMARK [3][-]{subsubsection.5.3.3}{Customizing break behavior}{subsection.5.3}% 12
+\BOOKMARK [1][-]{section.6}{Pygments support}{}% 13
+\BOOKMARK [2][-]{subsection.6.1}{Options for users}{section.6}% 14
+\BOOKMARK [2][-]{subsection.6.2}{For package authors}{section.6}% 15
+\BOOKMARK [1][-]{section.7}{Patches}{}% 16
+\BOOKMARK [2][-]{subsection.7.1}{Visible spaces}{section.7}% 17
+\BOOKMARK [2][-]{subsection.7.2}{obeytabs with visible tabs and with tabs inside macro arguments}{section.7}% 18
+\BOOKMARK [2][-]{subsection.7.3}{Math mode}{section.7}% 19
+\BOOKMARK [3][-]{subsubsection.7.3.1}{Spaces}{subsection.7.3}% 20
+\BOOKMARK [3][-]{subsubsection.7.3.2}{Symbols and fonts}{subsection.7.3}% 21
+\BOOKMARK [2][-]{subsection.7.4}{Orphaned labels}{section.7}% 22
+\BOOKMARK [2][-]{subsection.7.5}{rulecolor and fillcolor}{section.7}% 23
+\BOOKMARK [1][-]{section.8}{Additional modifications to fancyvrb}{}% 24
+\BOOKMARK [2][-]{subsection.8.1}{Backtick and single quotation mark}{section.8}% 25
+\BOOKMARK [2][-]{subsection.8.2}{Line numbering}{section.8}% 26
+\BOOKMARK [1][-]{section.9}{Undocumented features of fancyvrb}{}% 27
+\BOOKMARK [2][-]{subsection.9.1}{Undocumented options}{section.9}% 28
+\BOOKMARK [2][-]{subsection.9.2}{Undocumented macros}{section.9}% 29
+\BOOKMARK [1][-]{subsection.9.2}{Version History}{}% 30
+\BOOKMARK [1][-]{section.10}{Implementation}{}% 31
+\BOOKMARK [2][-]{subsection.10.1}{Required packages}{section.10}% 32
+\BOOKMARK [2][-]{subsection.10.2}{Utility macros}{section.10}% 33
+\BOOKMARK [2][-]{subsection.10.3}{Hooks}{section.10}% 34
+\BOOKMARK [2][-]{subsection.10.4}{Escaped characters}{section.10}% 35
+\BOOKMARK [2][-]{subsection.10.5}{Patches}{section.10}% 36
+\BOOKMARK [3][-]{subsubsection.10.5.1}{Visible spaces}{subsection.10.5}% 37
+\BOOKMARK [3][-]{subsubsection.10.5.2}{obeytabs with visible tabs and with tabs inside macro arguments}{subsection.10.5}% 38
+\BOOKMARK [3][-]{subsubsection.10.5.3}{Spacing in math mode}{subsection.10.5}% 39
+\BOOKMARK [3][-]{subsubsection.10.5.4}{Fonts and symbols in math mode}{subsection.10.5}% 40
+\BOOKMARK [3][-]{subsubsection.10.5.5}{Ophaned label}{subsection.10.5}% 41
+\BOOKMARK [3][-]{subsubsection.10.5.6}{rulecolor and fillcolor}{subsection.10.5}% 42
+\BOOKMARK [2][-]{subsection.10.6}{Extensions}{section.10}% 43
+\BOOKMARK [3][-]{subsubsection.10.6.1}{New options requiring minimal implementation}{subsection.10.6}% 44
+\BOOKMARK [3][-]{subsubsection.10.6.2}{Formatting with \134FancyVerbFormatLine, \134FancyVerbFormatText, and \134FancyVerbHighlightLine}{subsection.10.6}% 45
+\BOOKMARK [3][-]{subsubsection.10.6.3}{Line numbering}{subsection.10.6}% 46
+\BOOKMARK [3][-]{subsubsection.10.6.4}{Line highlighting or emphasis}{subsection.10.6}% 47
+\BOOKMARK [2][-]{subsection.10.7}{Line breaking}{section.10}% 48
+\BOOKMARK [3][-]{subsubsection.10.7.1}{Options and associated macros}{subsection.10.7}% 49
+\BOOKMARK [3][-]{subsubsection.10.7.2}{Line breaking implementation}{subsection.10.7}% 50
+\BOOKMARK [2][-]{subsection.10.8}{Pygments compatibility}{section.10}% 51

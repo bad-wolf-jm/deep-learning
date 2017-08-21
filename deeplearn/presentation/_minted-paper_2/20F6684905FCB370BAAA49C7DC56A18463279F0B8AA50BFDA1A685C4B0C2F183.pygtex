@@ -1,0 +1,4 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{class} \PYG{n+nc}{FOo}\PYG{p}{:}
+  \PYG{n}{bar}\PYG{o}{=}\PYG{l+m+mi}{1}
+\end{Verbatim}
