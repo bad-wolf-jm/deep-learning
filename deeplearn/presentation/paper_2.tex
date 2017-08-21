@@ -30,63 +30,6 @@
 \maketitle
 
 
-
-
-
-%\def\layersep{2.5cm}
-
-
-% \newcommand{\nodedef}{\tikzstyle{arrow} = [thick,->,>=stealth]
-%     \node (input) [] at (0cm,1cm) {};
-%     \node (output) [] at (0cm,-1cm) {};
-%     \node (s-input) [] at (-2cm,0cm) {};
-%     \node (s-output) [] at (2cm,0cm) {};
-%     \path[yshift=0.5cm]
-%         node[startstop] (N) at (0cm,-.5cm) {};
-%
-%     \draw [arrow] (input) -- (N);
-%     \draw [arrow] (s-input) -- (N);
-%     \draw [arrow] (N) -- (output);
-%     \draw [arrow] (N) -- (s-output);}
-%
-%
-% \newcommand{\nodedefinner}{\tikzstyle{arrow} = [thick,->,>=stealth]
-%     \node (input) [] at (0cm,1cm) {};
-%     \node (output) [] at (0cm,-1cm) {};
-%     \node (s-input) [] at (-2cm,0cm) {};
-%     \node (s-output) [] at (2cm,0cm) {};
-%     \path[yshift=0.5cm]
-%         node[startstop] (N) at (0cm,-.5cm) {};
-%
-%     %\draw [arrow] (input) -- (N);
-%     %\draw [arrow] (s-input) -- (N);
-%     \draw [arrow] (N) -- (output);
-%     \draw [arrow] (N) -- (s-output);}
-
-
-% \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=1cm]
-%     \tikzstyle{arrow} = [thick,->,>=stealth]
-%     \tikzstyle{startstop} = [rectangle, minimum width=2cm, minimum height=.75cm, text centered, draw=black, fill=black!20]
-%     \node (input) [] at (0cm,1cm) {};
-%     \node (output) [] at (0cm,-1cm) {};
-%     \node (s-input) [] at (-2cm,0cm) {};
-%     \node (s-output) [] at (2cm,0cm) {};
-%     \path[] node[startstop] (N) at (0cm,0cm) {};
-%     \draw [arrow] (input) -- (N);
-%     \draw [arrow] (s-input) -- (N);
-%     \draw [arrow] (N) -- (output);
-%     \draw [arrow] (N) -- (s-output);
-% \end{tikzpicture}
-%
-%
-
-
-
-
-
-
-
-
  \section{Introduction}
 
  Let $U=\R^n$ and $V=\R^m$ be vector spaces, and consider a function $f:U\to W$.
@@ -125,8 +68,6 @@
  \end{eqnarray*}
  and note that the last line above is a function of $u$ and $v$ alone, and we have to minimize it.
  \end{example}
-
-
 
 
 \section{Back Propagation}
@@ -541,7 +482,7 @@ Neutral	8	286	4	6
 Positive	4	2	125	16
 Irrelevant	11	9	1	168
 
-\subsection{Many-to-many} 
+\subsection{Many-to-many}
 
 \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=1cm]
     \tikzstyle{arrow} = [thick,->,>=stealth]

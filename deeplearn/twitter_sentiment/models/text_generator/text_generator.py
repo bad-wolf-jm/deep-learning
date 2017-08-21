@@ -187,6 +187,7 @@ def rnn_minibatch_sequencer(raw_data, batch_size, sequence_size, nb_epochs):
 def generate_text(length, session=None):
     generated_text = ''
     character = [[ord(' ')]]
+    print('Generating text')
     istate = np.zeros([Hyperparameters.n_layers, 1, Hyperparameters.hidden_states])
     while len(generated_text) < length:
         feed_dict = {Globals.model_input: character, Globals.initial_state: istate}
@@ -208,18 +209,21 @@ if __name__ == '__main__':
     chkpt = os.path.join(os.path.expanduser('~'), '.text_gen', 'model_chkpt')
     if not os.path.exists(save):
         os.makedirs(save)
-    if not os.path.exists(chkpt):
-        os.makedirs(chkpt)
-
     data = read_data_files_from_folder(os.path.join(root, 'harry_potter/*.txt'))
-
     inference()
     train()
     index = 0
-    istate = np.zeros([Hyperparameters.n_layers, 128, Hyperparameters.hidden_states])
+    istate = np.zeros([Hyperparameters.n_layers, 32, Hyperparameters.hidden_states])
     with tf.Session() as session:
         session.run(tf.global_variables_initializer())
-        for batch in rnn_minibatch_sequencer(data, 128, Hyperparameters.sequence_length, nb_epochs=100):
+        if not os.path.exists(chkpt):
+            os.makedirs(chkpt)
+        else:
+            s = tf.train.Saver()
+            s.save(session, os.path.join(chkpt, "t_gen_weights"))
+            print('Model restored')
+
+        for batch in rnn_minibatch_sequencer(data, 32, Hyperparameters.sequence_length, nb_epochs=100):
             x = batch['train_x']
             y = batch['train_y']
             feed_dict = {Globals.model_input: x,
@@ -228,8 +232,9 @@ if __name__ == '__main__':
             _, ostate = session.run([Globals.minimize, Globals.state], feed_dict=feed_dict)
             print('x', end='', flush=True)
             istate = ostate
-            if index % batch['epoch_number']*150 == 0:
-                file_name = "sort-test-{}".format(index)
+            #print(index, batch['epoch_number'])
+            if index % (batch['epoch_number']*150) == 0:
+                file_name = "text_gen-{}".format(index)
                 file_name = os.path.join(save, file_name)
                 with open(file_name, 'w') as test_file:
                     test_file.write(generate_text(20000, session))
