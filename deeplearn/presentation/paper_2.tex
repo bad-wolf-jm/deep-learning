@@ -2,6 +2,7 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{tikz}
+\usepackage{booktabs}
 \usetikzlibrary{shapes.geometric, arrows}
 
 
@@ -10,7 +11,18 @@
 
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\C}{\mathcal{C}}
+\renewcommand{\u}{\mathbf{u}}
+\renewcommand{\v}{\mathbf{v}}
+\newcommand{\w}{\mathbf{w}}
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\y}{\mathbf{y}}
+\renewcommand{\b}{\mathbf{b}}
+\newcommand{\e}{\mathbf{e}}
 
+
+\newcommand{\A}{\mathbf{A}}
+\newcommand{\B}{\mathbf{B}}
+\newcommand{\W}{\mathbf{W}}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{proposition}[theorem]{Proposition}
@@ -32,70 +44,61 @@
 
  \section{Introduction}
 
- Let $U=\R^n$ and $V=\R^m$ be vector spaces, and consider a function $f:U\to W$.
- In theory, $f$ here can be any set theoretic function, but for our purpose, we
- will assume that $f$ is at the very least square integrable. In general, we
- consider a class $\C$ of functions $U\to V$, and try to find an element $g\in\C$
- which is as close as possible to $f$.  In order to do so, we need a notion of distance
- between functions.  There are many possible choices, but some of the most popular are
- the $L^p$ norms and the $L^\infty$ norm.
+Throughout this handout, we use bold face lower case letters to represent vectors, and bold face capital letters to represent matrices.  Most of the time, we will blur the dustinction between matrices and vectors, except when it makes the exposition clearer.
 
- While the class $\C$ van be virtually any class of functions, we usually choose a class
- that is somewhat definable, in the sense that there is a (differentiable) function $F:U\times\R^k\to V$
- such that $\C=\{F(x, w): w\in \R^k\}$.  Such classes of functions have the advantage of
- being equicontinuous.
+ Let $f:\R^n\to \R^m$ be a function, and consider a class $\C$ of functions $g: \R^n\to \R^m$, which we assume to be parametrized by $\R^\ell$, in the sense that there is a function $F(\x,\w):\R^n\times \R^\ell\to\R^n$ such that $\C=\{\x\mapsto F(\x,\w):\w\in\R^n\}$.  The generic problem of machine learning is to find a vector $\w\in\R^{\ell}$ such that $D(f(\x), F(\x, \w))$ is as small as possible, where $D$ represents a notion of distance between functions, for example, $$D(f(\x), F(\x, \w)) = \min\{\|f(\x)-F(\x, \w)\|:\x\in\R^n\}$$ Note that since the minimum is computed over all possible vlues of $\x$, the value of $D$ in te equation above depends on $\w$.  Define $$\ell(\w)=D(f(\x), F(\x, \w))$$ Given the definition of $D$, we see that $\ell(\x)\geq 0$, and therefore $\ell$ has a global minimum (which is not necessarily unique). In general, the global minimum of $\ell$ is not attained, in the sense that if $\epsilon=\min\{\ell(\w):\x\in\R^n\}$, then there does not necessarily exist a value $\w_0\in\R^\ell$ such that $\epsilon=\ell(\w_0)$.  However, it can be approximated, that is to say there is a sequence $\w_i$ such that $\ell(\w_i)\to\epsilon$ as $i\to\infty$.  We may not be able to achieve the minimum with a specific value of $\w$, but we can get as close to it as we want: for every $\varepsilon>0$, there is some natural number $N_\varepsilon>0$ such that $\|\epsilon-\ell(\w_i)\|<\varepsilon$ for every $i>N_\varepsilon$. Since we can choose $\varepsilon$ to be as small as we want, if we choose it to be smaller than the smallest number which can be represented with a {\tt float32} (say), then from the point of view of any program, $\ell(\w_i)=\epsilon$ when $i>N_\varepsilon$.
 
+ The function $\ell$ we defined above is called a {\em loss function}.  There are many functions which are suitable for $\ell$.  In fact, $\ell$ does not need to represent a distance at all. In order to draw a meaningful conclusion from the minimum value of $\ell$, all we need to know is that $\ell(\w)=0$ implies $f(\x)=F(\x,\w)$ for every $\x$, or at the very least $\|f(\x)-F(\x,\w)\|\leq\varepsilon$ for arbitrary $\varepsilon$.  In every neural network we define, we specify a class of functions $F(\x, \w)$, and a definition for $\ell(\w)$ based on $F$. In tensorflow, the function we are trying to approximate is given in the form of a relation $f(\x)=\y$. We provide {\em placeholders} for the values of $\x$ and $\y$.  The function $F(\x,\w)$ is defined by a computation graph.  For example, here is a linear regression, in which we try to approximate a function $f:\R^{10}\to\R^{15}$ using a function of the form $F(\x, \W\b)=\W\x+\b$. Here $\W$ is an $15\times 10$ matrix, and $\b\in\R^{15}$
 
- \begin{example}
- Let $f(x)=x(x-1)(x+1)$.  As an example, we will try to fit a linear function
- $\ell(x)=ux+v$ to $f$.  The class $\C$ is defined by $\C=\{ux+v:u,v\in R\}$.
- For an element $g(x, u, v)\in\C$, we have $$f(x)-g(x,u,v) = x^3-x - ux+v$$
- From this we get
- \begin{eqnarray*}
-   (f(x)-g(x,u,v))^2 &=& (x^3 - (1-u)x + v)^2 \\
-   {} &=& x^6 - 2(1-u)x^4 + 2vx^3 + (1-u)^2x^2 - \\
-   {} & & 2(1-u)vx + v^2
- \end{eqnarray*}
- If we compute $\int_{-1}^1 (f(x)-g(x,u,v))^2$, we get
-
- \begin{eqnarray*}
-   \int_{-1}^1(f(x)-g(x; u,v))^2 &=& \int_{-1}^1(x^3 - (1-u)x + v)^2 \\
-   {} &=& \int_{-1}^1x^6 - 2(1-u)x^4 + 2vx^3 + (1-u)^2x^2 - 2(1-u)vx + v^2\\
-   {} &=& \frac{x^7}{7}-2v\frac{x^4}{4} + (1-u)^2\frac{x^3}{3} - 2(1-u)v\frac{x^2}{2}+v^2x\\
-   {} &=& \frac{1}{7}-2v\frac{1}{4} + (1-u)^2\frac{1}{3} - 2(1-u)v\frac{1}{2}+v^2\\
-   {} & & +\frac{1}{7}-2v\frac{1}{4} + (1-u)^2\frac{-1}{3} - 2(1-u)v\frac{1}{2}-v^2\\
-   {} &=& \frac{2}{7} - (2-u)v+v^2 = \ell(u,v)
- \end{eqnarray*}
- and note that the last line above is a function of $u$ and $v$ alone, and we have to minimize it.
- \end{example}
+ \begin{minted}{python}
+ x = tf.placeholder(shape=[None, 10])
+ y = tf.placeholder(shape=[None, 15])
+ W = tf.Variable(shape=[None, 10, 15])
+ b = tf.Variable(shape=[None, 15])
+ F = tf.matmul(x, W) + b
+ loss = tf.mean_square_error(y, F)
+ \end{minted}
 
 
-\section{Back Propagation}
+We are mainly interested in classification problems, or more generally problems which can be expressed as classification problems. Let $A$ and $B$ be finite sets, and let $f:A\to B$ be any function.  In order to use neural networks, which represent functions between topological vector spaces, to represent  function between ordinary sets, we must first translate the sets $A$ and $B$ into vector spaces.  The most straightforward (and freest) way to interpret a set $A$ as a vector space is to use $A$ as the basis for a vector space.  Write $A=\{a_1,...,a_n\}$, and let $\{\e_1,...,\e_n\}$ represent the standard basis for $\R^n$.  Let $e:A\to\R^n$ be defined by $e(a_i)=\e_i$.  Similarly, we can write $B=\{b_1,...,b_m\}$, and define $e:B\to \R^m$ by $e(b_i)=\e_i$.  This specific function is called {\em one-hot encoding}, and is present in tensorflow as tf.onehot.  Since we are mapping a finite set to an infinte set, the function $e$ has no inverse, but it has a "pseudo-inverse" given by the {\em argmax()} function defined by $argmax(\v)=i$ where $i$ is smallest such that $v_i\geq v_j$ for every $j\not=i$. In other words, $argmax$ computes the index of the largest component of a vector.
 
-In general, in order to minimize a function $f(w)$ of one variable, we make use of the fact that
-the extreme values of $f$ all have $f'(x)=0$.  If $f$ is a function of two or more variables, then
-if $x$ is such that $f(x)$ is a local max, or minimum, then all partial derivatives
-$\frac{\partial f}{\partial w_i}(x)=0$.  If $f:\R^n\to\R$ is a function, then the
-{\em gradient} of $f$ is the vector
-$\nabla f(x) = \left(\frac{\partial f}{\partial w_1}(x),...,\frac{\partial f}{\partial w_n}(x)\right)$.
-One interesting property of $\nabla f(x)$ is that, as a vector, it ``points'' in the direction in which
-$f$ decreases the most.  That is to say, there is a good chance that $f(x-\alpha\nabla f(x))\leq f(x)$.
-The chance is better the smaller $\alpha$ is.  We see that if we iterate that process, we get a
-sequence $x_1,...,x_n,...$ such that $f(x_{i+1})\leq f(x_i)$ for every $i$.  Since $m\leq f(x_i)\leq f(x_0)$
-for every $i$, we get a bounded decreasing sequence of real number, which converges.
+Given $\v\in\R^m$ is the output of $F(\x,\w)$, then if $\v$ has the property that $\sum v_i=1$, and $v_i\geq 0$ for every $i$, then we can interpret $\v$ as a probability distribution, where each component $v_i$ represents the probability that $\v=\e_i$.  The code, in tensorflow, which approximates a function $A\to B$ can be written as:
 
-Caveat: this ideal situation doesn't allways happen.
+\begin{minted}{python}
+x_in = tf.placeholder(shape=[None, 1])
+x = tf.one_hot(x_in, 10)
+y_in = tf.placeholder(shape=[None, 1])
+y = tf.one_hot(y_in, 15)
+W = tf.Variable(shape=[None, 10, 15])
+b = tf.Variable(shape=[None, 15])
+F = tf.softmax(tf.matmul(x, W) + b)
+loss = tf.cross_entropy(y, F)
+\end{minted}
 
-This iterative process is {\em (Stocastic) gradient descent}.
+The softmax function in the penultimate line is defined by $\sigma(\v) = \w$  where $$w_i= \frac{e^{v_i}}{\sum e^{v_j}}$$ Note that $\sum w_j=1$, which means that the output of the softmax function can be interpreted as a probability distribution.  This makes it a popular choice for classification problems with many classes.  If the target space is $\R^2$, then this reduces to a binomial distribution.  The cross-entropy function in the last line is defined by $C(\v, \w) = -\sum(v_i\log(w_i))$.  Intuitively, $C$ measures the number of vector components that are necessary to differentiate between the distribution $\v$ and the distribution $\w$.  Therefore, the optimal value for $C$ to have is $1$: measuring any bit should allow us to differentiate between $\v$ and $\w$.  Note that $C(\v, \w)=1$ if and only if $\log C(\v, \w)=0$, so that the logarithm of the cross entropy function is a candidate for a distance function. The vector $\w$ here should be the output of the model, whereas $\v$ should be the true value.  By definition, $w_i= \frac{e^{v_i}}{\sum e^{v_j}}$, so that $\log(w_i) = \log e^{w_i} - \log(\sum e^{v_j}) = w_i - \log(\sum e^{v_j})$. By definition again, $v_i=1$ and $v_j=0$ if $i\not=j$. Therefore, $C(\v, \w) = w_i + \log(\sum e^{w_j})$
 
-Suppose $f$ is a complsition of two functions, and that we can write $f(x,w)= g(h(x, w_1), w_2)$.
-Then we can write $\nabla_w f(x, w)=\nabla g(h(x, w_1), w_2)\cdot \nabla h(x, w_1)$. Each level
-of composition corresponds to a layer of neural network.  The chain rule transforms function composition
-into a product. If a network becomes deep, then the derivative of the loss function becomes a long
-product.  When gradients become small in norm (like they do when we approach a min), then the gradient
-becomes very close to $0$, and the update rule for gradient descent stops changing the weights.
-
-This is the vanishing gradient problem for very deep networks, and makes convergence slow.
+ % \begin{example}
+ % Let $f(x)=x(x-1)(x+1)$.  As an example, we will try to fit a linear function
+ % $\ell(x)=ux+v$ to $f$.  The class $\C$ is defined by $\C=\{ux+v:u,v\in R\}$.
+ % For an element $g(x, u, v)\in\C$, we have $$f(x)-g(x,u,v) = x^3-x - ux+v$$
+ % From this we get
+ % \begin{eqnarray*}
+ %   (f(x)-g(x,u,v))^2 &=& (x^3 - (1-u)x + v)^2 \\
+ %   {} &=& x^6 - 2(1-u)x^4 + 2vx^3 + (1-u)^2x^2 - \\
+ %   {} & & 2(1-u)vx + v^2
+ % \end{eqnarray*}
+ % If we compute $\int_{-1}^1 (f(x)-g(x,u,v))^2$, we get
+ %
+ % \begin{eqnarray*}
+ %   \int_{-1}^1(f(x)-g(x; u,v))^2 &=& \int_{-1}^1(x^3 - (1-u)x + v)^2 \\
+ %   {} &=& \int_{-1}^1x^6 - 2(1-u)x^4 + 2vx^3 + (1-u)^2x^2 - 2(1-u)vx + v^2\\
+ %   {} &=& \frac{x^7}{7}-2v\frac{x^4}{4} + (1-u)^2\frac{x^3}{3} - 2(1-u)v\frac{x^2}{2}+v^2x\\
+ %   {} &=& \frac{1}{7}-2v\frac{1}{4} + (1-u)^2\frac{1}{3} - 2(1-u)v\frac{1}{2}+v^2\\
+ %   {} & & +\frac{1}{7}-2v\frac{1}{4} + (1-u)^2\frac{-1}{3} - 2(1-u)v\frac{1}{2}-v^2\\
+ %   {} &=& \frac{2}{7} - (2-u)v+v^2 = \ell(u,v)
+ % \end{eqnarray*}
+ % and note that the last line above is a function of $u$ and $v$ alone, and we have to minimize it.
+ % \end{example}
 
 \section{Dealing with sequences}
 
@@ -179,6 +182,22 @@ Training a recurrent network is the same as producing a Turing machine.
 \end{tikzpicture}
 
 
+\section{Back Propagation}
+
+In general, in order to minimize a function $f(w)$ of one variable, we make use of the fact that the extreme values of $f$ all have $f'(x)=0$.  If $f$ is a function of two or more variables, then if $x$ is such that $f(x)$ is a local max, or minimum, then all partial derivatives $\frac{\partial f}{\partial w_i}(x)=0$.  If $f:\R^n\to\R$ is a function, then the {\em gradient} of $f$ is the vector $\nabla f(x) = \left(\frac{\partial f}{\partial w_1}(x),...,\frac{\partial f}{\partial w_n}(x)\right)$. One interesting property of $\nabla f(x)$ is that, as a vector, it ``points'' in the direction in which $f$ decreases the most.  That is to say, there is a good chance that $f(x-\alpha\nabla f(x))\leq f(x)$. The chance is better the smaller $\alpha$ is.  We see that if we iterate that process, we get a sequence $x_1,...,x_n,...$ such that $f(x_{i+1})\leq f(x_i)$ for every $i$.  Since $m\leq f(x_i)\leq f(x_0)$ for every $i$, we get a bounded decreasing sequence of real number, which converges.
+
+Caveat: this ideal situation doesn't allways happen.
+
+This iterative process is {\em (Stocastic) gradient descent}.
+
+Suppose $f$ is a complsition of two functions, and that we can write $f(x,w)= g(h(x, w_1), w_2)$.
+Then we can write $\nabla_w f(x, w)=\nabla g(h(x, w_1), w_2)\cdot \nabla h(x, w_1)$. Each level
+of composition corresponds to a layer of neural network.  The chain rule transforms function composition
+into a product. If a network becomes deep, then the derivative of the loss function becomes a long
+product.  When gradients become small in norm (like they do when we approach a min), then the gradient
+becomes very close to $0$, and the update rule for gradient descent stops changing the weights.
+
+This is the vanishing gradient problem for very deep networks, and makes convergence slow.
 
 
 \section{Backward Propagation Through Time}
@@ -227,6 +246,7 @@ How do we train recurrent neural networks? we can use back propagation, just lik
      %\draw [arrow] (C-4) -- (s-output-C);
 
 \end{tikzpicture}
+
 
 
 
@@ -321,7 +341,10 @@ def gru_cell(input_tensor, output, state):
 
 \subsection{Many-to-One}
 
-The Buzzometer sentiment analysis tool uses a bi-directional GRU model, in which the output a 4-layer bidirectional recurrent network is fed into a two-layer fully connected network which separates the input into four classes, corresponding to neutral, positive, negative and irrelevant messages. The only non-linearities in the network are inside the GRU cells.  Graphically, the network can be represented as:
+The Buzzometer sentiment analysis tool uses a bi-directional GRU model, in which the output a 4-layer
+bidirectional recurrent network is fed into a two-layer fully connected network which separates the input into
+four classes, corresponding to neutral, positive, negative and irrelevant messages. The only non-linearities
+ in the network are inside the GRU cells.  Graphically, the network can be represented as:
 
 %(GRAPHICAL REPRESENTATION OF NETWORK)
 \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=1cm]
@@ -395,8 +418,10 @@ The Buzzometer sentiment analysis tool uses a bi-directional GRU model, in which
 \end{tikzpicture}
 
 
-The base input ofor this network is a (unicode) character, which is one-hot encoded before being fed into the recurrent layers.  For training, the network is unrolled to a length of 256 characters, which is about the length of an average
-message in our database.  All strings are padded or truncated to a length of 256 characters.
+The base input ofor this network is a (unicode) character, which is one-hot encoded before being fed into the
+ recurrent layers.  For training, the network is unrolled to a length of 256 characters,
+ which is about twice the length  of an average message in our database, and all strings are padded or truncated
+ to a length of 256 characters.
 
 
 \begin{minted}{python}
@@ -421,66 +446,134 @@ message in our database.  All strings are padded or truncated to a length of 256
       return Globals.model_input, Globals.model_output
 \end{minted}
 
-first hour:
-Loss: 1.331 Accuracy: 45.50%
-0	Negative	Neutral	Positive	Irrelevant
-Negative	291	113	50	127
-Neutral	108	164	62	85
-Positive	0	0	0	0
-Irrelevant	0	0	0	0
+%first hour:
 
 
-Loss: 0.933 Accuracy: 60.30%
-0	Negative	Neutral	Positive	Irrelevant
-Negative	292	52	36	55
-Neutral	61	176	21	62
-Positive	5	15	65	15
-Irrelevant	33	28	14	70
+%Loss: 1.331 Accuracy: 45.50%
+%0	Negative	Neutral	Positive	Irrelevant
+%Negative	291	113	50	127
+%Neutral	108	164	62	85
+%Positive	0	0	0	0
+%Irrelevant	0	0	0	0
+\begin{tabular}{lcccc}
+  {} & {\bf Negative} & {\bf Neutral} & {\bf Positive} & {\bf Irrelevant}\\
+  {\bf Negative}   & {291} & {113} & {50} & {127}\\
+  {\bf Neutral}    & {108} & {113} & {50} & {85}\\
+  {\bf Positive}   & {0} & {0} & {0} & {0}\\
+  {\bf Irrelevant} & {0} & {0} & {0} & {0}\\
+\end{tabular}
 
 
-second hour
-Loss: 0.729 Accuracy: 71.80%
-0	Negative	Neutral	Positive	Irrelevant
-Negative	340	67	18	65
-Neutral	22	182	18	36
-Positive	10	7	91	10
-Irrelevant	8	13	8	105
-
-third hour
-Loss: 0.611 Accuracy: 76.70%
-0	Negative	Neutral	Positive	Irrelevant
-Negative	319	38	11	43
-Neutral	20	188	2	20
-Positive	10	18	91	10
-Irrelevant	27	27	7	169
-
-Loss: 0.468 Accuracy: 85.20%
-0	Negative	Neutral	Positive	Irrelevant
-Negative	334	20	3	18
-Neutral	14	242	0	9
-Positive	20	10	125	17
-Irrelevant	26	10	1	151
-
-0	Negative	Neutral	Positive	Irrelevant
-Negative	334	4	4	9
-Neutral	3	283	2	7
-Positive	1	0	125	2
-Irrelevant	1	0	4	221
-
-Loss: 0.530 Accuracy: 84.60%
-0	Negative	Neutral	Positive	Irrelevant
-Negative	361	18	13	29
-Neutral	22	246	10	18
-Positive	6	6	95	6
-Irrelevant	11	5	10	144
 
 
-Loss: 0.275 Accuracy: 90.00%
-0	Negative	Neutral	Positive	Irrelevant
-Negative	321	16	3	20
-Neutral	8	286	4	6
-Positive	4	2	125	16
-Irrelevant	11	9	1	168
+%Loss: 0.933 Accuracy: 60.30%
+%0	Negative	Neutral	Positive	Irrelevant
+%Negative	292	52	36	55
+%Neutral	61	176	21	62
+%Positive	5	15	65	15
+%Irrelevant	33	28	14	70
+\begin{tabular}{lcccc}
+  {} & {\bf Negative} & {\bf Neutral} & {\bf Positive} & {\bf Irrelevant}\\
+  {\bf Negative}   & {292} & {52} & {36} & {55}\\
+  {\bf Neutral}    & {61} & {176} & {21} & {62}\\
+  {\bf Positive}   & {5} & {15} & {65} & {15}\\
+  {\bf Irrelevant} & {33} & {28} & {14} & {70}\\
+\end{tabular}
+
+
+
+% second hour
+% Loss: 0.729 Accuracy: 71.80%
+% 0	Negative	Neutral	Positive	Irrelevant
+% Negative	340	67	18	65
+% Neutral	22	182	18	36
+% Positive	10	7	91	10
+% Irrelevant	8	13	8	105
+% \begin{tabular}{lcccc}
+%   {} & {\bf Negative} & {\bf Neutral} & {\bf Positive} & {\bf Irrelevant}\\
+%   {\bf Negative}   & {} & {} & {} & {}\\
+%   {\bf Neutral}    & {} & {} & {} & {}\\
+%   {\bf Positive}   & {} & {} & {} & {}\\
+%   {\bf Irrelevant} & {} & {} & {} & {}\\
+% \end{tabular}
+
+
+%third hour
+%Loss: 0.611 Accuracy: 76.70%
+%0	Negative	Neutral	Positive	Irrelevant
+%Negative	319	38	11	43
+%Neutral	20	188	2	20
+%Positive	10	18	91	10
+%Irrelevant	27	27	7	169
+\begin{tabular}{lcccc}
+  {} & {\bf Negative} & {\bf Neutral} & {\bf Positive} & {\bf Irrelevant}\\
+  {\bf Negative}   & {319} & {38} & {11} & {43}\\
+  {\bf Neutral}    & {20} & {188} & {2} & {20}\\
+  {\bf Positive}   & {10} & {18} & {91} & {10}\\
+  {\bf Irrelevant} & {27} & {27} & {7} & {169}\\
+\end{tabular}
+
+
+% Loss: 0.468 Accuracy: 85.20%
+% 0	Negative	Neutral	Positive	Irrelevant
+% Negative	334	20	3	18
+% Neutral	14	242	0	9
+% Positive	20	10	125	17
+% Irrelevant	26	10	1	151
+% \begin{tabular}{lcccc}
+%   {} & {\bf Negative} & {\bf Neutral} & {\bf Positive} & {\bf Irrelevant}\\
+%   {\bf Negative}   & {} & {} & {} & {}\\
+%   {\bf Neutral}    & {} & {} & {} & {}\\
+%   {\bf Positive}   & {} & {} & {} & {}\\
+%   {\bf Irrelevant} & {} & {} & {} & {}\\
+% \end{tabular}
+%
+
+%0	Negative	Neutral	Positive	Irrelevant
+%Negative	334	4	4	9
+%Neutral	3	283	2	7
+%Positive	1	0	125	2
+%Irrelevant	1	0	4	221
+\begin{tabular}{lcccc}
+  {} & {\bf Negative} & {\bf Neutral} & {\bf Positive} & {\bf Irrelevant}\\
+  {\bf Negative}   & {334} & {4} & {4} & {9}\\
+  {\bf Neutral}    & {3} & {283} & {2} & {7}\\
+  {\bf Positive}   & {1} & {0} & {125} & {2}\\
+  {\bf Irrelevant} & {1} & {0} & {4} & {221}\\
+\end{tabular}
+
+
+% Loss: 0.530 Accuracy: 84.60%
+% 0	Negative	Neutral	Positive	Irrelevant
+% Negative	361	18	13	29
+% Neutral	22	246	10	18
+% Positive	6	6	95	6
+% Irrelevant	11	5	10	144
+% \begin{tabular}{lcccc}
+%   {} & {\bf Negative} & {\bf Neutral} & {\bf Positive} & {\bf Irrelevant}\\
+%   {\bf Negative}   & {} & {} & {} & {}\\
+%   {\bf Neutral}    & {} & {} & {} & {}\\
+%   {\bf Positive}   & {} & {} & {} & {}\\
+%   {\bf Irrelevant} & {} & {} & {} & {}\\
+% \end{tabular}
+
+
+
+%Loss: 0.275 Accuracy: 90.00%
+%0	Negative	Neutral	Positive	Irrelevant
+%Negative	321	16	3	20
+%Neutral	8	286	4	6
+%Positive	4	2	125	16
+%Irrelevant	11	9	1	168
+\begin{tabular}{lcccc}
+  {} & {\bf Negative} & {\bf Neutral} & {\bf Positive} & {\bf Irrelevant}\\
+  {\bf Negative}   & {321} & {16} & {3} & {20}\\
+  {\bf Neutral}    & {8} & {286} & {4} & {6}\\
+  {\bf Positive}   & {4} & {2} & {125} & {16}\\
+  {\bf Irrelevant} & {11} & {9} & {1} & {168}\\
+\end{tabular}
+
+
 
 \subsection{Many-to-many}
 

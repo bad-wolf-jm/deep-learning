@@ -1,0 +1,10 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{x\PYGZus{}in} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{placeholder}\PYG{p}{(}\PYG{n}{shape}\PYG{o}{=}\PYG{p}{[}\PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{])}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{one\PYGZus{}hot}\PYG{p}{(}\PYG{n}{x\PYGZus{}in}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{)}
+\PYG{n}{y\PYGZus{}in} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{placeholder}\PYG{p}{(}\PYG{n}{shape}\PYG{o}{=}\PYG{p}{[}\PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{])}
+\PYG{n}{y} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{one\PYGZus{}hot}\PYG{p}{(}\PYG{n}{y\PYGZus{}in}\PYG{p}{,} \PYG{l+m+mi}{15}\PYG{p}{)}
+\PYG{n}{W} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{Variable}\PYG{p}{(}\PYG{n}{shape}\PYG{o}{=}\PYG{p}{[}\PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{15}\PYG{p}{])}
+\PYG{n}{b} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{Variable}\PYG{p}{(}\PYG{n}{shape}\PYG{o}{=}\PYG{p}{[}\PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{l+m+mi}{15}\PYG{p}{])}
+\PYG{n}{F} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{softmax}\PYG{p}{(}\PYG{n}{tf}\PYG{o}{.}\PYG{n}{matmul}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{W}\PYG{p}{)} \PYG{o}{+} \PYG{n}{b}\PYG{p}{)}
+\PYG{n}{loss} \PYG{o}{=} \PYG{n}{tf}\PYG{o}{.}\PYG{n}{cross\PYGZus{}entropy}\PYG{p}{(}\PYG{n}{y}\PYG{p}{,} \PYG{n}{F}\PYG{p}{)}
+\end{Verbatim}
