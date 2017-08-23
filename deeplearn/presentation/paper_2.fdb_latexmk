@@ -1,8 +1,8 @@
 # Fdb version 3
-["pdflatex"] 1503437374 "paper_2.tex" "/home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.pdf" "paper_2" 1503437376
+["pdflatex"] 1503517064 "paper_2.tex" "/home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.pdf" "paper_2" 1503517066
   "/dev/null" 1503407854 0 d41d8cd98f00b204e9800998ecf8427e ""
   "/etc/texmf/web2c/texmf.cnf" 1486668373 1101 af7716885e081ab43982cab7b4672c1a ""
-  "/home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.aux" 1503437376 2077 6d5da622a61a76c7f3af8f997a41d325 ""
+  "/home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.aux" 1503517065 2274 898367d1810ca3ffc4731f3e82157ac8 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1246382020 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -169,13 +169,13 @@
   "fvextra.sty" 1503319819 50568 c2b40450dceec7d451285b9acd7d9214 ""
   "minted.sty" 1503319819 47165 6a3e43a8d03bd86910a1dbf68d6c3645 ""
   "paper_2.aex" 0 -1 0 ""
-  "paper_2.aux" 1503437376 2077 6d5da622a61a76c7f3af8f997a41d325 ""
-  "paper_2.tex" 1503437374 39961 2fb61b203e1cdcee6f3ff1e944583be1 ""
+  "paper_2.aux" 1503517065 2274 898367d1810ca3ffc4731f3e82157ac8 ""
+  "paper_2.tex" 1503517063 41511 db7e4d73e3cacb69a5571519d60fc973 ""
   "paper_2.w18" 0 -1 0 ""
   (generated)
-  "paper_2.log"
-  "/home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.log"
-  "paper_2.pyg"
   "/home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.pdf"
-  "paper_2.pdf"
   "paper_2.aux"
+  "paper_2.pdf"
+  "/home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.log"
+  "paper_2.log"
+  "paper_2.pyg"

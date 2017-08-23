@@ -75,53 +75,29 @@ F = tf.softmax(tf.matmul(x, W) + b)
 loss = tf.cross_entropy(y, F)
 \end{minted}
 
-The softmax function in the penultimate line is defined by $\sigma(\v) = \w$  where $$w_i= \frac{e^{v_i}}{\sum e^{v_j}}$$ Note that $\sum w_j=1$, which means that the output of the softmax function can be interpreted as a probability distribution.  This makes it a popular choice for classification problems with many classes.  If the target space is $\R^2$, then this reduces to a binomial distribution.  The cross-entropy function in the last line is defined by $C(\v, \w) = -\sum(v_i\log(w_i))$.  Intuitively, $C$ measures the number of vector components that are necessary to differentiate between the distribution $\v$ and the distribution $\w$.  Therefore, the optimal value for $C$ to have is $1$: measuring any bit should allow us to differentiate between $\v$ and $\w$.  Note that $C(\v, \w)=1$ if and only if $\log C(\v, \w)=0$, so that the logarithm of the cross entropy function is a candidate for a distance function. The vector $\w$ here should be the output of the model, whereas $\v$ should be the true value.  By definition, $w_i= \frac{e^{v_i}}{\sum e^{v_j}}$, so that $\log(w_i) = \log e^{w_i} - \log(\sum e^{v_j}) = w_i - \log(\sum e^{v_j})$. By definition again, $v_i=1$ and $v_j=0$ if $i\not=j$. Therefore, $C(\v, \w) = w_i + \log(\sum e^{w_j})$
+The softmax function in the penultimate line is defined by $\sigma(\v) = \w$  where $$w_i= \frac{e^{v_i}}{\sum e^{v_j}}$$ Note that $\sum w_j=1$, which means that the output of the softmax function can be interpreted as a probability distribution.  This makes it a popular choice for classification problems with many classes.  If the target space is $\R^2$, then this reduces to a binomial distribution.  The cross-entropy function in the last line is defined by $C(\v, \w) = -\sum(v_i\log(w_i))$.  Intuitively, $C$ measures the number of vector components that are necessary to differentiate between the distribution $\v$ and the distribution $\w$.  Therefore, the optimal value for $C$ to have is $N$: measuring any bit should allow us to differentiate between $\v$ and $\w$.  Note that $C(\v, \w)=1$ if and only if $\log C(\v, \w)=0$, so that the logarithm of the cross entropy function is a candidate for a distance function. The vector $\w$ here should be the output of the model, whereas $\v$ should be the true value.  By definition, $w_i= \frac{e^{v_i}}{\sum e^{v_j}}$, so that $\log(w_i) = \log e^{w_i} - \log(\sum e^{v_j}) = w_i - \log(\sum e^{v_j})$. By definition again, $v_i=1$ and $v_j=0$ if $i\not=j$. Therefore, $C(\v, \w) = w_i + \log(\sum e^{w_j})$
 
- % \begin{example}
- % Let $f(x)=x(x-1)(x+1)$.  As an example, we will try to fit a linear function
- % $\ell(x)=ux+v$ to $f$.  The class $\C$ is defined by $\C=\{ux+v:u,v\in R\}$.
- % For an element $g(x, u, v)\in\C$, we have $$f(x)-g(x,u,v) = x^3-x - ux+v$$
- % From this we get
- % \begin{eqnarray*}
- %   (f(x)-g(x,u,v))^2 &=& (x^3 - (1-u)x + v)^2 \\
- %   {} &=& x^6 - 2(1-u)x^4 + 2vx^3 + (1-u)^2x^2 - \\
- %   {} & & 2(1-u)vx + v^2
- % \end{eqnarray*}
- % If we compute $\int_{-1}^1 (f(x)-g(x,u,v))^2$, we get
- %
- % \begin{eqnarray*}
- %   \int_{-1}^1(f(x)-g(x; u,v))^2 &=& \int_{-1}^1(x^3 - (1-u)x + v)^2 \\
- %   {} &=& \int_{-1}^1x^6 - 2(1-u)x^4 + 2vx^3 + (1-u)^2x^2 - 2(1-u)vx + v^2\\
- %   {} &=& \frac{x^7}{7}-2v\frac{x^4}{4} + (1-u)^2\frac{x^3}{3} - 2(1-u)v\frac{x^2}{2}+v^2x\\
- %   {} &=& \frac{1}{7}-2v\frac{1}{4} + (1-u)^2\frac{1}{3} - 2(1-u)v\frac{1}{2}+v^2\\
- %   {} & & +\frac{1}{7}-2v\frac{1}{4} + (1-u)^2\frac{-1}{3} - 2(1-u)v\frac{1}{2}-v^2\\
- %   {} &=& \frac{2}{7} - (2-u)v+v^2 = \ell(u,v)
- % \end{eqnarray*}
- % and note that the last line above is a function of $u$ and $v$ alone, and we have to minimize it.
- % \end{example}
 
 \section{Dealing with sequences}
 
-Let $A$ be a finite set. We define the set $A^*$ of all finite sequences of elements of $A$ to be the smallest set $X$ with the property that the empty sequence $\epsilon$ is in $X$, and whenever $w\in X$ and $a\in A$, the sequence $aw\in X$. If $A$ and $B$ are two finite sets, and $f:A\to B$ is any function, then we can extend $f$ extends uniquely to a function $f^*:A^*\to B^*$, which is defined by $f(a_1a_2,...,a_n)=f(a_1)f(a_2)\cdots f(a_n)$. This $f^*$ is the only function extending $f$ which satisfies $f(vw)=f(v)f(w)$.
+\subsection{Basic theory} Classical neural networks are great for classification problems involving either fixed (finite) sets $f:A\to B$, where $A$ represents the set to be classified, and $B$ is the set of labels, or functions $f:\R^n\to B$. An example of the latter is image classification, since an $n\times m$ image can be directly represented as a vector in $\R^{\ell mn}$. In many cases, however, the data to be classified is better represented as a (finite) sequence.  For example, sentences are sequences of words, words are sequences of letters, movies are sequences of images, and sound files are sequences of amplitudes.  It is possible to deal with sequences with ordinary neural networks, but we run into difficulties when we try to model dependency between different elements of a sequence.  Let $A$ be a finite set. A finite sequence of elements of $A$ is a tuple $(a_1,...,a_n)$, where $a_i\in A$ for every $i$.  Here the number $n$ is allowed to change.  The set of all finite sequences of elements of $A$ is denoted $A^*$.  From the definition we just gave, we have $A^*=\bigcup_{n\geq 0} A^n$, which is a good enough definition for our purpose.  If we are given two finite sets $A$ and $B$, there are many situations we can consider if we also have access to $A^*$ and $B^*$.
+\begin{enumerate}
+  \item A function $f:A\to B^*$, which given an element of $A$ outputs a sequence of elements of $B$.  This is called a {\em one-to-many} function. We use this architecture in a sequence sorting neural network. The Tweet2Vec autoencoder also uses a one-to-many neural network.
+  \item A function $f:A^*\to B$, which is given a sequence of elments of $A$ and produces a single element of $B$.  This is called a {\em many-to-one} function.  A good example of sich a function is the Buzzometer sentiment analysis tool which assigns a single sentiment value to messages which can vary in length.
+  \item A function $f:A^*\to B^*$ which is given a seuqence of elements of $A$< and outputs a sequence of elements of $B$.  This is called a {\em many-to-many} function.  As an example of such a function we will show the implementation of a simple text generator.  Translation, video captioning, part-of-speech tagging and speech recognition are all examples of many-to-many functions.
+\end{enumerate}
 
-Let $S$ be another finite set with a distinguished element $\perp\in S$, and let $f:A\times S\to B\times S$ be a function. We can use $f$ to define a function $f^*:A^*\to B^*$ in several ways. Consider an auxiliary function $f^*:A^*\to B^*\times S$ by defining First we define $f^*(\epsilon)=(\epsilon, \perp)$. If $a\in A$ then $f^*(a)=f(a, \perp)$. If $v=aw$, then by induction we can compute $f^*(w)=(u, s)$. Write $f(a, s)=(b, s')$, and define $f^*(aw)=(bu, s')$.  We can produce a function $f^*:A^*\to B^*$ by taking $f^*(w)=\pi_2 g(w)$.
+We can of course define functions $A\to B^*$, $A^*\to B$ and $A^*\to B^*$ directly (they are just sets, after all), but it is more interesting and instructive to make use of the structure of $A^*$ and $B^*$ as sets of sequences of $A$ and $B$, and see how one can use a function (or class of functions) $A\to B$ to define a function $A^*\to B^*$. In particular, we will me making use of the iterative nature of the construction $A^*$ and $B^*$. Here is the simplest example: if $A=B$, and $f:A\to A$ is a function, then we can iterate $f$: $f^0(a)=a$ for every $a\in A$, and $f^{n+1}(a) = f(f^n(a))$. We terminate the iteration at the first value of $n$ for which $f^n(a)=f^{n-1}(a)$ (note that there is no guarantee that this will ever happen). This gives a function $f:A\to A^\omega$.
 
-We can use $f$ to define a function $f^*:A^*\to B$. Consider an auxiliary function $f^*:A^*\to B\times S$ by defining First we define $f^*(\epsilon)=(b_0, \perp)$. If $a\in A$ then $f^*(a)=f(a, \perp)$. If $v=aw$, then by induction we can compute $f^*(w)=(u, s)$. Write $f(a, s)=(b, s')$, and define $f^*(aw)=(b, s')$.  We can produce a function $f^*:A^*\to B$ by taking $f^*(w)=\pi_2 g(w)$.
+We describe a more general situation. Let $S$ be a (finite) set of {\em states} with a distinguished element $\perp\in S$, and consider a function $f:A\times S\to B\times S$. Let $a_1,...,a_n$ be a finite sequence of elements of $A$.  We define two sequences $b_1,...,b_n$ and $s_1,...,s_n$ of elements of $B$ and $S$ respectively as follows.  We first define $b_1, s_1 = f(a_1, \perp)$.  Suppose that we have defined the elements $b_1,...,b_n$ and $s_1,...,s_n$.  We define $b_{n+1}$ and $s_{n+1}$ via $b_{n+1}, s_{n+1} = f(a_{n+1}, s_n)$.  We define $f^*(a_1...a_n)=b_1...b_n$, with $b_1,...,b_n$ defined as above.  This is a function $f^*:A^*\to B^*$, and it has the property that the length of the output sequence is the same as that of the input sequence.  An interesting special case of this is when $S=B$. In this case, we can have $f:A\times B\to B$. We can define b_1 = f(a_1, \perp)$, and $b_{n+1}=f(a_{n+1}, b_n)$. This is in fact the main type of function we use in our examples later.
 
-Let $S$ be another finite set with a distinguished element $\perp\in S$, and let $f:A\times S\to B\times S$ be a function. We can use $f$ to define a function $f^*:A\to B^N$ for every $N$ in several ways. Consider an auxiliary function $f^*:A\to B^N\times S$ by defining. If $a\in A$ then $f^*(a)_1=f(a, \perp)$. Suppose $f^*(a)_n=(w, s)$, and  $f(a, s) = (b, s')$, then $f^*(a)_{n+1}=(bw, s')$.  This is an example of a one-to-many function. If $A$ has a distinguished element $a_0$, then we can define $f^*(a)_1=f(a, \perp)$, and $f^*(a)_n=(w, s)$, and  $f(a_0, s) = (b, s')$, then $f^*(a)_{n+1}=(bw, s')$.  This is an example of a one-to-many function.  Note that this is a special case of the many to many function, where $f^*(a)$ is just defined as $f^*(aaa\cdots a)$, or $f^*(aa_0\cdots a_0)$.
+We use the exact same method to define a many-to-one function. If $f:A\times S\to B\times S$ is a function, and  $a_1,...,a_n$, $b_1,...,b_n$ and $s_1,...,s_n$ are defined as above, then we define $f^*(a_1,...,a_n)=b_n$.  In other words, we discard all elements of $B$ produced during the iteration, and keep only the last one.
 
-
-%If $v=aw$, then by induction we can compute $f^*(w)=(u, s)$. Write $f(a, s)=(b, s')$, and define $f^*(aw)=(bu, %s')$.  We can produce a function $f^*:A^*\to B^*$ by taking $f^*(w)=\pi_2 g(w)$.
-%  We can then define $f^*(v)=f^*(aw)=f(a, s) = (w', s')$, or mode formally, $f^*(aw)=f(a, \pi_2f^*(w)$
-%
-%$f^*(v)=f^*()
-%
-%There is more than one way to extend a recurrent function to a set of sequences
-
+Finally, we tackle the case of a one-to-many function. Again we let $f:A\times S\to B\times S$ be any function. We define sequences $b_1,...,b_i,...$ and $s_1,...,s_i,...$ as follows. $b_1,s_1=f(a,\perp)$, and for every $n$, $b_{n+1}, s_{n+1}=f(a, s_n)$. In other words, we keep iterating $f$, feeding $a$ as input at every step. An imoprtant variant of this is when $a$ itself has a distinguished element $\perp_A$, in which case, after feeding $a$ as an input to $f$ in the first iteration, we subsequently feed it $\perp_A$, and get $b_{n+1}, s_{n+1}=f(\perp_A, s_n)$.  We stop the iteration whenever $s_n=\perp$ (or any other predetermined element of $S$). Note that this may never happen, i.e. the sequence $b_n$ may go on forever. In fact, there is no way to give a general pattern of definition for $f:A\times S\to B\times S$ which will guarantee that $f^*(a)$ is finite for every $a$.
 
 
 
-\section{The base of recurrent networks}
+\subsection{The base of recurrent networks}
 
 Consider a function $f:U\times S\to V\times S$, where $U$, $V$ and $S$ are finite dimensional vector spaces.
 Note that every vector space has a a distinguished element $0$, the zero-vector.  Let $u_1,...,u_n$ be a finite
@@ -184,7 +160,7 @@ Training a recurrent network is the same as producing a Turing machine.
 
 \section{Back Propagation}
 
-In general, in order to minimize a function $f(w)$ of one variable, we make use of the fact that the extreme values of $f$ all have $f'(x)=0$.  If $f$ is a function of two or more variables, then if $x$ is such that $f(x)$ is a local max, or minimum, then all partial derivatives $\frac{\partial f}{\partial w_i}(x)=0$.  If $f:\R^n\to\R$ is a function, then the {\em gradient} of $f$ is the vector $\nabla f(x) = \left(\frac{\partial f}{\partial w_1}(x),...,\frac{\partial f}{\partial w_n}(x)\right)$. One interesting property of $\nabla f(x)$ is that, as a vector, it ``points'' in the direction in which $f$ decreases the most.  That is to say, there is a good chance that $f(x-\alpha\nabla f(x))\leq f(x)$. The chance is better the smaller $\alpha$ is.  We see that if we iterate that process, we get a sequence $x_1,...,x_n,...$ such that $f(x_{i+1})\leq f(x_i)$ for every $i$.  Since $m\leq f(x_i)\leq f(x_0)$ for every $i$, we get a bounded decreasing sequence of real number, which converges.
+\subsection{The standard version} In general, in order to minimize a function $f(w)$ of one variable, we make use of the fact that the extreme values of $f$ all have $f'(x)=0$.  If $f$ is a function of two or more variables, then if $x$ is such that $f(x)$ is a local max, or minimum, then all partial derivatives $\frac{\partial f}{\partial w_i}(x)=0$.  If $f:\R^n\to\R$ is a function, then the {\em gradient} of $f$ is the vector $\nabla f(x) = \left(\frac{\partial f}{\partial w_1}(x),...,\frac{\partial f}{\partial w_n}(x)\right)$. One interesting property of $\nabla f(x)$ is that, as a vector, it ``points'' in the direction in which $f$ decreases the most.  That is to say, there is a good chance that $f(x-\alpha\nabla f(x))\leq f(x)$. The chance is better the smaller $\alpha$ is.  We see that if we iterate that process, we get a sequence $x_1,...,x_n,...$ such that $f(x_{i+1})\leq f(x_i)$ for every $i$.  Since $m\leq f(x_i)\leq f(x_0)$ for every $i$, we get a bounded decreasing sequence of real number, which converges.
 
 Caveat: this ideal situation doesn't allways happen.
 
@@ -200,8 +176,7 @@ becomes very close to $0$, and the update rule for gradient descent stops changi
 This is the vanishing gradient problem for very deep networks, and makes convergence slow.
 
 
-\section{Backward Propagation Through Time}
-
+\subsection{Backward Propagation Through Time}
 How do we train recurrent neural networks? we can use back propagation, just like a regular neural network. Heuristically, we unroll the recurrent network ``infinitely'' many times, until it looks like an ordinary very deep neural network.  In practice, since computers only have a finite amount of resources, we only unroll the network a large but finite number of times, and treat it like an ordinary neural network.
 
 \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=1cm]

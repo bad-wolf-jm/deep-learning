@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.2.9)  22 AUG 2017 17:29
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.2.9)  23 AUG 2017 15:37
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -544,7 +544,19 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
  (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/default-pyg-prefix.pygstyle) (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/default.pygstyle) (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/CF2F2E40197FAEA81FDC434511CDF97A63279F0B8AA50BFDA1A685C4B0C2F183.pygtex [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
 \openout4 = `paper_2.pyg'.
 
- (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/9F08B9D95D86992374491D665C26E90F63279F0B8AA50BFDA1A685C4B0C2F183.pygtex) [2] [3] [4]
+ (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/9F08B9D95D86992374491D665C26E90F63279F0B8AA50BFDA1A685C4B0C2F183.pygtex) [2]
+/home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.tex:92: Missing $ inserted.
+<inserted text> 
+                $
+l.92 ... have $f:A\times B\to B$. We can define b_
+                                                  1 = f(a_1, \perp)$, and $b...
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+[3]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [4] [5]
 \openout4 = `paper_2.pyg'.
 
  (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/A46208F8D86E617BD8AA727D6B10950063279F0B8AA50BFDA1A685C4B0C2F183.pygtex
@@ -553,53 +565,49 @@ LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10> not available
 )
 \openout4 = `paper_2.pyg'.
 
-
-(/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/43EA0688221BDB000305C8A53DDA51FA63279F0B8AA50BFDA1A685C4B0C2F183.pygtex [5])
+ (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/43EA0688221BDB000305C8A53DDA51FA63279F0B8AA50BFDA1A685C4B0C2F183.pygtex [6])
 \openout4 = `paper_2.pyg'.
 
- (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/E5B76A559976E32C34A43E0CF998BF0163279F0B8AA50BFDA1A685C4B0C2F183.pygtex)
-Underfull \vbox (badness 1009) has occurred while \output is active []
-
- [6]
+ (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/E5B76A559976E32C34A43E0CF998BF0163279F0B8AA50BFDA1A685C4B0C2F183.pygtex) [7]
 \openout4 = `paper_2.pyg'.
 
- (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/78350D5970E741089420595D5EF5205563279F0B8AA50BFDA1A685C4B0C2F183.pygtex
-Underfull \vbox (badness 1960) has occurred while \output is active []
+ (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/78350D5970E741089420595D5EF5205563279F0B8AA50BFDA1A685C4B0C2F183.pygtex)
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [7])
-Overfull \hbox (90.69583pt too wide) in paragraph at lines 621--622
- \OT1/cmr/m/n/10 7.2.\OT1/cmr/bx/n/10 Many-to-many.[] [] 
+ [8]
+Overfull \hbox (90.69583pt too wide) in paragraph at lines 596--597
+ \OT1/cmr/m/n/10 5.2.\OT1/cmr/bx/n/10 Many-to-many.[] [] 
  []
 
 \openout4 = `paper_2.pyg'.
 
-(/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/605F24333E968CE4E7A9D647E4E59BFB63279F0B8AA50BFDA1A685C4B0C2F183.pygtex [8])
+(/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/605F24333E968CE4E7A9D647E4E59BFB63279F0B8AA50BFDA1A685C4B0C2F183.pygtex [9])
 \openout4 = `paper_2.pyg'.
 
  (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/8821F93CA261374F32ED74F7CC3AA3D063279F0B8AA50BFDA1A685C4B0C2F183.pygtex)
 \openout4 = `paper_2.pyg'.
 
  (/home/jalbert/python/deep-learning/deeplearn/presentation/_minted-paper_2/A14B0524A890C0C9891353E50FB88E9B63279F0B8AA50BFDA1A685C4B0C2F183.pygtex
-Underfull \vbox (badness 4699) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [9]) [10] (/home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.aux)
+ [10]) [11] (/home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.aux)
 runsystem(rm paper_2.pyg)...executed.
 
  ) 
 Here is how much of TeX's memory you used:
  16986 strings out of 493029
  342932 string characters out of 6136235
- 464549 words of memory out of 5000000
+ 468063 words of memory out of 5000000
  20014 multiletter control sequences out of 15000+600000
  10533 words of font info for 41 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
  55i,7n,60p,1742b,798s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsf
 onts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on /home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.pdf (10 pages, 230139 bytes).
+Output written on /home/jalbert/python/deep-learning/deeplearn/presentation/paper_2.pdf (11 pages, 235673 bytes).
 PDF statistics:
- 108 PDF objects out of 1000 (max. 8388607)
- 78 compressed objects within 1 object stream
+ 111 PDF objects out of 1000 (max. 8388607)
+ 80 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  13 words of extra memory for PDF output out of 10000 (max. 10000000)
 
