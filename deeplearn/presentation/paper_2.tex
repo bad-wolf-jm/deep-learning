@@ -18,6 +18,7 @@
 \newcommand{\y}{\mathbf{y}}
 \renewcommand{\b}{\mathbf{b}}
 \newcommand{\e}{\mathbf{e}}
+\newcommand{\s}{\mathbf{s}}
 
 
 \newcommand{\A}{\mathbf{A}}
@@ -89,35 +90,28 @@ The softmax function in the penultimate line is defined by $\sigma(\v) = \w$  wh
 
 We can of course define functions $A\to B^*$, $A^*\to B$ and $A^*\to B^*$ directly (they are just sets, after all), but it is more interesting and instructive to make use of the structure of $A^*$ and $B^*$ as sets of sequences of $A$ and $B$, and see how one can use a function (or class of functions) $A\to B$ to define a function $A^*\to B^*$. In particular, we will me making use of the iterative nature of the construction $A^*$ and $B^*$. Here is the simplest example: if $A=B$, and $f:A\to A$ is a function, then we can iterate $f$: $f^0(a)=a$ for every $a\in A$, and $f^{n+1}(a) = f(f^n(a))$. We terminate the iteration at the first value of $n$ for which $f^n(a)=f^{n-1}(a)$ (note that there is no guarantee that this will ever happen). This gives a function $f:A\to A^\omega$.
 
-We describe a more general situation. Let $S$ be a (finite) set of {\em states} with a distinguished element $\perp\in S$, and consider a function $f:A\times S\to B\times S$. Let $a_1,...,a_n$ be a finite sequence of elements of $A$.  We define two sequences $b_1,...,b_n$ and $s_1,...,s_n$ of elements of $B$ and $S$ respectively as follows.  We first define $b_1, s_1 = f(a_1, \perp)$.  Suppose that we have defined the elements $b_1,...,b_n$ and $s_1,...,s_n$.  We define $b_{n+1}$ and $s_{n+1}$ via $b_{n+1}, s_{n+1} = f(a_{n+1}, s_n)$.  We define $f^*(a_1...a_n)=b_1...b_n$, with $b_1,...,b_n$ defined as above.  This is a function $f^*:A^*\to B^*$, and it has the property that the length of the output sequence is the same as that of the input sequence.  An interesting special case of this is when $S=B$. In this case, we can have $f:A\times B\to B$. We can define b_1 = f(a_1, \perp)$, and $b_{n+1}=f(a_{n+1}, b_n)$. This is in fact the main type of function we use in our examples later.
+We describe a more general situation. Let $S$ be a (finite) set of {\em states} with a distinguished element $\perp\in S$, and consider a function $f:A\times S\to B\times S$. Let $a_1,...,a_n$ be a finite sequence of elements of $A$.  We define two sequences $b_1,...,b_n$ and $s_1,...,s_n$ of elements of $B$ and $S$ respectively as follows.  We first define $b_1, s_1 = f(a_1, \perp)$.  Suppose that we have defined the elements $b_1,...,b_n$ and $s_1,...,s_n$.  We define $b_{n+1}$ and $s_{n+1}$ via $b_{n+1}, s_{n+1} = f(a_{n+1}, s_n)$.  We define $f^*(a_1...a_n)=b_1...b_n$, with $b_1,...,b_n$ defined as above.  This is a function $f^*:A^*\to B^*$, and it has the property that the length of the output sequence is the same as that of the input sequence.  An interesting special case of this is when $S=B$. In this case, we can have $f:A\times B\to B$. We can define b_1 = f(a_1, \perp)$, and $b_{n+1}=f(a_{n+1}, b_n)$. This is in fact the main type of function we use in our examples later. Note that this is a state machine, close to a deterministic finite automaton, except that here the state space $S$ is allowed to be infinite.
 
 We use the exact same method to define a many-to-one function. If $f:A\times S\to B\times S$ is a function, and  $a_1,...,a_n$, $b_1,...,b_n$ and $s_1,...,s_n$ are defined as above, then we define $f^*(a_1,...,a_n)=b_n$.  In other words, we discard all elements of $B$ produced during the iteration, and keep only the last one.
 
 Finally, we tackle the case of a one-to-many function. Again we let $f:A\times S\to B\times S$ be any function. We define sequences $b_1,...,b_i,...$ and $s_1,...,s_i,...$ as follows. $b_1,s_1=f(a,\perp)$, and for every $n$, $b_{n+1}, s_{n+1}=f(a, s_n)$. In other words, we keep iterating $f$, feeding $a$ as input at every step. An imoprtant variant of this is when $a$ itself has a distinguished element $\perp_A$, in which case, after feeding $a$ as an input to $f$ in the first iteration, we subsequently feed it $\perp_A$, and get $b_{n+1}, s_{n+1}=f(\perp_A, s_n)$.  We stop the iteration whenever $s_n=\perp$ (or any other predetermined element of $S$). Note that this may never happen, i.e. the sequence $b_n$ may go on forever. In fact, there is no way to give a general pattern of definition for $f:A\times S\to B\times S$ which will guarantee that $f^*(a)$ is finite for every $a$.
 
 
+\subsection{Recurrent networks}
 
-\subsection{The base of recurrent networks}
-
-Consider a function $f:U\times S\to V\times S$, where $U$, $V$ and $S$ are finite dimensional vector spaces.
-Note that every vector space has a a distinguished element $0$, the zero-vector.  Let $u_1,...,u_n$ be a finite
-sequence of vectors in $U$.  We construct a sequence of vectors in $V$ as follows. Write $f(u_1, 0)=(v_1, s_1)$,
-and for every $i$, if $f(u_{i}, s_{i-1})=(v_i, s_i)$. Note that this is a state machine, close to a
-deterministic finite automaton, except that here the state space $S$ is infinite.
-
-The set $\{0,1\}^*$ of all finite sequences of $0$'s and $1$'s is countable, and $S$, being a real vector space,
+In general, a recurrent neural network is just a presceiption for a class of functions of the form $f:\R^n\times \R^\ell\times\R^m\to \R^m\times \R^\ell$, where $\R^m$ is the space of parameters. The set $\{0,1\}^*$ of all finite sequences of $0$'s and $1$'s is countable, and $\R^\ell$, being a real vector space,
 is uncountable.  Therefore, we can encode every element $w\in\{0,1\}^*$ as a vector in $S$.  Informally,
-$S$ is enough to encode any finite state space, and every possible value for the content of the tape of a
+$\R^\ell$ is enough to encode any finite state space, and every possible value for the content of the tape of a
 Turing machine. We get:
 
 \begin{theorem}
 Recurrent neural networks are Turing-complete.
 \end{theorem}
 
-which explains why recurrent neural networks seem to be able to produce results that other networks can't.
-Training a recurrent network is the same as producing a Turing machine.
+This explains why recurrent neural networks seem to be able to produce results that other networks can't. Training a recurrent network is the same as producing a Turing machine.  A common way to represent a recurrent node is to use a box, the inside of which represent the definition of $f$.  The vertical arrows represent the input and onput of the node, and the horisontal arrows represent the input and output state of the node.
 
-\begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=1cm]
+\begin{center}
+  \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=1cm]
     \tikzstyle{arrow} = [thick,->,>=stealth]
     \tikzstyle{startstop} = [rectangle, minimum width=2cm, minimum height=.75cm, text centered, draw=black, fill=black!20]
     \node (input) [] at (0cm,1cm) {};
@@ -130,7 +124,11 @@ Training a recurrent network is the same as producing a Turing machine.
     \draw [arrow] (N) -- (output);
     \draw [arrow] (N) -- (s-output);
 \end{tikzpicture}
+\end{center}
 
+Just like any regular neural network layer, recurrent nodes can be composed.  The composition of two recurrent nodes is done by feeding the output of one node into the input of the other, and concatenating their state space.  Formally, if $f:\R^n\times \R^\ell\times\to \R^m\times \R^\ell$ and $g:\R^n\times \R^\ell\times\to \R^m\times \R^\ell$ are two recurrent nodes, then we have the node $(f;g):\R^m\times\R^\ell\times\R^L\to\R^k\times\R^\ell\times\R^L$ defined by $(f;g)(\x, \s_1, \s_2) = (\y, \s'_1, \s'_2)$ where $f(\x, \s_1) = \x', \s'_1$ and $g(\x', \s_2) = \y, \s'_2$. Graphically, we can represent this by stacking the boxes representing $f$ and $g$ on top of one another
+
+\begin{center}
 \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=1cm]
     \tikzstyle{arrow} = [thick,->,>=stealth]
     \tikzstyle{startstop} = [rectangle, minimum width=1.5cm, minimum height=.6cm, text centered, draw=black, fill=black!20]
@@ -156,7 +154,7 @@ Training a recurrent network is the same as producing a Turing machine.
     \draw [arrow] (B) -- (C);
     \draw [arrow] (C) -- (output);
 \end{tikzpicture}
-
+\end{center}
 
 \section{Back Propagation}
 

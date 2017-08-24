@@ -223,7 +223,7 @@ if __name__ == '__main__':
             s.save(session, os.path.join(chkpt, "t_gen_weights"))
             print('Model restored')
 
-        for batch in rnn_minibatch_sequencer(data, 32, Hyperparameters.sequence_length, nb_epochs=100):
+        for batch in rnn_minibatch_sequencer(data, 32, Hyperparameters.sequence_length, nb_epochs=500):
             x = batch['train_x']
             y = batch['train_y']
             feed_dict = {Globals.model_input: x,
@@ -237,7 +237,7 @@ if __name__ == '__main__':
                 file_name = "text_gen-{}".format(index)
                 file_name = os.path.join(save, file_name)
                 with open(file_name, 'w') as test_file:
-                    test_file.write(generate_text(20000, session))
+                    test_file.write(generate_text(2000, session))
             if index % 250 == 0:
                 s = tf.train.Saver()
                 s.save(session, os.path.join(chkpt, "t_gen_weights"))
