@@ -1,0 +1,31 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{rnn\PYGZus{}minibatch\PYGZus{}sequencer}\PYG{p}{(}\PYG{n}{raw\PYGZus{}data}\PYG{p}{,} \PYG{n}{batch\PYGZus{}size}\PYG{p}{,} \PYG{n}{sequence\PYGZus{}size}\PYG{p}{,} \PYG{n}{nb\PYGZus{}epochs}\PYG{p}{):}
+    \PYG{n}{data} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{x} \PYG{k}{for} \PYG{n}{x} \PYG{o+ow}{in} \PYG{n}{raw\PYGZus{}data}\PYG{p}{])}
+    \PYG{n}{data\PYGZus{}len} \PYG{o}{=} \PYG{n}{data}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+    \PYG{c+c1}{\PYGZsh{} using (data\PYGZus{}len\PYGZhy{}1) because we must provide for the sequence shifted by 1 too}
+    \PYG{n}{nb\PYGZus{}batches} \PYG{o}{=} \PYG{p}{(}\PYG{n}{data\PYGZus{}len} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{//} \PYG{p}{(}\PYG{n}{batch\PYGZus{}size} \PYG{o}{*} \PYG{n}{sequence\PYGZus{}size}\PYG{p}{)}
+
+    \PYG{n}{total\PYGZus{}num\PYGZus{}batches} \PYG{o}{=} \PYG{p}{(}\PYG{n}{data\PYGZus{}len} \PYG{o}{*} \PYG{n}{nb\PYGZus{}epochs}\PYG{p}{)} \PYG{o}{//} \PYG{n}{batch\PYGZus{}size}
+    \PYG{c+c1}{\PYGZsh{}batches\PYGZus{}per\PYGZus{}epoch = len(data\PYGZus{}x) // batch\PYGZus{}size}
+
+    \PYG{k}{assert} \PYG{n}{nb\PYGZus{}batches} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}Not enough data, even for a single batch. Try using a smaller batch\PYGZus{}size.\PYGZdq{}}
+    \PYG{n}{rounded\PYGZus{}data\PYGZus{}len} \PYG{o}{=} \PYG{n}{nb\PYGZus{}batches} \PYG{o}{*} \PYG{n}{batch\PYGZus{}size} \PYG{o}{*} \PYG{n}{sequence\PYGZus{}size}
+    \PYG{n}{xdata} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{data}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{n}{rounded\PYGZus{}data\PYGZus{}len}\PYG{p}{],} \PYG{p}{[}\PYG{n}{batch\PYGZus{}size}\PYG{p}{,} \PYG{n}{nb\PYGZus{}batches} \PYG{o}{*} \PYG{n}{sequence\PYGZus{}size}\PYG{p}{])}
+    \PYG{n}{ydata} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{data}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{n}{rounded\PYGZus{}data\PYGZus{}len} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{],} \PYG{p}{[}\PYG{n}{batch\PYGZus{}size}\PYG{p}{,} \PYG{n}{nb\PYGZus{}batches} \PYG{o}{*} \PYG{n}{sequence\PYGZus{}size}\PYG{p}{])}
+    \PYG{n}{I} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{k}{for} \PYG{n}{epoch} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nb\PYGZus{}epochs}\PYG{p}{):}
+        \PYG{k}{for} \PYG{n}{batch} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nb\PYGZus{}batches}\PYG{p}{):}
+            \PYG{n}{x} \PYG{o}{=} \PYG{n}{xdata}\PYG{p}{[:,} \PYG{n}{batch} \PYG{o}{*} \PYG{n}{sequence\PYGZus{}size}\PYG{p}{:(}\PYG{n}{batch} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{*} \PYG{n}{sequence\PYGZus{}size}\PYG{p}{]}
+            \PYG{n}{y} \PYG{o}{=} \PYG{n}{ydata}\PYG{p}{[:,} \PYG{n}{batch} \PYG{o}{*} \PYG{n}{sequence\PYGZus{}size}\PYG{p}{:(}\PYG{n}{batch} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{*} \PYG{n}{sequence\PYGZus{}size}\PYG{p}{]}
+            \PYG{n}{x} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{roll}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{n}{epoch}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} to continue the text from epoch to epoch (do not reset rnn state!)}
+            \PYG{n}{y} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{roll}\PYG{p}{(}\PYG{n}{y}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{n}{epoch}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}
+            \PYG{n}{I} \PYG{o}{+=} \PYG{l+m+mi}{1}
+            \PYG{k}{yield} \PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}train\PYGZus{}x\PYGZsq{}}\PYG{p}{:}  \PYG{n}{x}\PYG{p}{,}
+                   \PYG{l+s+s1}{\PYGZsq{}train\PYGZus{}y\PYGZsq{}}\PYG{p}{:}  \PYG{n}{y}\PYG{p}{,}
+                   \PYG{l+s+s1}{\PYGZsq{}validate\PYGZsq{}}\PYG{p}{:} \PYG{n+nb+bp}{None}\PYG{p}{,}
+                   \PYG{l+s+s1}{\PYGZsq{}batch\PYGZus{}number\PYGZsq{}}\PYG{p}{:}  \PYG{n}{batch}\PYG{p}{,}
+                   \PYG{l+s+s1}{\PYGZsq{}epoch\PYGZus{}number\PYGZsq{}}\PYG{p}{:}  \PYG{n}{epoch}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{,}
+                   \PYG{l+s+s1}{\PYGZsq{}batch\PYGZus{}index\PYGZsq{}}\PYG{p}{:}   \PYG{n}{I}\PYG{p}{,}
+                   \PYG{l+s+s1}{\PYGZsq{}total\PYGZus{}batches\PYGZsq{}}\PYG{p}{:} \PYG{n}{total\PYGZus{}num\PYGZus{}batches}\PYG{p}{,}
+                   \PYG{l+s+s1}{\PYGZsq{}total\PYGZus{}epochs\PYGZsq{}}\PYG{p}{:}  \PYG{n}{nb\PYGZus{}epochs}\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

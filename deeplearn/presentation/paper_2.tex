@@ -126,7 +126,7 @@ This explains why recurrent neural networks seem to be able to produce results t
 \end{tikzpicture}
 \end{center}
 
-Just like any regular neural network layer, recurrent nodes can be composed.  The composition of two recurrent nodes is done by feeding the output of one node into the input of the other, and concatenating their state space.  Formally, if $f:\R^n\times \R^\ell\times\to \R^m\times \R^\ell$ and $g:\R^n\times \R^\ell\times\to \R^m\times \R^\ell$ are two recurrent nodes, then we have the node $(f;g):\R^m\times\R^\ell\times\R^L\to\R^k\times\R^\ell\times\R^L$ defined by $(f;g)(\x, \s_1, \s_2) = (\y, \s'_1, \s'_2)$ where $f(\x, \s_1) = \x', \s'_1$ and $g(\x', \s_2) = \y, \s'_2$. Graphically, we can represent this by stacking the boxes representing $f$ and $g$ on top of one another
+Just like any regular neural network layer, recurrent nodes can be composed.  The composition of two recurrent nodes is done by feeding the output of one node into the input of the other, and concatenating their state space.  Formally, if $f:\R^n\times \R^\ell\times\to \R^m\times \R^\ell$ and $g:\R^n\times \R^\ell\times\to \R^m\times \R^\ell$ are two recurrent nodes, then we have the node $(f;g):\R^m\times\R^\ell\times\R^L\to\R^k\times\R^\ell\times\R^L$ defined by $(f;g)(\x, \s_1, \s_2) = (\y, \s'_1, \s'_2)$ where $f(\x, \s_1) = \x', \s'_1$ and $g(\x', \s_2) = \y, \s'_2$. Graphically, we can represent this by stacking the boxes representing $f$ and $g$ on top of one another:
 
 \begin{center}
 \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=1cm]
@@ -156,7 +156,9 @@ Just like any regular neural network layer, recurrent nodes can be composed.  Th
 \end{tikzpicture}
 \end{center}
 
-\section{Back Propagation}
+The whole stack can then be seen as one single recurrent node.
+
+\section{Training}
 
 \subsection{The standard version} In general, in order to minimize a function $f(w)$ of one variable, we make use of the fact that the extreme values of $f$ all have $f'(x)=0$.  If $f$ is a function of two or more variables, then if $x$ is such that $f(x)$ is a local max, or minimum, then all partial derivatives $\frac{\partial f}{\partial w_i}(x)=0$.  If $f:\R^n\to\R$ is a function, then the {\em gradient} of $f$ is the vector $\nabla f(x) = \left(\frac{\partial f}{\partial w_1}(x),...,\frac{\partial f}{\partial w_n}(x)\right)$. One interesting property of $\nabla f(x)$ is that, as a vector, it ``points'' in the direction in which $f$ decreases the most.  That is to say, there is a good chance that $f(x-\alpha\nabla f(x))\leq f(x)$. The chance is better the smaller $\alpha$ is.  We see that if we iterate that process, we get a sequence $x_1,...,x_n,...$ such that $f(x_{i+1})\leq f(x_i)$ for every $i$.  Since $m\leq f(x_i)\leq f(x_0)$ for every $i$, we get a bounded decreasing sequence of real number, which converges.
 
@@ -225,22 +227,28 @@ How do we train recurrent neural networks? we can use back propagation, just lik
 
 \section{Types of Recurrent Cells}
 
-There are three main types of recurrent cells which are used to build recurrent neural networks.  Let us describe them, and give some of their basic properties, along with a na\"ive implementation in tensorflow.
+
+In this section we descripbe three of the main types of recurrent cells currently in use.  They are the basic recurrent cell, which is a straightforward implementation of a function $f:\R^n\times\R^\ell\to\R^\ell$, then long short term memory cell (LSTM), which is more suitable to model long term dependencies in sequences, and the gated recurrent unit cell, which is a simplification of the LSTM cell, but which performs almost equally well at long term dependencies. We give a formal definition of each oc these cells along with a na\"ive implementation in {\tt tensorflow}. The implementation we provide is only expositional though, and would not work out of the box in an actual production model.
+%There are three main types of recurrent cells which are used to build recurrent neural networks.  Let us describe them, and give some of their basic properties, along with a na\"ive implementation in tensorflow.
 
 \subsection{Basic Recurrent Cell} We begin with the most basic of recurrent cell. Abstractly, a function $f:U\times S\to V\times S$ can be defined using two functions $u:\R^n\times \R^\ell\to \R^n$ and $v:\R^n\times\R^\ell \to \R^\ell$. We se ethe former function as providing the output, and the latter function as a state updating function.  The most common definition for $u$ and $v$ for basic recurrent cells is as follows: $u(x, s) = f(A_ux+B_us)$, where $A$ nad $B$ are matrices, and $f$ is a non-linear function, and $v(x, s) = \tanh(A_vx+B_vs)$. Te parameters in this definition are $A_u$, $B_u$, $A_v$ and $B_v$. In tehsorflow, the code looks like:
 
 \begin{minted}{python}
-def basic_rnn_cell(input_tensor, state_tensor):
-  A_u = tf.Variable(shape=[N, L])
-  B_u = tf.Variable(shape=[L, L])
-  A_v = tf.Variable(shape=[N, L])
-  B_v = tf.Variable(shape=[L, L])
-  output_tensor = tf.relu(tf.matmul(input_tensor, A_u) +
+def basic_rnn_cell(input_tensor, state_tensor, output_dimension):
+  input_dimension = input_tensor.get_shape()[1]
+  state_dimension = input_tensor.get_shape()[1]
+  A_u = tf.Variable(shape=[input_dimension, output_dimension])
+  B_u = tf.Variable(shape=[state_dimension, output_dimension])
+  A_v = tf.Variable(shape=[input_dimension, state_dimension])
+  B_v = tf.Variable(shape=[state_dimension, state_dimension])
+  output_tensor = tf.relu(tf.matmul(input_tensor, A_u) + \
                             tf.matmul(state_tensor, B_u))
   new_state_tensor = tf.tanh(tf.matmul(input_tensor, A_v) + \
                                   tf.matmul(state_tensor, B_v))
   return output_tensor, new_state_tensor
 \end{minted}
+
+A variant of this cell uses the output as a state vector, thus computing every step as a function of the cirrent ouput, and the previous output.
 
 
 \subsection{Long Short-term Memory Cell} There are a few problems with the architecture described above.  First, it suffers greatly from the vanishing gradient problem, since there is no way to prevent gradients from becoming very small.  Secondly, simple recurrent networks have a hard time remembering facts about the input sequence.  To remedy this situation, long short-term memory cells were introduced.  The overall structure of an LSTM cell is almost the same as the basic RNN cell. This time we take the previous output into account, which gives the structure as $f:\R^n\times \R^m\times \R^{\ell}\to \R^m\times \R^{\ell}$ which can be divided as two function $u:\R^{n}\times\R^m\times \R^{\ell}\to \R^m$ and $v:\R^n\times \R^m\times\R^{\ell}\to \R^{\ell}$. To define the functione $u$ and $v$, we use auxiliary functions $F$, $I$, and $O$ defined as follows
@@ -549,6 +557,42 @@ The base input ofor this network is a (unicode) character, which is one-hot enco
 
 
 \subsection{Many-to-many}
+
+As an example of a many-to-many recurrent neural network, we propose an architecture that generates text in the style of a particular author, or body of text.  The architecture is very simple, and consists of three stacked GRU cells.  This model will also expose some of the challenges in training recurrent networks.  As an example, we trained the model on the text of the Harry Potter series, for a total of 500 epochs.  Every once in a while we paused the training to let it generate a sequence of about 2000 characters.  For training we network was unrolled to 30 characters, and the training was done in batches of 32 strings.  The main challenge for training is that the strings should continue from batch to batch.  For example, consider training a similar network unrolled to 2 characters with a batch size of 3.  Consider the sentence {\tt The quick brown fox jumps over the lazy dog}.  The first step is to cut the string into substrings of length 2:
+{\tt |Th|e |qu|ic|k |br|ow|n |fo|x |ju|mp|s |ov|er| t|he| l|az|y |do|g.|}. In a normal batching situation, we would then cut this liet of strings into chunks of length 3, like so
+{\tt |(Th|e |qu)|(ic|k |br)|(ow|n |fo)|(x |ju|mp)|(s |ov|er)|( t|he| l)|(az|y |do)|} but this causes a problem.  The first sequence of the first batch is {\tt Th}, which will leave the network in a certain state $s$. This For this state to be updated properly, the first element of the second batch should be {\tt |e |}, and {\em not} {\tt |ic|}.  We must therefore use a different batching strategy. The string will give us 7 batches in total, so we number the subsequences with a batch index from 1 to 7 in order, starting over at 1 when we run out of indices. The expected output, in this case, is the same as the input but shifted by one character. In code, the batching looks like:
+
+\begin{minted}{python}
+def rnn_minibatch_sequencer(raw_data, batch_size, sequence_size, nb_epochs):
+    data = np.array([x for x in raw_data])
+    data_len = data.shape[0]
+    # using (data_len-1) because we must provide for the sequence shifted by 1 too
+    nb_batches = (data_len - 1) // (batch_size * sequence_size)
+
+    total_num_batches = (data_len * nb_epochs) // batch_size
+    #batches_per_epoch = len(data_x) // batch_size
+
+    assert nb_batches > 0, "Not enough data, even for a single batch. Try using a smaller batch_size."
+    rounded_data_len = nb_batches * batch_size * sequence_size
+    xdata = np.reshape(data[0:rounded_data_len], [batch_size, nb_batches * sequence_size])
+    ydata = np.reshape(data[1:rounded_data_len + 1], [batch_size, nb_batches * sequence_size])
+    I = 0
+    for epoch in range(nb_epochs):
+        for batch in range(nb_batches):
+            x = xdata[:, batch * sequence_size:(batch + 1) * sequence_size]
+            y = ydata[:, batch * sequence_size:(batch + 1) * sequence_size]
+            x = np.roll(x, -epoch, axis=0)  # to continue the text from epoch to epoch (do not reset rnn state!)
+            y = np.roll(y, -epoch, axis=0)
+            I += 1
+            yield {'train_x':  x,
+                   'train_y':  y,
+                   'validate': None,
+                   'batch_number':  batch,
+                   'epoch_number':  epoch+1,
+                   'batch_index':   I,
+                   'total_batches': total_num_batches,
+                   'total_epochs':  nb_epochs}
+\end{minted}
 
 \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=1cm]
     \tikzstyle{arrow} = [thick,->,>=stealth]
