@@ -201,6 +201,12 @@ def generate_text(length, session=None):
         istate = state
     return generated_text
 
+def initialize_uninitialized_variables(session=None):
+    global_variables = tf.global_variables()
+    is_initialized = session.run([tf.is_variable_initialized(x) for x in global_variables])
+    uninitialized_variables = [x for (x, v) in zip(global_variables, is_initialized) if not v]
+    if len(uninitialized_variables) > 0:
+        session.run(tf.variables_initializer(uninitialized_variables))
 
 if __name__ == '__main__':
     root = os.path.dirname(__file__)
@@ -215,12 +221,14 @@ if __name__ == '__main__':
     index = 0
     istate = np.zeros([Hyperparameters.n_layers, 32, Hyperparameters.hidden_states])
     with tf.Session() as session:
-        session.run(tf.global_variables_initializer())
+        #session.run(tf.global_variables_initializer())
         if not os.path.exists(chkpt):
             os.makedirs(chkpt)
+            session.run(tf.global_variables_initializer())
         else:
             s = tf.train.Saver()
-            s.save(session, os.path.join(chkpt, "t_gen_weights"))
+            s.restore(session, os.path.join(chkpt, "t_gen_weights"))
+            initialize_uninitialized_variables(session)
             print('Model restored')
 
         for batch in rnn_minibatch_sequencer(data, 32, Hyperparameters.sequence_length, nb_epochs=1000):
@@ -233,12 +241,12 @@ if __name__ == '__main__':
             print('x', end='', flush=True)
             istate = ostate
             #print(index, batch['epoch_number'])
-            if index % (batch['epoch_number']*150) == 0:
+            if index % 300 == 0:
                 file_name = "text_gen-{}".format(index)
                 file_name = os.path.join(save, file_name)
                 with open(file_name, 'w') as test_file:
                     test_file.write(generate_text(4000, session))
-            if index % 250 == 0:
-                s = tf.train.Saver()
-                s.save(session, os.path.join(chkpt, "t_gen_weights"))
+            #if index % 250 == 0:
+            #    s = tf.train.Saver()
+            #    s.save(session, os.path.join(chkpt, "t_gen_weights"))
             index += 1
