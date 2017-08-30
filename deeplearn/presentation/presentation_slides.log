@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.8.24)  28 AUG 2017 16:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.8.24)  30 AUG 2017 16:52
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -832,15 +832,15 @@ LaTeX Font Warning: Font shape `OT1/cmss/m/n' in size <4> not available
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-LaTeX Font Info:    Try loading font information for U+msa on input line 53.
+LaTeX Font Info:    Try loading font information for U+msa on input line 61.
  (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 53.
+LaTeX Font Info:    Try loading font information for U+msb on input line 61.
  (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for OT1+mathkerncmss on input line 53.
+LaTeX Font Info:    Try loading font information for OT1+mathkerncmss on input line 61.
  (/usr/share/texlive/texmf-dist/tex/latex/sansmathaccent/ot1mathkerncmss.fd
 File: ot1mathkerncmss.fd 2013/03/27 Fontinst v1.933 font definitions for OT1/mathkerncmss.
 ) [2
@@ -871,96 +871,57 @@ File: lstlang1.sty 2015/06/04 1.6 listings language file
 
 ] [13
 
-] [14
-
 ]
-Overfull \hbox (40.80914pt too wide) in paragraph at lines 220--220
+Overfull \hbox (26.58276pt too wide) in paragraph at lines 321--321
 [][]  
  []
 
-[15
+[14
 
-] [16
+] [15
 
 ]
 \@verb\lstI=\box63
 
-Overfull \hbox (102.20934pt too wide) in paragraph at lines 229--230
-[][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (83.30937pt too wide) in paragraph at lines 232--233
-[][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (83.30937pt too wide) in paragraph at lines 233--234
-[][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (77.00938pt too wide) in paragraph at lines 234--235
-[][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (77.00938pt too wide) in paragraph at lines 235--236
-[][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (58.10942pt too wide) in paragraph at lines 236--237
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 347--348
 [][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (51.80943pt too wide) in paragraph at lines 237--238
-[][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (77.00938pt too wide) in paragraph at lines 238--239
+Overfull \hbox (7.70952pt too wide) in paragraph at lines 349--350
 [][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
+[16
 
-Overfull \hbox (89.60936pt too wide) in paragraph at lines 239--240
-[][][][][][][][][][][][] 
- []
+] [17
 
-[17
-
-]
-Overfull \vbox (17.98938pt too high) detected at line 258
- []
-
-[18
+] [18
 
 ]
 \@verb\lstI=\box64
 
-Overfull \hbox (32.90947pt too wide) in paragraph at lines 262--263
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 400--401
 [][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (114.80931pt too wide) in paragraph at lines 266--267
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 404--405
+[][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (1.40953pt too wide) in paragraph at lines 270--271
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 412--413
 [][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (1.40953pt too wide) in paragraph at lines 271--272
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 413--414
 [][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (1.40953pt too wide) in paragraph at lines 272--273
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 414--415
 [][][][][][][][][][][][][][][][][][][] 
  []
 
@@ -971,13 +932,23 @@ Overfull \hbox (1.40953pt too wide) in paragraph at lines 272--273
 ]
 \@verb\lstI=\box65
 
-Overfull \hbox (26.60948pt too wide) in paragraph at lines 297--298
+Overfull \hbox (26.60948pt too wide) in paragraph at lines 450--451
 [][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (114.80931pt too wide) in paragraph at lines 301--302
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 454--455
+[][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 455--456
+[][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 464--465
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 [21
@@ -985,7 +956,7 @@ Overfull \hbox (114.80931pt too wide) in paragraph at lines 301--302
 ] [22
 
 ]
-Overfull \hbox (40.80914pt too wide) in paragraph at lines 392--392
+Overfull \hbox (40.80914pt too wide) in paragraph at lines 561--561
 [][]  
  []
 
@@ -994,43 +965,8 @@ Overfull \hbox (40.80914pt too wide) in paragraph at lines 392--392
 ]
 \@verb\lstI=\box66
 
-Overfull \hbox (114.80931pt too wide) in paragraph at lines 402--403
-[][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (77.00938pt too wide) in paragraph at lines 403--404
-[][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (171.5092pt too wide) in paragraph at lines 407--408
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (83.30937pt too wide) in paragraph at lines 408--409
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 567--568
 [][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (77.00938pt too wide) in paragraph at lines 409--410
-[][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (7.70952pt too wide) in paragraph at lines 413--414
-[][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (184.10918pt too wide) in paragraph at lines 414--415
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (20.3095pt too wide) in paragraph at lines 415--416
-[][][][][][][][][][][][][][][] 
  []
 
 [24
@@ -1039,214 +975,55 @@ Overfull \hbox (20.3095pt too wide) in paragraph at lines 415--416
 
 ] [26
 
+] [27
+
 ]
-Overfull \hbox (40.80914pt too wide) in paragraph at lines 491--491
+Overfull \hbox (40.80914pt too wide) in paragraph at lines 718--718
 [][]  
- []
-
-[27
-
-]
-\@verb\lstI=\box67
-
-Overfull \hbox (114.80931pt too wide) in paragraph at lines 502--503
-[][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (77.00938pt too wide) in paragraph at lines 503--504
-[][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (1.40953pt too wide) in paragraph at lines 504--505
-[][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (108.50932pt too wide) in paragraph at lines 505--506
-[][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (39.20946pt too wide) in paragraph at lines 507--508
-[][][][][][][][][] 
- []
-
-
-Overfull \hbox (95.90935pt too wide) in paragraph at lines 508--509
-[][][][][][][] 
- []
-
-
-Overfull \hbox (1.40953pt too wide) in paragraph at lines 511--512
-[][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (45.50945pt too wide) in paragraph at lines 514--515
-[][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \vbox (13.48938pt too high) detected at line 522
  []
 
 [28
 
 ] [29
 
-]
-\@verb\lstI=\box68
-
-Overfull \hbox (20.3095pt too wide) in paragraph at lines 537--538
-[][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (14.0095pt too wide) in paragraph at lines 538--539
-[][][][][][][][][][] 
- []
-
-
-Overfull \hbox (127.40929pt too wide) in paragraph at lines 539--540
-[][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (39.20946pt too wide) in paragraph at lines 540--541
-[][][][][][][] 
- []
-
-
-Overfull \hbox (64.40941pt too wide) in paragraph at lines 541--542
-[][][][][][][] 
- []
-
-
-Overfull \hbox (64.40941pt too wide) in paragraph at lines 542--543
-[][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (77.00938pt too wide) in paragraph at lines 545--546
-[][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (77.00938pt too wide) in paragraph at lines 546--547
-[][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (45.50945pt too wide) in paragraph at lines 547--548
-[][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \vbox (1.48938pt too high) detected at line 558
- []
-
-[30
+] [30
 
 ] [31
 
 ]
-Overfull \hbox (40.80914pt too wide) in paragraph at lines 617--617
-[][]  
+\@verb\lstI=\box67
+
+Overfull \hbox (32.90947pt too wide) in paragraph at lines 758--759
+[][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (39.20946pt too wide) in paragraph at lines 759--760
+[][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 760--761
+[][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (32.90947pt too wide) in paragraph at lines 762--763
+[][][][][][][][][][][][][][][][][][][] 
  []
 
 [32
 
 ]
-\@verb\lstI=\box69
+\@verb\lstI=\box68
 
-Overfull \hbox (77.00938pt too wide) in paragraph at lines 629--630
-[][][][][][][][][][] 
+Overfull \hbox (20.3095pt too wide) in paragraph at lines 793--794
+[][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (45.50945pt too wide) in paragraph at lines 630--631
-[][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (1.40953pt too wide) in paragraph at lines 631--632
-[][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (20.3095pt too wide) in paragraph at lines 632--633
-[][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (64.40941pt too wide) in paragraph at lines 634--635
-[][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (133.70927pt too wide) in paragraph at lines 637--638
-[][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (140.00926pt too wide) in paragraph at lines 638--639
-[][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (26.60948pt too wide) in paragraph at lines 639--640
-[][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (45.50945pt too wide) in paragraph at lines 640--641
-[][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (89.60936pt too wide) in paragraph at lines 641--642
-[][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (133.70927pt too wide) in paragraph at lines 642--643
-[][][][][][][][][] 
- []
-
-
-Overfull \hbox (152.60924pt too wide) in paragraph at lines 643--644
-[][][][][][][] 
- []
-
-
-Overfull \hbox (140.00926pt too wide) in paragraph at lines 644--645
-[][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (7.70952pt too wide) in paragraph at lines 645--646
-[][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (45.50945pt too wide) in paragraph at lines 646--647
-[][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (7.70952pt too wide) in paragraph at lines 647--648
-[][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (108.50932pt too wide) in paragraph at lines 648--649
-[][][][][][][][][][] 
- []
-
-
-Overfull \vbox (133.48938pt too high) detected at line 657
+Overfull \hbox (7.70952pt too wide) in paragraph at lines 797--798
+[][][][][][][][][][][][][][][][][][][] 
  []
 
 [33
@@ -1263,6 +1040,55 @@ Overfull \vbox (133.48938pt too high) detected at line 657
 
 ] [39
 
+] [40
+
+] [41
+
+] [42
+
+] [43
+
+] [44
+
+] [45
+
+] [46
+
+] [47
+
+]
+\@verb\lstI=\box69
+
+Overfull \hbox (1.40953pt too wide) in paragraph at lines 934--935
+[][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (32.90947pt too wide) in paragraph at lines 938--939
+[][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+[48
+
+]
+\@verb\lstI=\box70
+
+Overfull \hbox (7.70952pt too wide) in paragraph at lines 959--960
+[][][][][][][] 
+ []
+
+[49
+
+] [50
+
+] [51
+
+] [52
+
+] [53
+
+] [54
+
 ]
 \tf@nav=\write6
 \openout6 = `presentation_slides.nav'.
@@ -1273,11 +1099,11 @@ Overfull \vbox (133.48938pt too high) detected at line 657
 \tf@snm=\write8
 \openout8 = `presentation_slides.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 679.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 679.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1045.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1045.
  (/home/jalbert/python/deep-learning/deeplearn/presentation/presentation_slides.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 679.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 679.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1045.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1045.
 Package rerunfilecheck Info: File `presentation_slides.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
 
@@ -1285,22 +1111,22 @@ Package rerunfilecheck Info: File `presentation_slides.out' has not changed.
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 1.0pt have occurred.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 679.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1045.
  ) 
 Here is how much of TeX's memory you used:
- 22989 strings out of 493029
- 449557 string characters out of 6136234
- 720711 words of memory out of 5000000
- 25979 multiletter control sequences out of 15000+600000
- 9454 words of font info for 35 fonts, out of 8000000 for 9000
+ 23166 strings out of 493029
+ 452416 string characters out of 6136234
+ 691728 words of memory out of 5000000
+ 26119 multiletter control sequences out of 15000+600000
+ 13639 words of font info for 50 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 56i,14n,62p,1166b,1068s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam7.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
-blic/amsfonts/symbols/msbm10.pfb>
-Output written on /home/jalbert/python/deep-learning/deeplearn/presentation/presentation_slides.pdf (39 pages, 224443 bytes).
+ 56i,14n,62p,927b,1068s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on /home/jalbert/python/deep-learning/deeplearn/presentation/presentation_slides.pdf (54 pages, 289727 bytes).
 PDF statistics:
- 1087 PDF objects out of 1200 (max. 8388607)
- 1015 compressed objects within 11 object streams
- 79 named destinations out of 1000 (max. 500000)
+ 1493 PDF objects out of 1728 (max. 8388607)
+ 1398 compressed objects within 14 object streams
+ 109 named destinations out of 1000 (max. 500000)
  43 words of extra memory for PDF output out of 10000 (max. 10000000)
 
