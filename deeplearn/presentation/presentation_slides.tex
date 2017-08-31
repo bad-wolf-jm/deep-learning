@@ -47,12 +47,10 @@
 \begin{frame}{A Bird's Eye View Of Classical Neural Networks}
 
 \begin{itemize}
-  \item A neural network is a fancy way to describe a class of functions $f:\R^n\to \R^m$ parametrized by $\R^\ell$.
-  \item The layers of a NN represent function composition.
-  \item If $f$ is a function $F(\x, \w):\R^n\times \R^\ell\to\R^n$ such that $\C=\{\x\mapsto F(\x, \w):\w\in\R^n\}$.
+  \item The task is to model functions $f:A\to B$, where $A$ and $B$ are sets, using functions $\R^n\to\R^m$.
+  \item A neural network is a fancy way to describe a class of functions $f:\R^n\to \R^m$ parametrized by $\R^\ell$, in the sense that there is a function $F(\x, \w):\R^n\times \R^\ell\to\R^n$ such that $\C=\{\x\mapsto F(\x, \w):\w\in\R^n\}$.
   \item Each vector $\w\in\R^\ell$ is in some sense a code for an element of $\C$.
   \item When we are given a function $f:\R^n\to \R^m$, we try to find which element of $\C$ best represents $f$.
-
 %  \item That is to say, find $\w$ such that
 \end{itemize}
 
@@ -146,7 +144,12 @@ There are several types of functions on sequences:
 
 \item it is more interesting and instructive to make use of the structure of $A^*$ and $B^*$ as sets of sequences of $A$ and $B$, and see how one can use a function $A\to B$ to define a function $A^*\to B^*$.
 %\item In particular, we will me making use of the iterative nature of the construction $A^*$ and $B^*$.
-\item Here is the simplest example: if $A=B$, and $f:A\to A$ is a function, then we can iterate $f$: $f^0(a)=a$ for every $a\in A$, and $f^{n+1}(a) = f(f^n(a))$. We terminate the iteration at the first value of $n$ for which $f^n(a)=f^{n-1}(a)$ (note that there is no guarantee that this will ever happen).
+\item Here is the simplest example: if $A=B$, and $f:A\to A$ is a function, then we can iterate $f$:
+\begin{itemize}
+  \item $f^0(a)=a$ for every $a\in A$,
+  \item $f^{n+1}(a) = f(f^n(a))$.
+\end{itemize}
+We terminate the iteration at the first value of $n$ for which $f^n(a)=f^{n-1}(a)$ (note that there is no guarantee that this will ever happen).
 \item This gives a function $f^\omega:A\to A^\omega$.
 \end{itemize}
 \end{frame}
@@ -499,11 +502,11 @@ The architecture is:
       \node (input) [] at (0cm, 1cm) {};
       \node (output) [] at (0cm, -2.25cm) {};
       \node (s-input-A) [] at (-2cm, 0cm) {};
-      \node (s-output-A) [] at (10cm, 0cm) {};
+      \node (s-output-A) [] at (9.5cm, 0cm) {};
       \node (s-input-B) [] at (-2cm, -1cm) {};
-      \node (s-output-B) [] at (10cm, -1cm) {};
+      \node (s-output-B) [] at (9.5cm, -1cm) {};
       \node (s-input-C) [] at (-2cm, -2cm) {};
-      \node (s-output-C) [] at (10cm, -2cm) {};
+      \node (s-output-C) [] at (9.5cm, -2cm) {};
       \path[] node[startstop] (A-0) at (0cm, 0cm) {};
       \path[] node[startstop] (B-0) at (0cm, -1cm) {};
       \path[] node[startstop] (C-0) at (0cm, -2cm) {};
@@ -810,51 +813,70 @@ def generate_text(length, session=None):
 
 
 \begin{frame}{A many-to-many example (output)}
+%\begin{verbatim}
+%  W =YL nuf rs t Cgi3uaa nemk+ymeK  tWb elhr inseae iu  g (.
+  Faewn tron ooaes  rl n   u i o .or3itkdieesatint  bt u ahHhkoenn
+  etra+uHtiebnndrlyht sato  ioom y  n m,ee.soon ol e0  ,y a hnreliy?e
+  wree nf tlVthyi  oei oloynea .h.g8wtnsekhw r. ow AleiasfrhoeiryeswB
+  .ogor H ael,gol m Rno sn aa  galrm er o de3surr asadeatso  detn %
+  aml hrwedop orl aoirltsrggos,a  rnaurlewyYe". eld.k ujdt<ad losd\^roe
+  msnr.tou ods rr L-hieeee eagug oo5si y 6setS  osg e .d f dmd e p\^mraohe.
+  iaroh.let  etshdsseniolthg emeyndt neotg ue h iy hunthdg !me  oeA oer
+  te sl h t mnmdi t da3nfnspL>lndrr yhlehee mX  olaPfgdoye,l thot m.gitlc
+  eegn gseo(gn> Btehnnuasn eiffbggi ud  r nfet.m ri!iokuCeou  ?j
+  uraiAuuhwoslb|k  iho aeat- k y   . m neBnh.p ulhosah . vusLesagshio e o
+  alyeea rrae   sams   y phsu as  iaey ka ert   raetl1s  o m hweirLz/a
+  mldordrlehdphtr !eal  aawaoi,slrmdhooieit  rdath dhe r uohtn  giu hl  ,eo
+\end{frame}
+
+\begin{frame}{A many-to-many example (output)}
+  st best neeoa, bet hublen  whin nevents, Yebear towhrath lit Goed P orrssss H
+  int. Revell, but hav ed asak MudgSe Poo
+  Marry hooling olkint of the torferyfwerdnole opotger as  Snd dot fufped a rivenad with a hedd Swering ald end the fose l had tra of oss tobe. Lhoush dame, haik  Dumbledore, bhents wayens is couldnbacking the tavirg ou at fre with if comelt intiVcrweroughtsit whed tagrtadh teer EontY Baid joom han sanledoo to falfin. Mrd hid you steedhesed that asd and Goomemis,. If save ti t  yeak, and ulststod, pay Chouehhed. I sswvect mech. makd thene whost well, shead Duwpledoalmingverya thin, will.houco itthatuardryd tle freled to prope ly bndchy bgrid gowntiing gronsidocw ng thes uthim mame f atd reeed the  wrye,gou deyer fonnt ere aarn whatsebyihe haugh. gedling his ames.diain. Bunnea oleyk. Herrioned
+  AIn, Prldy.fors.ead Monfurfry.ars.. Lur Mames. The le arnay
+\end{frame}
+
+\begin{frame}{A many-to-many example (output)}
+  Yes, said Phich. I seem d tou.e,in t it. ... Harry could not understracked on the sirlow quite. YoteirSh? Masi4  easley was tweir baaring a swarm onss o oy shem. Ho your veice! sr7 Mrs  WOr!!eIll saact ye as i tomgo enhuge f. . . is to have teen his siorys faked thobonsto tarelys pld the board to have seennttered th seen. Harry had gnven the dignaes oonce, tf ce was turning, mattering, irs dmorning your way at t tell only time  nankl?uldur ofntabally all about it, after a luot eo  inclneriitcr ed. How other ever tep ga se, ao  But   It Harlid, said The Soivers. .  with aimioh ey iould had for them.to! Yus, iaid TBattern he mired  ever sackbd fandinred clldye  copfles, te aidenly told as averying to be seet but she was curling ilougain.t a  the ske was png khen because im inteirsion. O. love hes lef ... Harry said acgedally, his newdecime closs and hidding as he spoke, you right to use of if of cheverdiescand mot,h, haypened tuffleng her itions andly at horrgalm.
 
 \end{frame}
 
 \begin{frame}{A many-to-many example (output)}
+  A fartoblind, shouing in coptless, rutching lis glasses alive with a tightly rhrugting. Fartyeys in the tibrage serched on green like iktin the wandow, crossed with hoggant.ba warrowes rkling with dhheul  and pon sever broatures, which was carved again frum the age of the glasm too.
+
+  There wase risonab look at thi splattday, eaen on the blurd aobodyheasal hed back ao a marmor tfualive with slacklines  o
+  Before that  ac will, sery mered, Fasy so  ln ihe staff table, and then  Yidmione sxploded, aan uring thi  no. But Dhe , whele y
+\end{frame}
+
+\begin{frame}{A many-to-many example (output)}
+Filch ead eere with all tis hneethighb hair, seemed as hi had musmereded faxh apport ae Kruacher had the Slytherin house of tets before.yesterday, Rind how to see, great, and taure he llfore, that weth nded stay in the rormer Slugee Yoar? No  unknown, nlytherin, Hf ter go nowhing that , bixing   .ouve jHished to losk at himest, Hermione, George. Neledaayest Narcissa,in built. on theimsddle of my while. Albus, he  ... liveng and safeer ers oime fiustrw .. good fabily., or came f... Your famher roneared at he feared her wa rinht dowr behind the  dark and every step, their terrified sealing and
+\end{frame}
+
+\begin{frame}{A many-to-many example (output)}
+  Theres no doubt to kateh  Harry, dont bet er toke toe naght he reckons the wayds can surprise Inean halp that icdobd side mn  those ehit apd Aunt Petenia Allum  jusped up Doth tis wands. Tre not anabl a Distinctly  I detds ed,miggry of knoph tifough ahfunl still boy nhat whin he pas comfrowling ay murder than usual. In siarel mistress in Doagon Illey ... thet wy subrotrs,had been giing and marious.teat sange  whet  aust betliout, said Ron nuietly, but he did not lant to have to fulded as he picked back.
 
 \end{frame}
 
 \begin{frame}{A many-to-many example (output)}
-
+  Oh are stay-hamfered myny memold? Professor M Great Holl avice is shwpshelves  said Lupin, and shr knew out. H
+  g soudents faster: Treaicized aunitius! Hasmione!lives to she common got the Indie with myself? Who is a wording, Malfoy. as t-ttinhtto tell him that the stubents wll with Snape anybody oIll have ior Siriul the caad tnyohere, Ill belceve egomr  Inter Bllba rust Copy,of Vus Charms and yhan-ed Ocdonagss harrible  onceusl. Prowessor? Yaid a creaty ahirl and thr blonked ond powerfulsy. There was an adgiliai and the back of the two hide, then rinilumblid, and up the srmcktfo cans  flel down to the kead.
 \end{frame}
 
 \begin{frame}{A many-to-many example (output)}
-
+  Traco Malfoy, well, and you add the Min, they go  Cho back indo Lur strits, gripping gaolies around its, aleared lood. They presaed no prefects for that, sho hoot ... he knepsda lhe tinistry least until I think,i You oont trink hesdid. . Looking kiidly with ut multipe serore where wrountsyou  hhat came to itvola yours l We can finds, anl right?.Horccux as furious by awrid brooer, fin you  Aaid Hateilita, lof him hut what he thinks it, you wesder any time theyd have lesven to do. Nice Hnd,lasten to me. And yeure going fon thelferhenks, have, said Mu. Weasley bliracciusty, as it had became very reliev, bugay n  a powntiof giren sp echo dpeliher.tents. He was listening sor. It was Dembledore desire. He had missed lu . He turned his foer never held bytween the sige, the huftled expluseli needr that followed.
 \end{frame}
 
 \begin{frame}{A many-to-many example (output)}
-
+  Oh, he said gruntingly. N
+  Teel me somethn your oire, made it ttained from Hogwadts  ae doea, you saemed to be dropping Uis at Harry  hed Head . . . that he das ! but Dobby is has faet, readuti, sireaking after a mans cauttleng  theyd hald to vosmentagainst tige of a Quifditch  alarming!y. Toeyre doing an earthy yaurs  And by name ac alr, you know .t Harrys lying thin s  hom mummerook! Maybe you wirldnt chugh eventmones later, Po two, did you? said Harry with his eyeb with flulf,rsnnd-solnger,lunk away at Sim.
 \end{frame}
 
 \begin{frame}{A many-to-many example (output)}
-
+  arry could not look quickly at his hustened,pnd stile barsting with his hwig apen? Thatswat hing Umbridge the rnx saggins if you taen startanders, thay po it, sor knod.that  I think you  in iould be l bat an ahothcle at the weardnc term,at find Rim   Blat on prypticess not,to take a viry chocolate, take uhes roomed bine on thes The. Harry had left the stairs toomention, but Harry interreesed the sort of reaih was it,
 \end{frame}
 
 \begin{frame}{A many-to-many example (output)}
-
-\end{frame}
-
-\begin{frame}{A many-to-many example (output)}
-
-\end{frame}
-
-\begin{frame}{A many-to-many example (output)}
-
-\end{frame}
-
-\begin{frame}{A many-to-many example (output)}
-
-\end{frame}
-
-\begin{frame}{A many-to-many example (output)}
-
-\end{frame}
-
-\begin{frame}{A many-to-many example (output)}
-
+  Varry shurted oot over to find Fudges oyes with hir pool eaery direction. You know where hes worth dirtction yeh,wuth mere moubtful upon the days. Iow may e ... but not hintless. ... Shes strong,y uven losdlr, Professor, I hve look bank  gut it will remember wha fine- steeds to listen . . . blew an!and alr Mystlound vanished about Malfoy g indisaiing time. Im sorry th want to hear the Ministry,ofispers.to aonfll eavisdormitory, itswoll even if you  wanteto have home. A  peyed  very surpas off   Si  struxed th a haov and mede iim hn arinaelery distracled  Itmdonld numbil centaminate the katwien he himself. Harry, Ron, and Hermione, the okly oeniis lizarding moving ps their study that hhownd aany sotus of powdereathe faont paggent so tHa his speak aentttoon the higlstryc  igh a brocm, and none of them  ould seem sick lant temrh Itnever kmen in curse  fact, wher it somt of d whons gettling through their airection ttab with a thue issuses. I never enew you went every me and finalive rnd! He wasnt sngnified, said Harry.
 \end{frame}
 
 
