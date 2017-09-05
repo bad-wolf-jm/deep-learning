@@ -111,9 +111,9 @@ def populate_table(table_name, source_query, source_connection, target_connectio
             target_connection.commit()
 
 if ignore_bugs:
-    training_table = 'neuronet_training_dataset'
-else:
     training_table = 'neuronet_training_dataset_no_bug'
+else:
+    training_table = 'neuronet_training_dataset'
 
 def fetch_cms_data(table_name):
     populate_table(table_name=table_name,
@@ -157,12 +157,12 @@ def shuffle_table_rows(table_name, connection):
         connection.commit()
 
 
-def truncate_table(table_name):
+def truncate_table(table_name, connection):
     with connection.cursor() as cursor:
         sql = """TRUNCATE {table_name}""".format(table_name=table_name)
         cursor.execute(sql)
 
-truncate_table(table_name)
+truncate_table(training_table, buzzometer_dev_connection)
 fetch_cms_data(training_table)
 fetch_buzzometer_data(training_table)
 shuffle_table_rows(training_table, buzzometer_dev_connection)
