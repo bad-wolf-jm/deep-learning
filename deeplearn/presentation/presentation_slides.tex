@@ -204,11 +204,10 @@ We describe a more general situation.
 
 \begin{frame}{Recurrent Neural Networks}
   \begin{itemize}
-  \item Recurrent neural networks are just a prescription for a class of functions of the form $f:\R^n\times \R^\ell\times\R^m\to \R^\ell\times \R^m$, where $\R^m$ is the space of parameters.
+  \item Recurrent neural networks are just a prescription for a class of functions of the form $$f:\R^n\times \R^\ell\times\R^m\to \R^\ell\times \R^m$$ where $\R^m$ is the space of parameters.\pause
   \item The set $\{0, 1\}^*$ of all finite sequences of $0$'s and $1$'s is countable,
-  \item and $\R^\ell$, is a real vector space,
-  is uncountable.
-  \item Therefore, we can encode every element $w\in\{0, 1\}^*$ as a vector in $S$.  Informally,
+  \item and $\R^\ell$, is uncountable.
+  \item We can encode every element $w\in\{0, 1\}^*$ as a vector in $S$.  Informally,
   $\R^\ell$ is enough to encode any finite state space, and every possible value for the content of the tape of a Turing machine. We get:
   {\em Recurrent neural networks are Turing-complete.}
   \item This explains why recurrent neural networks seem to be able to produce results that other networks can't.
