@@ -26,7 +26,7 @@ HOURS = 3600
 SECONDS = 1
 
 validation_interval = 5
-test_interval = 2 * MINUTES
+test_interval = 5 * MINUTES
 e_mail_interval = 1 * HOURS
 summary_span = None
 checkpoint_interval = 45 * MINUTES
@@ -84,11 +84,15 @@ def save_checkpoint():
 x = CompiledTrainingModel(model_path)
 with tf.Session(graph=x._graph) as _session:
     x.initialize(_session)
-    supervisor = TrainingSupervisor(session=_session, model=x, test_interval=test_interval, validation_interval=validation_interval,
-                                    summary_span=summary_span)
+    supervisor = TrainingSupervisor(
+            session=_session, model=x, test_interval=test_interval,
+            validation_interval=validation_interval, summary_span=summary_span
+        )
     start(supervisor)
-    for loss in supervisor.run_training(epochs=epochs, train_batch_size=train_batch_size, validation_batch_size=validation_batch_size,
-                                        test_batch_size=test_batch_size):
+    for loss in supervisor.run_training(
+            epochs=epochs, train_batch_size=train_batch_size,
+            validation_batch_size=validation_batch_size, test_batch_size=test_batch_size
+        ):
         try:
             if isinstance(loss, TestData):
                 tests.append(loss)

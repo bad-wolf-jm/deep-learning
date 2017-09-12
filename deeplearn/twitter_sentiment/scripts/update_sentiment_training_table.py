@@ -1,6 +1,7 @@
 import os
 import sys
 import pymysql
+import hashlib
 import numpy as np
 
 ignore_bugs = '--ignore-bugs' in sys.argv
@@ -47,7 +48,7 @@ def tokenize(text):
 
 
 # Source query for the cms database
-cms_query = """ SELECT comment.message AS message, comments_flags.flag_id as sentiment
+cms_query = """ SELECT comment.date_created as date, comment.message AS message, comments_flags.flag_id as sentiment
 FROM (comment INNER JOIN comments_flags ON comment.id = comments_flags.comment_id)
 WHERE comments_flags.flag_id between 1 and 5"""
 
@@ -56,14 +57,14 @@ if ignore_bugs:
     cms_query_sentiment_map[1]=None
 
 # Source query for the user_assigned sentiments
-tren_games_query = """SELECT message, user_assigned_sentiment as sentiment FROM {table} WHERE lang='en'
+tren_games_query = """SELECT date, message, user_assigned_sentiment as sentiment FROM {table} WHERE lang='en'
 AND user_assigned_sentiment IS NOT NULL and user_assigned_sentiment != -3"""
 tren_games_query_sentiment_map = {-1:0, 0:1, 1:2, -2:3}
 
 dataset_insert_query = """INSERT INTO {table_name}
-(id, sentiment, text, sanitized_text, message_length, sanitized_message_length)
-VALUES ({id}, {sentiment}, '{message}', '{sanitized_message}', {message_length},
-{sanitized_message_length})"""
+(date, hash, sentiment, text, sanitized_text, message_length, sanitized_message_length)
+VALUES ('{date}', '{hash}', {sentiment}, '{message}', '{sanitized_message}', {message_length},
+{sanitized_message_length}) ON DUPLICATE KEY UPDATE sentiment={sentiment}, date='{date}'"""
 
 
 def max_value(connection, table_name, field):
@@ -92,8 +93,11 @@ def populate_table(table_name, source_query, source_connection, target_connectio
                 message_length = len(message)
                 sanitized_message = tokenize(message)
                 sanitized_message_length = len(sanitized_message)
+                print(hashlib.md5(message.encode('utf8')).hexdigest())
                 sql = dataset_insert_query.format(id=I,
                                                   table_name=table_name,
+                                                  date=row['date'].strftime('%Y-%m-%d'),
+                                                  hash=hashlib.md5(message.encode('utf8')).hexdigest(),
                                                   sentiment=int(sentiment),
                                                   message=addslashes(message),
                                                   sanitized_message=addslashes(sanitized_message),
@@ -145,11 +149,12 @@ def fetch_buzzometer_data(table_name):
 
 def shuffle_table_rows(table_name, connection):
     with connection.cursor() as cursor:
-        sql = """SELECT COUNT(id) as N FROM {table_name}""".format(table_name=table_name)
+        sql = """SELECT id FROM {table_name}""".format(table_name=table_name)
         cursor.execute(sql)
-        N = cursor.fetchone()['N']
-        shuffle = np.random.permutation(N)
-        for id_, perm_id in enumerate(shuffle):
+        N = cursor.fetchall() #['N']
+        shuffle = np.random.permutation(len(N))
+        id_perm = [(N[x]['id'], shuffle[x]) for x in range(len(N))]
+        for id_, perm_id in id_perm: #enumerate(shuffle):
             sql = """UPDATE {table_name} SET shuffle_id={perm_id} WHERE id={id_}"""
             sql = sql.format(table_name=table_name, perm_id=perm_id, id_=id_)
             print(sql)
@@ -162,7 +167,7 @@ def truncate_table(table_name, connection):
         sql = """TRUNCATE {table_name}""".format(table_name=table_name)
         cursor.execute(sql)
 
-truncate_table(training_table, buzzometer_dev_connection)
+#truncate_table(training_table, buzzometer_dev_connection)
 fetch_cms_data(training_table)
 fetch_buzzometer_data(training_table)
 shuffle_table_rows(training_table, buzzometer_dev_connection)

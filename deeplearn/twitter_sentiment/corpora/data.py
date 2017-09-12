@@ -1,4 +1,4 @@
-from train.dbi import DBConnection
+from corpora.dbi import DBConnection
 
 db_host = '127.0.0.1'
 db_user = 'root'
@@ -123,7 +123,7 @@ def generate_user_cms_batches(min_id=0, max_id=None, batch_size=10, epochs=None)
 
 def user_cms_training_generator(batch_size=10, epochs=None, validation_size=None, test_size=None):
     if validation_size is not None:
-        N = count_rows('user_cms_sentiment_dataset')
+        N = count_rows('neuronet_training_dataset')
         test = N // 50
         validation_iterator = generate_user_cms_batches(min_id=0, max_id=test, batch_size=validation_size, epochs=None)
     else:
@@ -131,7 +131,7 @@ def user_cms_training_generator(batch_size=10, epochs=None, validation_size=None
         test = 0
         validation_iterator = None
     if test_size is not None:
-        N = count_rows('user_cms_sentiment_dataset')
+        N = count_rows('neuronet_training_dataset')
         test = N // 50
         test_iterator = generate_user_cms_batches(min_id=0, max_id=test, batch_size=test_size, epochs=None)
     else:

@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 from train.summary import StreamSummary
 import datetime
-from train.datasources import get_dataset_specs
+from corpora.datasources import get_dataset_specs
 
 
 class InfiniteLoss(Exception):
