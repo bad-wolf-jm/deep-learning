@@ -52,7 +52,7 @@ class TrainingSupervisor(object):
         self._batch_index = None
         self._total_batches = None
         self._session = session
-        self.data = get_dataset_specs(self.model.data)
+        self.data = self.model.data
 
     @property
     def batch_number(self):
@@ -179,12 +179,13 @@ class TrainingSupervisor(object):
                 for string, truth, predicted in out]
 
     def run_training(self, epochs=10, train_batch_size=100, validation_batch_size=100, test_batch_size=500):
-        constructor = self.data['constructor']
+        constructor = self.data #['constructor']
+        print (constructor)
         data_generator = constructor(batch_size=train_batch_size, epochs=epochs,
                                      validation_size=validation_batch_size, test_size=test_batch_size)
-        training_data_generator = data_generator['train']
-        validation_iterator = data_generator['validation'] or self.__default_validation_iterator()
-        test_iterator = data_generator['test'] or self.__default_validation_iterator()
+        training_data_generator = data_generator.train
+        validation_iterator = data_generator.validation or self.__default_validation_iterator()
+        test_iterator = data_generator.test or self.__default_validation_iterator()
         self._training_start_time = time.time()
         self._epoch_start_time = time.time()
         last_test_time = self._training_start_time

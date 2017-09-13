@@ -151,10 +151,10 @@ def shuffle_table_rows(table_name, connection):
     with connection.cursor() as cursor:
         sql = """SELECT id FROM {table_name}""".format(table_name=table_name)
         cursor.execute(sql)
-        N = cursor.fetchall() #['N']
+        N = cursor.fetchall()
         shuffle = np.random.permutation(len(N))
         id_perm = [(N[x]['id'], shuffle[x]) for x in range(len(N))]
-        for id_, perm_id in id_perm: #enumerate(shuffle):
+        for id_, perm_id in id_perm:
             sql = """UPDATE {table_name} SET shuffle_id={perm_id} WHERE id={id_}"""
             sql = sql.format(table_name=table_name, perm_id=perm_id, id_=id_)
             print(sql)
@@ -167,7 +167,6 @@ def truncate_table(table_name, connection):
         sql = """TRUNCATE {table_name}""".format(table_name=table_name)
         cursor.execute(sql)
 
-#truncate_table(training_table, buzzometer_dev_connection)
 fetch_cms_data(training_table)
 fetch_buzzometer_data(training_table)
 shuffle_table_rows(training_table, buzzometer_dev_connection)

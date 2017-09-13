@@ -89,7 +89,11 @@ class DBConnection(object):
         while (epochs is None) or (epoch <= epochs):
             offset = min_id or 0
             for batch in range(batches_per_epoch):
-                o, batch_d = self._get_batch(table_name, index_column, select_columns,  starting_id=offset, batch_size=batch_size, record_count=record_count)
+                o, batch_d = self._get_batch(
+                        table_name, index_column, select_columns,
+                        starting_id=offset, batch_size=batch_size,
+                        record_count=record_count
+                    )
                 I += 1
                 yield {'batch': batch_d,
                        'batch_number': batch,

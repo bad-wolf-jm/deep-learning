@@ -1,6 +1,11 @@
 import tensorflow as tf
 import numpy as np
 
+# print(__file__)
+
+from corpora.cms_user_input_dataset import CMSUserInputDataset
+
+
 
 class Metadata:
     model_name = "3 layer bidirectional GRU model"
@@ -9,7 +14,7 @@ class Metadata:
     date = 'Aug 4th, 2017'
     doc = "A 3 layer bidirectional recurrent neural network for sentiment analysis of short texts."
     type = 'classifier'
-    data = 'CMSUserInputDataset'
+    data = CMSUserInputDataset
     categories = {0: 'Negative', 1: 'Neutral', 2: 'Positive', 3: 'Irrelevant'}
 
 
