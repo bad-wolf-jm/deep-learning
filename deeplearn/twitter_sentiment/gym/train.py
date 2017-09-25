@@ -83,7 +83,7 @@ def save_checkpoint():
 
 x = CompiledTrainingModel(model_path)
 with tf.Session(graph=x._graph) as _session:
-    x.initialize(_session)
+    x.initialize(_session) # restore weights here
     supervisor = TrainingSupervisor(
             session=_session, model=x, test_interval=test_interval,
             validation_interval=validation_interval, summary_span=summary_span

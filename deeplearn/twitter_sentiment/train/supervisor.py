@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 from train.summary import StreamSummary
 import datetime
-from corpora.datasources import get_dataset_specs
+#from corpora.datasources import get_dataset_specs
 
 
 class InfiniteLoss(Exception):
@@ -179,8 +179,7 @@ class TrainingSupervisor(object):
                 for string, truth, predicted in out]
 
     def run_training(self, epochs=10, train_batch_size=100, validation_batch_size=100, test_batch_size=500):
-        constructor = self.data #['constructor']
-        print (constructor)
+        constructor = self.data
         data_generator = constructor(batch_size=train_batch_size, epochs=epochs,
                                      validation_size=validation_batch_size, test_size=test_batch_size)
         training_data_generator = data_generator.train

@@ -32,6 +32,7 @@ class CompiledModel(object):
         with self._graph.as_default():
             saver = tf.train.Saver()
             saver.restore(session, path)
+            self.initialize_uninitialized_variables(session)
 
     def initialize_uninitialized_variables(self, session=None):
         global_variables = tf.global_variables()

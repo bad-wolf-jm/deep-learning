@@ -1,8 +1,5 @@
 import tensorflow as tf
 import numpy as np
-
-# print(__file__)
-
 from corpora.cms_user_input_dataset import CMSUserInputDataset
 
 
@@ -106,7 +103,10 @@ def prepare_batch(batch_x, batch_y):
 
 def evaluate_batch(batch_x, batch_y, session=None):
     feed_dict = prepare_batch(batch_x, batch_y)
-    p, loss, accuracy = session.run([Globals.prediction, Globals.batch_loss, Globals.batch_accuracy], feed_dict=feed_dict)
+    p, loss, accuracy = session.run(
+        [Globals.prediction, Globals.batch_loss, Globals.batch_accuracy],
+        feed_dict=feed_dict
+        )
     _ = [x[0] for x in batch_y]
     strings = []
     for l in batch_x:
