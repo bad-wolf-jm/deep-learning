@@ -57,71 +57,44 @@
     <p>This is a special notification which you can dismiss if you're bored with it.</p>
   </div>
 
-  <div class="ui message">
-    <i class="close icon"></i>
-    <div class="header">
-      Welcome back!
-    </div>
-    <p>This is a special notification which you can dismiss if you're bored with it.</p>
-  </div>
-
-  <div class="ui message">
-    <i class="close icon"></i>
-    <div class="header">
-      Welcome back!
-    </div>
-    <p>This is a special notification which you can dismiss if you're bored with it.</p>
-  </div>
-
       <div class="ui two column grid">
+
+
+      <!-- <div class="ui two column grid"> -->
         <div class="column">
           <div class="top attached ui inverted grey segment">
-            <b>User logs</b>
+            <b>SCRIPTS</b>
           </div>
           <table class="ui single line striped selectable bottom attached table">
             <thead>
               <!--<tr><th colspan="5">RECENT JOBS</th>-->
-              <tr> <th>NAME</th> <th>DATE</th>  <th>PAGE</th><th>REQUEST</th> <th></th></tr>
+              <tr> <th></th><th>NAME</th><th>DESCRIPTION</th> <th>FILE</th>  <th>ADDED</th>  <th>ADDED BY</th> <th>LAST RUN</th> <th>LAST RUN BY</th> <th>AVG. TIME</th> <th>LOG LEVEL</th><th></th></tr>
             </thead>
             <tbody>
-              <tr> <td><b>user-email.address@gameloft.com</b></td> <td class="collapsing">2017-02-30:8:00:32</td>  <td class="collapsing">/dasboard.php</td>  <td class="collapsing"><div class='ui green label'>GET</div></td> <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-            </tbody>
-          </table>
-          <div class="top attached ui inverted grey segment">
-            <b>RECENTLY COMPLETED JOBS</b>
-          </div>
-          <table class="ui single line striped selectable bottom attached table">
-            <thead>
-              <!--<tr><th colspan="5">RECENT JOBS</th>-->
-              <tr> <th>NAME</th> <th>STARTED</th>  <th>ENDED</th>  <th>STATUS</th> <th></th></tr>
-            </thead>
-            <tbody>
-              <tr> <td><b>Rules enforcer</b></td> <td class="collapsing">2017-02-30:8:00:32</td>  <td class="collapsing">2017-02-30:8:12:54</td>  <td class="collapsing"><div class='ui green label'>OK</div></td> <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-              <tr> <td><b>Facebook Campaign Status Update</b></td> <td class="collapsing">2017-02-30:8:00:32</td>  <td class="collapsing">---</td>  <td class="collapsing"><div class='ui violet label'>RUNNING</div></td> <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-              <tr> <td><b>Rules enforcer</b></td> <td class="collapsing">2017-02-30:8:00:32</td>  <td class="collapsing">2017-02-30:8:12:54</td>  <td class="collapsing"><div class='ui red label'>ERROR</div></td> <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="column">
-          <div class="top attached ui inverted grey segment">
-            <b>LOG</b>
-          </div>
-          <table class="ui single line striped selectable bottom attached table">
-            <thead>
-              <!-- <tr><th colspan="4">LOG</th>-->
-            </thead>
-            <tbody>
-              <tr><td class="collapsing"><div class='ui violet label'>DEBUG</div></td> <td class="collapsing">2017-02-30:10:43:22</td> <td class="collapsing">LoggerName</td>  <td>This is a debugging message</td><td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-              <tr> <td class="collapsing"><div class='ui green label'>INFO</div></td><td class="collapsing">2017-02-30:10:43:22</td> <td class="collapsing">LoggerName</td>  <td>This is an information message</td><td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-              <tr> <td class="collapsing"><div class='ui yellow label'>WARNING</div></td><td class="collapsing">2017-02-30:10:43:22</td> <td class="collapsing">LoggerName</td>  <td>This is a warning message</td><td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-              <tr> <td class="collapsing"><div class='ui red label'>ERROR</div></td> <td class="collapsing">2017-02-30:10:43:22</td> <td class="collapsing">10:43:22</td> <td>This is an error message</td><td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-              <tr> <td class="collapsing"><div class='ui black label'>CRITICAL</div></td> <td class="collapsing">2017-02-30:10:43:22</td> <td class="collapsing">10:43:22</td> <td>This is a critical message</td><td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
+              <tr>
+                <td class="collapsing">
+                  <button class="ui tiny labeled icon button">
+                    <i class="play icon"></i>
+                    RUN
+                  </button>
+                </td>
+                <td class="collapsing"><b>Drop all tables</b></td>
+                <td>Drops all the tables in the database, Be very careful when you run this, nothing will work afterward, make sure you have a backup!!!</td>
+                <td class="collapsing">drop_tables.py</td>
+                <td class="collapsing">2018-02-03:1:02</td>
+                <td class="collapsing">J-M</td>
+                <td class="collapsing">2018-02-03:1:02</td>
+                <td class="collapsing">J-M</td>
+                <td class="collapsing">00:08:30</td>
+                <td class="collapsing">INFO</td>
+                <td class="collapsing"><i class="big edit icon"></i></td>
+              </tr>
             </tbody>
           </table>
         </div>
 
-      </div>
+
+      <!-- </div> -->
     <style type="text/css">
       body {
         display: relative;

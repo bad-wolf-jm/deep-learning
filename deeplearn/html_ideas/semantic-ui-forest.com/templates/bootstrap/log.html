@@ -26,28 +26,6 @@
         <a class="item">Dashboard</a><a class="item">Settings</a><a class="item">Profile</a><a class="item">Help</a>
       </div>
     </div>
-      <!-- <div class="ui grid">
-        <div class="row">
-          <div class="column" id="sidebar">
-            <div class="ui secondary vertical fluid menu">
-              <a class="active item">Overview</a><a class="item">Reports</a><a class="item">Analytics</a><a class="item">Export</a>
-              <div class="ui hidden divider"></div>
-              <a class="item">Nav item</a><a class="item">Nav item again</a><a class="item">One more nav</a><a class="item">Another nav item</a><a class="item">More navigation</a>
-              <div class="ui hidden divider"></div>
-              <a class="item">Macintosh</a><a class="item">Linux</a><a class="item">Windows</a>
-            </div>
-          </div>
-          <div class="column" id="content">
-            <div class="ui grid">
-              <div class="row">
-                <h1 class="ui huge header">
-                  Dashboard
-                </h1>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
 
       <div class="ui message">
     <i class="close icon"></i>
@@ -75,19 +53,179 @@
 
 
         <div class="column">
-          <div class="top attached ui inverted grey segment">
+          <div class="top attached ui inverted grey segment" style="height:100%; overflow-y:scroll">
             <b>LOG</b>
           </div>
-          <table class="ui single line striped selectable bottom attached table">
+          <table class="ui single line striped selectable bottom attached table" style="height:100%; overflow-y:scroll">
             <thead>
               <!-- <tr><th colspan="4">LOG</th>-->
             </thead>
             <tbody>
-              <tr><td class="collapsing"><div class='ui violet label'>DEBUG</div></td> <td class="collapsing">2017-02-30:10:43:22</td> <td class="collapsing">LoggerName</td>  <td>This is a debugging message</td><td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-              <tr> <td class="collapsing"><div class='ui green label'>INFO</div></td><td class="collapsing">2017-02-30:10:43:22</td> <td class="collapsing">LoggerName</td>  <td>This is an information message</td><td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-              <tr> <td class="collapsing"><div class='ui yellow label'>WARNING</div></td><td class="collapsing">2017-02-30:10:43:22</td> <td class="collapsing">LoggerName</td>  <td>This is a warning message</td><td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-              <tr> <td class="collapsing"><div class='ui red label'>ERROR</div></td> <td class="collapsing">2017-02-30:10:43:22</td> <td class="collapsing">10:43:22</td> <td>This is an error message</td><td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
-              <tr> <td class="collapsing"><div class='ui black label'>CRITICAL</div></td> <td class="collapsing">2017-02-30:10:43:22</td> <td class="collapsing">10:43:22</td> <td>This is a critical message</td><td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td></tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui violet label'>DEBUG</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a debugging message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui green label'>INFO</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is an information message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui yellow label'>WARNING</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a warning message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui red label'>ERROR</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is an error message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
+              <tr>
+                <td class="collapsing"><div class='ui black label'>CRITICAL</div></td>
+                <td class="collapsing">2017-02-30:10:43:22</td>
+                <td class="collapsing">LoggerName</td>
+                <td>This is a critical message</td>
+                <td class="collapsing">function_name</td>
+                <td class="collapsing">module_name</td>
+                <td class="collapsing">filename.py</td>
+                <td class="collapsing">L:123</td>
+                <td class="collapsing"><i class="medium horizontal ellipsis icon"></i></td>
+              </tr>
             </tbody>
           </table>
         </div>
