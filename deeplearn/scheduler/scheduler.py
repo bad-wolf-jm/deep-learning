@@ -14,7 +14,7 @@ class Scheduler(Base):
     start_time = Column(DateTime, nullable=False)
 
     # after this time, the job won't run
-    end_time = Column(DateTime, nullable=False)
+    end_time = Column(DateTime, nullable=True)
 
     # when to run
     schedule = Column(Text, nullable=False)
@@ -47,19 +47,8 @@ class Scheduler(Base):
     def is_paused(self):
         return self.schedule != 'SCHEDULED'
 
-    def _is_interval_from_start(self, num, unit):
-        conversion = {
-            'seconds': 1,
-            'minutes': 60,
-            'hours': 3600,
-            'days': 24 * 3600,
-            'weeks': 7 * 24 * 3600
-        }
-        s = (datetime.datetime.today() - self.start_time).total_seconds()
-        return (s % (num * conversion[unit]) == 0)
-
     def _should_run_now(self):
-        pass
+        return self.schedule_object.scheduled_at(datetime.datetime.today())
 
     def _can_run_now(self):
         t = datetime.datetime.today()

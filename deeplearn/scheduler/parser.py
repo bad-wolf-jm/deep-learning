@@ -111,13 +111,30 @@ def p_every_month(t):
 def p_every_week(t):
     """
     every_week : WEEKDAY AT time
+               | list AT time
+               | list
     """
-    time = t[3]
-    assert isinstance(t[3], datetime.time)
-    t[0] = WeeklySchedule(
-        weekday=t[1],
-        time=time
-    )
+    if len(t) > 2:
+        time = t[3]
+        assert isinstance(t[3], datetime.time)
+        if isinstance(t[1], str):
+            t[0] = WeeklySchedule(
+                weekday=[t[1]],
+                time=time
+            )
+        else:
+            assert isinstance(t[1], list)
+            t[0] = WeeklySchedule(
+                weekday=t[1],
+                time=time
+            )
+    else:
+        e = []
+        for day, time in t[1]:
+            e.append(
+                WeeklySchedule([day], time)
+            )
+        t[0] = ListSchedule(e)
 
 
 def p_every_hour(t):
@@ -152,8 +169,34 @@ def p_list(t):
     """
     list : '(' list_of_times ')'
          | '(' list_of_numbers ')'
+         | '(' list_of_weekdays ')'
+         | '(' list_of_weekdays_w_times ')'
     """
     t[0] = t[2]
+
+
+def p_list_of_weekdays_w_times(t):
+    """
+    list_of_weekdays_w_times : list_of_weekdays_w_times ',' WEEKDAY AT time
+                             | WEEKDAY AT time
+    """
+    if len(t) == 4:
+        t[0] = [(t[1], t[3])]
+    else:
+        t[1].append((t[3], t[5]))
+        t[0] = t[1]
+
+
+def p_list_of_weekdays(t):
+    """
+    list_of_weekdays : list_of_weekdays ',' WEEKDAY
+                     | WEEKDAY
+    """
+    if len(t) == 2:
+        t[0] = [t[1]]
+    else:
+        t[1].append(t[3])
+        t[0] = t[1]
 
 
 def p_list_of_numbers(t):
@@ -197,6 +240,8 @@ data = [
     "EVERY FRIDAY AT 13:40",
     "EVERY SATURDAY AT 1:45",
     "EVERY SUNDAY AT 15:04",
+    "EVERY (MONDAY, WEDNESDAY, FRIDAY) AT 15:04",
+    "EVERY (MONDAY AT 15:04, WEDNESDAY AT 15:04, FRIDAY AT 15:04)",
     "EVERY DAY AT 15:45",
     "EVERY DAY AT (15:45)",
     "EVERY DAY AT (15:45, 12:31, 15:34)",
