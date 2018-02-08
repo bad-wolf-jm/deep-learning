@@ -1,0 +1,12 @@
+EVERY MINUTE
+
+EVERY HOUR ON MINUTE 1, 3, 5, 7, 9...
+
+
+EVERY DAY AT (HH:MM, [,HH:MM,...])
+EVERY <weekday> AT (HH:MM,...)
+EVERY MONTH ON DAY (1, 3, 5, 7, 9...) AT (HH:MM[, HH:MM,...])
+
+EVERY xx (MINUTES, HOURS, DAYS, WEEKS) ---> counting starts from start date of job
+
+DATE AT HH:MM
