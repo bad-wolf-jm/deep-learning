@@ -2,85 +2,97 @@ Created by PLY version 3.10 (http://www.dabeaz.com/ply)
 
 Unused terminals:
 
+    COMMENT
     SPACE
+    NEWLINE
 
 Grammar
 
 Rule 0     S' -> schedule
-Rule 1     schedule -> EVERY every_week
-Rule 2     schedule -> EVERY every_day
-Rule 3     schedule -> EVERY every_hour
-Rule 4     schedule -> EVERY every_month
-Rule 5     schedule -> EVERY every_minute
-Rule 6     every_minute -> MINUTE
-Rule 7     every_month -> MONTH ON DAY list AT time
-Rule 8     every_week -> WEEKDAY AT time
-Rule 9     every_week -> list AT time
-Rule 10    every_week -> list
-Rule 11    every_hour -> HOUR ON MINUTE list
-Rule 12    every_day -> DAY AT list
-Rule 13    every_day -> DAY AT time
-Rule 14    list -> ( list_of_times )
-Rule 15    list -> ( list_of_numbers )
-Rule 16    list -> ( list_of_weekdays )
-Rule 17    list -> ( list_of_weekdays_w_times )
-Rule 18    list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT time
-Rule 19    list_of_weekdays_w_times -> WEEKDAY AT time
-Rule 20    list_of_weekdays -> list_of_weekdays , WEEKDAY
-Rule 21    list_of_weekdays -> WEEKDAY
-Rule 22    list_of_numbers -> list_of_numbers , NUMBER
-Rule 23    list_of_numbers -> NUMBER
-Rule 24    list_of_times -> list_of_times , time
-Rule 25    list_of_times -> time
-Rule 26    time -> NUMBER : NUMBER
+Rule 1     schedule -> list
+Rule 2     schedule_element -> EVERY every_week
+Rule 3     schedule_element -> EVERY every_day
+Rule 4     schedule_element -> EVERY every_hour
+Rule 5     schedule_element -> EVERY every_month
+Rule 6     schedule_element -> EVERY every_minute
+Rule 7     every_minute -> MINUTE
+Rule 8     every_month -> MONTH ON DAY list AT time
+Rule 9     every_week -> WEEKDAY AT time
+Rule 10    every_week -> list AT time
+Rule 11    every_week -> list
+Rule 12    every_hour -> HOUR ON MINUTE list
+Rule 13    every_day -> DAY AT list
+Rule 14    every_day -> DAY AT time
+Rule 15    list -> ( list_of_times )
+Rule 16    list -> ( list_of_numbers )
+Rule 17    list -> ( list_of_weekdays )
+Rule 18    list -> ( list_of_weekdays_w_times )
+Rule 19    list -> ( list_of_schedules )
+Rule 20    list_of_schedules -> list_of_schedules , schedule_element
+Rule 21    list_of_schedules -> schedule_element
+Rule 22    list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT time
+Rule 23    list_of_weekdays_w_times -> WEEKDAY AT time
+Rule 24    list_of_weekdays -> list_of_weekdays , WEEKDAY
+Rule 25    list_of_weekdays -> WEEKDAY
+Rule 26    list_of_numbers -> list_of_numbers , NUMBER
+Rule 27    list_of_numbers -> NUMBER
+Rule 28    list_of_times -> list_of_times , time
+Rule 29    list_of_times -> time
+Rule 30    time -> NUMBER : NUMBER
 
 Terminals, with rules where they appear
 
-(                    : 14 15 16 17
-)                    : 14 15 16 17
-,                    : 18 20 22 24
-:                    : 26
-AT                   : 7 8 9 12 13 18 19
-DAY                  : 7 12 13
-EVERY                : 1 2 3 4 5
-HOUR                 : 11
-MINUTE               : 6 11
-MONTH                : 7
-NUMBER               : 22 23 26 26
-ON                   : 7 11
+(                    : 15 16 17 18 19
+)                    : 15 16 17 18 19
+,                    : 20 22 24 26 28
+:                    : 30
+AT                   : 8 9 10 13 14 22 23
+COMMENT              : 
+DAY                  : 8 13 14
+EVERY                : 2 3 4 5 6
+HOUR                 : 12
+MINUTE               : 7 12
+MONTH                : 8
+NEWLINE              : 
+NUMBER               : 26 27 30 30
+ON                   : 8 12
 SPACE                : 
-WEEKDAY              : 8 18 19 20 21
+WEEKDAY              : 9 22 23 24 25
 error                : 
 
 Nonterminals, with rules where they appear
 
-every_day            : 2
-every_hour           : 3
-every_minute         : 5
-every_month          : 4
-every_week           : 1
-list                 : 7 9 10 11 12
-list_of_numbers      : 15 22
-list_of_times        : 14 24
-list_of_weekdays     : 16 20
-list_of_weekdays_w_times : 17 18
+every_day            : 3
+every_hour           : 4
+every_minute         : 6
+every_month          : 5
+every_week           : 2
+list                 : 1 8 10 11 12 13
+list_of_numbers      : 16 26
+list_of_schedules    : 19 20
+list_of_times        : 15 28
+list_of_weekdays     : 17 24
+list_of_weekdays_w_times : 18 22
 schedule             : 0
-time                 : 7 8 9 13 18 19 24 25
+schedule_element     : 20 21
+time                 : 8 9 10 14 22 23 28 29
 
 Parsing method: LALR
 
 state 0
 
     (0) S' -> . schedule
-    (1) schedule -> . EVERY every_week
-    (2) schedule -> . EVERY every_day
-    (3) schedule -> . EVERY every_hour
-    (4) schedule -> . EVERY every_month
-    (5) schedule -> . EVERY every_minute
+    (1) schedule -> . list
+    (15) list -> . ( list_of_times )
+    (16) list -> . ( list_of_numbers )
+    (17) list -> . ( list_of_weekdays )
+    (18) list -> . ( list_of_weekdays_w_times )
+    (19) list -> . ( list_of_schedules )
 
-    EVERY           shift and go to state 2
+    (               shift and go to state 2
 
     schedule                       shift and go to state 1
+    list                           shift and go to state 3
 
 state 1
 
@@ -90,483 +102,573 @@ state 1
 
 state 2
 
-    (1) schedule -> EVERY . every_week
-    (2) schedule -> EVERY . every_day
-    (3) schedule -> EVERY . every_hour
-    (4) schedule -> EVERY . every_month
-    (5) schedule -> EVERY . every_minute
-    (8) every_week -> . WEEKDAY AT time
-    (9) every_week -> . list AT time
-    (10) every_week -> . list
-    (12) every_day -> . DAY AT list
-    (13) every_day -> . DAY AT time
-    (11) every_hour -> . HOUR ON MINUTE list
-    (7) every_month -> . MONTH ON DAY list AT time
-    (6) every_minute -> . MINUTE
-    (14) list -> . ( list_of_times )
-    (15) list -> . ( list_of_numbers )
-    (16) list -> . ( list_of_weekdays )
-    (17) list -> . ( list_of_weekdays_w_times )
+    (15) list -> ( . list_of_times )
+    (16) list -> ( . list_of_numbers )
+    (17) list -> ( . list_of_weekdays )
+    (18) list -> ( . list_of_weekdays_w_times )
+    (19) list -> ( . list_of_schedules )
+    (28) list_of_times -> . list_of_times , time
+    (29) list_of_times -> . time
+    (26) list_of_numbers -> . list_of_numbers , NUMBER
+    (27) list_of_numbers -> . NUMBER
+    (24) list_of_weekdays -> . list_of_weekdays , WEEKDAY
+    (25) list_of_weekdays -> . WEEKDAY
+    (22) list_of_weekdays_w_times -> . list_of_weekdays_w_times , WEEKDAY AT time
+    (23) list_of_weekdays_w_times -> . WEEKDAY AT time
+    (20) list_of_schedules -> . list_of_schedules , schedule_element
+    (21) list_of_schedules -> . schedule_element
+    (30) time -> . NUMBER : NUMBER
+    (2) schedule_element -> . EVERY every_week
+    (3) schedule_element -> . EVERY every_day
+    (4) schedule_element -> . EVERY every_hour
+    (5) schedule_element -> . EVERY every_month
+    (6) schedule_element -> . EVERY every_minute
 
-    WEEKDAY         shift and go to state 12
-    DAY             shift and go to state 13
-    HOUR            shift and go to state 6
-    MONTH           shift and go to state 9
-    MINUTE          shift and go to state 14
-    (               shift and go to state 7
+    NUMBER          shift and go to state 7
+    WEEKDAY         shift and go to state 9
+    EVERY           shift and go to state 8
 
-    every_minute                   shift and go to state 3
-    every_hour                     shift and go to state 4
-    every_month                    shift and go to state 5
-    list                           shift and go to state 8
-    every_week                     shift and go to state 10
-    every_day                      shift and go to state 11
+    list_of_weekdays               shift and go to state 4
+    list_of_times                  shift and go to state 5
+    list_of_weekdays_w_times       shift and go to state 10
+    time                           shift and go to state 6
+    schedule_element               shift and go to state 11
+    list_of_numbers                shift and go to state 12
+    list_of_schedules              shift and go to state 13
 
 state 3
 
-    (5) schedule -> EVERY every_minute .
+    (1) schedule -> list .
 
-    $end            reduce using rule 5 (schedule -> EVERY every_minute .)
+    $end            reduce using rule 1 (schedule -> list .)
 
 
 state 4
 
-    (3) schedule -> EVERY every_hour .
+    (17) list -> ( list_of_weekdays . )
+    (24) list_of_weekdays -> list_of_weekdays . , WEEKDAY
 
-    $end            reduce using rule 3 (schedule -> EVERY every_hour .)
+    )               shift and go to state 14
+    ,               shift and go to state 15
 
 
 state 5
 
-    (4) schedule -> EVERY every_month .
+    (15) list -> ( list_of_times . )
+    (28) list_of_times -> list_of_times . , time
 
-    $end            reduce using rule 4 (schedule -> EVERY every_month .)
+    )               shift and go to state 16
+    ,               shift and go to state 17
 
 
 state 6
 
-    (11) every_hour -> HOUR . ON MINUTE list
+    (29) list_of_times -> time .
 
-    ON              shift and go to state 15
+    )               reduce using rule 29 (list_of_times -> time .)
+    ,               reduce using rule 29 (list_of_times -> time .)
 
 
 state 7
 
-    (14) list -> ( . list_of_times )
-    (15) list -> ( . list_of_numbers )
-    (16) list -> ( . list_of_weekdays )
-    (17) list -> ( . list_of_weekdays_w_times )
-    (24) list_of_times -> . list_of_times , time
-    (25) list_of_times -> . time
-    (22) list_of_numbers -> . list_of_numbers , NUMBER
-    (23) list_of_numbers -> . NUMBER
-    (20) list_of_weekdays -> . list_of_weekdays , WEEKDAY
-    (21) list_of_weekdays -> . WEEKDAY
-    (18) list_of_weekdays_w_times -> . list_of_weekdays_w_times , WEEKDAY AT time
-    (19) list_of_weekdays_w_times -> . WEEKDAY AT time
-    (26) time -> . NUMBER : NUMBER
+    (27) list_of_numbers -> NUMBER .
+    (30) time -> NUMBER . : NUMBER
 
-    NUMBER          shift and go to state 19
-    WEEKDAY         shift and go to state 20
+    )               reduce using rule 27 (list_of_numbers -> NUMBER .)
+    ,               reduce using rule 27 (list_of_numbers -> NUMBER .)
+    :               shift and go to state 18
 
-    list_of_times                  shift and go to state 17
-    time                           shift and go to state 18
-    list_of_numbers                shift and go to state 22
-    list_of_weekdays               shift and go to state 16
-    list_of_weekdays_w_times       shift and go to state 21
 
 state 8
 
-    (9) every_week -> list . AT time
-    (10) every_week -> list .
+    (2) schedule_element -> EVERY . every_week
+    (3) schedule_element -> EVERY . every_day
+    (4) schedule_element -> EVERY . every_hour
+    (5) schedule_element -> EVERY . every_month
+    (6) schedule_element -> EVERY . every_minute
+    (9) every_week -> . WEEKDAY AT time
+    (10) every_week -> . list AT time
+    (11) every_week -> . list
+    (13) every_day -> . DAY AT list
+    (14) every_day -> . DAY AT time
+    (12) every_hour -> . HOUR ON MINUTE list
+    (8) every_month -> . MONTH ON DAY list AT time
+    (7) every_minute -> . MINUTE
+    (15) list -> . ( list_of_times )
+    (16) list -> . ( list_of_numbers )
+    (17) list -> . ( list_of_weekdays )
+    (18) list -> . ( list_of_weekdays_w_times )
+    (19) list -> . ( list_of_schedules )
 
-    AT              shift and go to state 23
-    $end            reduce using rule 10 (every_week -> list .)
+    WEEKDAY         shift and go to state 19
+    DAY             shift and go to state 25
+    HOUR            shift and go to state 23
+    MONTH           shift and go to state 29
+    MINUTE          shift and go to state 27
+    (               shift and go to state 2
 
+    every_minute                   shift and go to state 20
+    every_hour                     shift and go to state 21
+    every_month                    shift and go to state 22
+    list                           shift and go to state 28
+    every_week                     shift and go to state 26
+    every_day                      shift and go to state 24
 
 state 9
 
-    (7) every_month -> MONTH . ON DAY list AT time
+    (25) list_of_weekdays -> WEEKDAY .
+    (23) list_of_weekdays_w_times -> WEEKDAY . AT time
 
-    ON              shift and go to state 24
+    )               reduce using rule 25 (list_of_weekdays -> WEEKDAY .)
+    ,               reduce using rule 25 (list_of_weekdays -> WEEKDAY .)
+    AT              shift and go to state 30
 
 
 state 10
 
-    (1) schedule -> EVERY every_week .
+    (18) list -> ( list_of_weekdays_w_times . )
+    (22) list_of_weekdays_w_times -> list_of_weekdays_w_times . , WEEKDAY AT time
 
-    $end            reduce using rule 1 (schedule -> EVERY every_week .)
+    )               shift and go to state 31
+    ,               shift and go to state 32
 
 
 state 11
 
-    (2) schedule -> EVERY every_day .
+    (21) list_of_schedules -> schedule_element .
 
-    $end            reduce using rule 2 (schedule -> EVERY every_day .)
+    )               reduce using rule 21 (list_of_schedules -> schedule_element .)
+    ,               reduce using rule 21 (list_of_schedules -> schedule_element .)
 
 
 state 12
 
-    (8) every_week -> WEEKDAY . AT time
+    (16) list -> ( list_of_numbers . )
+    (26) list_of_numbers -> list_of_numbers . , NUMBER
 
-    AT              shift and go to state 25
+    )               shift and go to state 33
+    ,               shift and go to state 34
 
 
 state 13
 
-    (12) every_day -> DAY . AT list
-    (13) every_day -> DAY . AT time
+    (19) list -> ( list_of_schedules . )
+    (20) list_of_schedules -> list_of_schedules . , schedule_element
 
-    AT              shift and go to state 26
+    )               shift and go to state 35
+    ,               shift and go to state 36
 
 
 state 14
 
-    (6) every_minute -> MINUTE .
+    (17) list -> ( list_of_weekdays ) .
 
-    $end            reduce using rule 6 (every_minute -> MINUTE .)
+    $end            reduce using rule 17 (list -> ( list_of_weekdays ) .)
+    )               reduce using rule 17 (list -> ( list_of_weekdays ) .)
+    ,               reduce using rule 17 (list -> ( list_of_weekdays ) .)
+    AT              reduce using rule 17 (list -> ( list_of_weekdays ) .)
 
 
 state 15
 
-    (11) every_hour -> HOUR ON . MINUTE list
+    (24) list_of_weekdays -> list_of_weekdays , . WEEKDAY
 
-    MINUTE          shift and go to state 27
+    WEEKDAY         shift and go to state 37
 
 
 state 16
 
-    (16) list -> ( list_of_weekdays . )
-    (20) list_of_weekdays -> list_of_weekdays . , WEEKDAY
+    (15) list -> ( list_of_times ) .
 
-    )               shift and go to state 28
-    ,               shift and go to state 29
+    $end            reduce using rule 15 (list -> ( list_of_times ) .)
+    )               reduce using rule 15 (list -> ( list_of_times ) .)
+    ,               reduce using rule 15 (list -> ( list_of_times ) .)
+    AT              reduce using rule 15 (list -> ( list_of_times ) .)
 
 
 state 17
 
-    (14) list -> ( list_of_times . )
-    (24) list_of_times -> list_of_times . , time
-
-    )               shift and go to state 30
-    ,               shift and go to state 31
-
-
-state 18
-
-    (25) list_of_times -> time .
-
-    )               reduce using rule 25 (list_of_times -> time .)
-    ,               reduce using rule 25 (list_of_times -> time .)
-
-
-state 19
-
-    (23) list_of_numbers -> NUMBER .
-    (26) time -> NUMBER . : NUMBER
-
-    )               reduce using rule 23 (list_of_numbers -> NUMBER .)
-    ,               reduce using rule 23 (list_of_numbers -> NUMBER .)
-    :               shift and go to state 32
-
-
-state 20
-
-    (21) list_of_weekdays -> WEEKDAY .
-    (19) list_of_weekdays_w_times -> WEEKDAY . AT time
-
-    )               reduce using rule 21 (list_of_weekdays -> WEEKDAY .)
-    ,               reduce using rule 21 (list_of_weekdays -> WEEKDAY .)
-    AT              shift and go to state 33
-
-
-state 21
-
-    (17) list -> ( list_of_weekdays_w_times . )
-    (18) list_of_weekdays_w_times -> list_of_weekdays_w_times . , WEEKDAY AT time
-
-    )               shift and go to state 34
-    ,               shift and go to state 35
-
-
-state 22
-
-    (15) list -> ( list_of_numbers . )
-    (22) list_of_numbers -> list_of_numbers . , NUMBER
-
-    )               shift and go to state 36
-    ,               shift and go to state 37
-
-
-state 23
-
-    (9) every_week -> list AT . time
-    (26) time -> . NUMBER : NUMBER
+    (28) list_of_times -> list_of_times , . time
+    (30) time -> . NUMBER : NUMBER
 
     NUMBER          shift and go to state 38
 
     time                           shift and go to state 39
 
+state 18
+
+    (30) time -> NUMBER : . NUMBER
+
+    NUMBER          shift and go to state 40
+
+
+state 19
+
+    (9) every_week -> WEEKDAY . AT time
+
+    AT              shift and go to state 41
+
+
+state 20
+
+    (6) schedule_element -> EVERY every_minute .
+
+    )               reduce using rule 6 (schedule_element -> EVERY every_minute .)
+    ,               reduce using rule 6 (schedule_element -> EVERY every_minute .)
+
+
+state 21
+
+    (4) schedule_element -> EVERY every_hour .
+
+    )               reduce using rule 4 (schedule_element -> EVERY every_hour .)
+    ,               reduce using rule 4 (schedule_element -> EVERY every_hour .)
+
+
+state 22
+
+    (5) schedule_element -> EVERY every_month .
+
+    )               reduce using rule 5 (schedule_element -> EVERY every_month .)
+    ,               reduce using rule 5 (schedule_element -> EVERY every_month .)
+
+
+state 23
+
+    (12) every_hour -> HOUR . ON MINUTE list
+
+    ON              shift and go to state 42
+
+
 state 24
 
-    (7) every_month -> MONTH ON . DAY list AT time
+    (3) schedule_element -> EVERY every_day .
 
-    DAY             shift and go to state 40
+    )               reduce using rule 3 (schedule_element -> EVERY every_day .)
+    ,               reduce using rule 3 (schedule_element -> EVERY every_day .)
 
 
 state 25
 
-    (8) every_week -> WEEKDAY AT . time
-    (26) time -> . NUMBER : NUMBER
+    (13) every_day -> DAY . AT list
+    (14) every_day -> DAY . AT time
 
-    NUMBER          shift and go to state 38
+    AT              shift and go to state 43
 
-    time                           shift and go to state 41
 
 state 26
 
-    (12) every_day -> DAY AT . list
-    (13) every_day -> DAY AT . time
-    (14) list -> . ( list_of_times )
-    (15) list -> . ( list_of_numbers )
-    (16) list -> . ( list_of_weekdays )
-    (17) list -> . ( list_of_weekdays_w_times )
-    (26) time -> . NUMBER : NUMBER
+    (2) schedule_element -> EVERY every_week .
 
-    (               shift and go to state 7
-    NUMBER          shift and go to state 38
+    )               reduce using rule 2 (schedule_element -> EVERY every_week .)
+    ,               reduce using rule 2 (schedule_element -> EVERY every_week .)
 
-    time                           shift and go to state 43
-    list                           shift and go to state 42
 
 state 27
 
-    (11) every_hour -> HOUR ON MINUTE . list
-    (14) list -> . ( list_of_times )
-    (15) list -> . ( list_of_numbers )
-    (16) list -> . ( list_of_weekdays )
-    (17) list -> . ( list_of_weekdays_w_times )
+    (7) every_minute -> MINUTE .
 
-    (               shift and go to state 7
+    )               reduce using rule 7 (every_minute -> MINUTE .)
+    ,               reduce using rule 7 (every_minute -> MINUTE .)
 
-    list                           shift and go to state 44
 
 state 28
 
-    (16) list -> ( list_of_weekdays ) .
+    (10) every_week -> list . AT time
+    (11) every_week -> list .
 
-    $end            reduce using rule 16 (list -> ( list_of_weekdays ) .)
-    AT              reduce using rule 16 (list -> ( list_of_weekdays ) .)
+    AT              shift and go to state 44
+    )               reduce using rule 11 (every_week -> list .)
+    ,               reduce using rule 11 (every_week -> list .)
 
 
 state 29
 
-    (20) list_of_weekdays -> list_of_weekdays , . WEEKDAY
+    (8) every_month -> MONTH . ON DAY list AT time
 
-    WEEKDAY         shift and go to state 45
+    ON              shift and go to state 45
 
 
 state 30
 
-    (14) list -> ( list_of_times ) .
-
-    $end            reduce using rule 14 (list -> ( list_of_times ) .)
-    AT              reduce using rule 14 (list -> ( list_of_times ) .)
-
-
-state 31
-
-    (24) list_of_times -> list_of_times , . time
-    (26) time -> . NUMBER : NUMBER
+    (23) list_of_weekdays_w_times -> WEEKDAY AT . time
+    (30) time -> . NUMBER : NUMBER
 
     NUMBER          shift and go to state 38
 
     time                           shift and go to state 46
 
+state 31
+
+    (18) list -> ( list_of_weekdays_w_times ) .
+
+    $end            reduce using rule 18 (list -> ( list_of_weekdays_w_times ) .)
+    )               reduce using rule 18 (list -> ( list_of_weekdays_w_times ) .)
+    ,               reduce using rule 18 (list -> ( list_of_weekdays_w_times ) .)
+    AT              reduce using rule 18 (list -> ( list_of_weekdays_w_times ) .)
+
+
 state 32
 
-    (26) time -> NUMBER : . NUMBER
+    (22) list_of_weekdays_w_times -> list_of_weekdays_w_times , . WEEKDAY AT time
 
-    NUMBER          shift and go to state 47
+    WEEKDAY         shift and go to state 47
 
 
 state 33
 
-    (19) list_of_weekdays_w_times -> WEEKDAY AT . time
-    (26) time -> . NUMBER : NUMBER
+    (16) list -> ( list_of_numbers ) .
 
-    NUMBER          shift and go to state 38
+    $end            reduce using rule 16 (list -> ( list_of_numbers ) .)
+    )               reduce using rule 16 (list -> ( list_of_numbers ) .)
+    ,               reduce using rule 16 (list -> ( list_of_numbers ) .)
+    AT              reduce using rule 16 (list -> ( list_of_numbers ) .)
 
-    time                           shift and go to state 48
 
 state 34
 
-    (17) list -> ( list_of_weekdays_w_times ) .
+    (26) list_of_numbers -> list_of_numbers , . NUMBER
 
-    $end            reduce using rule 17 (list -> ( list_of_weekdays_w_times ) .)
-    AT              reduce using rule 17 (list -> ( list_of_weekdays_w_times ) .)
+    NUMBER          shift and go to state 48
 
 
 state 35
 
-    (18) list_of_weekdays_w_times -> list_of_weekdays_w_times , . WEEKDAY AT time
+    (19) list -> ( list_of_schedules ) .
 
-    WEEKDAY         shift and go to state 49
+    $end            reduce using rule 19 (list -> ( list_of_schedules ) .)
+    )               reduce using rule 19 (list -> ( list_of_schedules ) .)
+    ,               reduce using rule 19 (list -> ( list_of_schedules ) .)
+    AT              reduce using rule 19 (list -> ( list_of_schedules ) .)
 
 
 state 36
 
-    (15) list -> ( list_of_numbers ) .
+    (20) list_of_schedules -> list_of_schedules , . schedule_element
+    (2) schedule_element -> . EVERY every_week
+    (3) schedule_element -> . EVERY every_day
+    (4) schedule_element -> . EVERY every_hour
+    (5) schedule_element -> . EVERY every_month
+    (6) schedule_element -> . EVERY every_minute
 
-    $end            reduce using rule 15 (list -> ( list_of_numbers ) .)
-    AT              reduce using rule 15 (list -> ( list_of_numbers ) .)
+    EVERY           shift and go to state 8
 
+    schedule_element               shift and go to state 49
 
 state 37
 
-    (22) list_of_numbers -> list_of_numbers , . NUMBER
+    (24) list_of_weekdays -> list_of_weekdays , WEEKDAY .
 
-    NUMBER          shift and go to state 50
+    )               reduce using rule 24 (list_of_weekdays -> list_of_weekdays , WEEKDAY .)
+    ,               reduce using rule 24 (list_of_weekdays -> list_of_weekdays , WEEKDAY .)
 
 
 state 38
 
-    (26) time -> NUMBER . : NUMBER
+    (30) time -> NUMBER . : NUMBER
 
-    :               shift and go to state 32
+    :               shift and go to state 18
 
 
 state 39
 
-    (9) every_week -> list AT time .
+    (28) list_of_times -> list_of_times , time .
 
-    $end            reduce using rule 9 (every_week -> list AT time .)
+    )               reduce using rule 28 (list_of_times -> list_of_times , time .)
+    ,               reduce using rule 28 (list_of_times -> list_of_times , time .)
 
 
 state 40
 
-    (7) every_month -> MONTH ON DAY . list AT time
-    (14) list -> . ( list_of_times )
-    (15) list -> . ( list_of_numbers )
-    (16) list -> . ( list_of_weekdays )
-    (17) list -> . ( list_of_weekdays_w_times )
+    (30) time -> NUMBER : NUMBER .
 
-    (               shift and go to state 7
+    )               reduce using rule 30 (time -> NUMBER : NUMBER .)
+    ,               reduce using rule 30 (time -> NUMBER : NUMBER .)
 
-    list                           shift and go to state 51
 
 state 41
 
-    (8) every_week -> WEEKDAY AT time .
+    (9) every_week -> WEEKDAY AT . time
+    (30) time -> . NUMBER : NUMBER
 
-    $end            reduce using rule 8 (every_week -> WEEKDAY AT time .)
+    NUMBER          shift and go to state 38
 
+    time                           shift and go to state 50
 
 state 42
 
-    (12) every_day -> DAY AT list .
+    (12) every_hour -> HOUR ON . MINUTE list
 
-    $end            reduce using rule 12 (every_day -> DAY AT list .)
+    MINUTE          shift and go to state 51
 
 
 state 43
 
-    (13) every_day -> DAY AT time .
+    (13) every_day -> DAY AT . list
+    (14) every_day -> DAY AT . time
+    (15) list -> . ( list_of_times )
+    (16) list -> . ( list_of_numbers )
+    (17) list -> . ( list_of_weekdays )
+    (18) list -> . ( list_of_weekdays_w_times )
+    (19) list -> . ( list_of_schedules )
+    (30) time -> . NUMBER : NUMBER
 
-    $end            reduce using rule 13 (every_day -> DAY AT time .)
+    (               shift and go to state 2
+    NUMBER          shift and go to state 38
 
+    time                           shift and go to state 53
+    list                           shift and go to state 52
 
 state 44
 
-    (11) every_hour -> HOUR ON MINUTE list .
-
-    $end            reduce using rule 11 (every_hour -> HOUR ON MINUTE list .)
-
-
-state 45
-
-    (20) list_of_weekdays -> list_of_weekdays , WEEKDAY .
-
-    )               reduce using rule 20 (list_of_weekdays -> list_of_weekdays , WEEKDAY .)
-    ,               reduce using rule 20 (list_of_weekdays -> list_of_weekdays , WEEKDAY .)
-
-
-state 46
-
-    (24) list_of_times -> list_of_times , time .
-
-    )               reduce using rule 24 (list_of_times -> list_of_times , time .)
-    ,               reduce using rule 24 (list_of_times -> list_of_times , time .)
-
-
-state 47
-
-    (26) time -> NUMBER : NUMBER .
-
-    $end            reduce using rule 26 (time -> NUMBER : NUMBER .)
-    )               reduce using rule 26 (time -> NUMBER : NUMBER .)
-    ,               reduce using rule 26 (time -> NUMBER : NUMBER .)
-
-
-state 48
-
-    (19) list_of_weekdays_w_times -> WEEKDAY AT time .
-
-    )               reduce using rule 19 (list_of_weekdays_w_times -> WEEKDAY AT time .)
-    ,               reduce using rule 19 (list_of_weekdays_w_times -> WEEKDAY AT time .)
-
-
-state 49
-
-    (18) list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY . AT time
-
-    AT              shift and go to state 52
-
-
-state 50
-
-    (22) list_of_numbers -> list_of_numbers , NUMBER .
-
-    )               reduce using rule 22 (list_of_numbers -> list_of_numbers , NUMBER .)
-    ,               reduce using rule 22 (list_of_numbers -> list_of_numbers , NUMBER .)
-
-
-state 51
-
-    (7) every_month -> MONTH ON DAY list . AT time
-
-    AT              shift and go to state 53
-
-
-state 52
-
-    (18) list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT . time
-    (26) time -> . NUMBER : NUMBER
+    (10) every_week -> list AT . time
+    (30) time -> . NUMBER : NUMBER
 
     NUMBER          shift and go to state 38
 
     time                           shift and go to state 54
 
+state 45
+
+    (8) every_month -> MONTH ON . DAY list AT time
+
+    DAY             shift and go to state 55
+
+
+state 46
+
+    (23) list_of_weekdays_w_times -> WEEKDAY AT time .
+
+    )               reduce using rule 23 (list_of_weekdays_w_times -> WEEKDAY AT time .)
+    ,               reduce using rule 23 (list_of_weekdays_w_times -> WEEKDAY AT time .)
+
+
+state 47
+
+    (22) list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY . AT time
+
+    AT              shift and go to state 56
+
+
+state 48
+
+    (26) list_of_numbers -> list_of_numbers , NUMBER .
+
+    )               reduce using rule 26 (list_of_numbers -> list_of_numbers , NUMBER .)
+    ,               reduce using rule 26 (list_of_numbers -> list_of_numbers , NUMBER .)
+
+
+state 49
+
+    (20) list_of_schedules -> list_of_schedules , schedule_element .
+
+    )               reduce using rule 20 (list_of_schedules -> list_of_schedules , schedule_element .)
+    ,               reduce using rule 20 (list_of_schedules -> list_of_schedules , schedule_element .)
+
+
+state 50
+
+    (9) every_week -> WEEKDAY AT time .
+
+    )               reduce using rule 9 (every_week -> WEEKDAY AT time .)
+    ,               reduce using rule 9 (every_week -> WEEKDAY AT time .)
+
+
+state 51
+
+    (12) every_hour -> HOUR ON MINUTE . list
+    (15) list -> . ( list_of_times )
+    (16) list -> . ( list_of_numbers )
+    (17) list -> . ( list_of_weekdays )
+    (18) list -> . ( list_of_weekdays_w_times )
+    (19) list -> . ( list_of_schedules )
+
+    (               shift and go to state 2
+
+    list                           shift and go to state 57
+
+state 52
+
+    (13) every_day -> DAY AT list .
+
+    )               reduce using rule 13 (every_day -> DAY AT list .)
+    ,               reduce using rule 13 (every_day -> DAY AT list .)
+
+
 state 53
 
-    (7) every_month -> MONTH ON DAY list AT . time
-    (26) time -> . NUMBER : NUMBER
+    (14) every_day -> DAY AT time .
 
-    NUMBER          shift and go to state 38
+    )               reduce using rule 14 (every_day -> DAY AT time .)
+    ,               reduce using rule 14 (every_day -> DAY AT time .)
 
-    time                           shift and go to state 55
 
 state 54
 
-    (18) list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT time .
+    (10) every_week -> list AT time .
 
-    )               reduce using rule 18 (list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT time .)
-    ,               reduce using rule 18 (list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT time .)
+    )               reduce using rule 10 (every_week -> list AT time .)
+    ,               reduce using rule 10 (every_week -> list AT time .)
 
 
 state 55
 
-    (7) every_month -> MONTH ON DAY list AT time .
+    (8) every_month -> MONTH ON DAY . list AT time
+    (15) list -> . ( list_of_times )
+    (16) list -> . ( list_of_numbers )
+    (17) list -> . ( list_of_weekdays )
+    (18) list -> . ( list_of_weekdays_w_times )
+    (19) list -> . ( list_of_schedules )
 
-    $end            reduce using rule 7 (every_month -> MONTH ON DAY list AT time .)
+    (               shift and go to state 2
+
+    list                           shift and go to state 58
+
+state 56
+
+    (22) list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT . time
+    (30) time -> . NUMBER : NUMBER
+
+    NUMBER          shift and go to state 38
+
+    time                           shift and go to state 59
+
+state 57
+
+    (12) every_hour -> HOUR ON MINUTE list .
+
+    )               reduce using rule 12 (every_hour -> HOUR ON MINUTE list .)
+    ,               reduce using rule 12 (every_hour -> HOUR ON MINUTE list .)
+
+
+state 58
+
+    (8) every_month -> MONTH ON DAY list . AT time
+
+    AT              shift and go to state 60
+
+
+state 59
+
+    (22) list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT time .
+
+    )               reduce using rule 22 (list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT time .)
+    ,               reduce using rule 22 (list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT time .)
+
+
+state 60
+
+    (8) every_month -> MONTH ON DAY list AT . time
+    (30) time -> . NUMBER : NUMBER
+
+    NUMBER          shift and go to state 38
+
+    time                           shift and go to state 61
+
+state 61
+
+    (8) every_month -> MONTH ON DAY list AT time .
+
+    )               reduce using rule 8 (every_month -> MONTH ON DAY list AT time .)
+    ,               reduce using rule 8 (every_month -> MONTH ON DAY list AT time .)
 

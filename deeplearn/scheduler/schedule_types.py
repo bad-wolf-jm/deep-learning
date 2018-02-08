@@ -11,14 +11,30 @@ class Schedule(object):
     def should_run_now(self):
         return self.scheduled_at(datetime.datetime.today)
 
-    def next_n_events(self, n=5):
-        raise NotImplemented()
+    def next_n_events(self, n=2, date_start=None):
+        date_start = date_start if date_start is not None else datetime.datetime.today()
+        next_events = []
+        for i, ev in enumerate(self.list_events(start_date)):
+            if i < n:
+                next_events.append(ev)
+            else:
+                break
+        return next_events
 
-    def first_event_after(self, date):
-        raise NotImplemented()
+    def list_events(self, date_start):
+        if self.scheduled_at(date_start):
+            yield date_start
+        e = date_start
+        while True:
+            e = self.first_event_after(e)
+            yield e
 
     def get_events_in_range(self, date_start, date_end):
-        raise NotImplemented()
+        for ev in self.list_events(date_start):
+            if ev <= date_end:
+                yield ev
+            else:
+                break
 
     def _round_date(self, d):
         return datetime.datetime(
@@ -29,8 +45,12 @@ class Schedule(object):
             minute=d.minute
         )
 
+    def first_event_after(self, date):
+        raise NotImplemented()
+
+
 class ListSchedule(Schedule):
-    # Syntax: EVERY MINUTE
+    # Syntax: (<schedule>, <schedule>, <schedule>,...)
     def __init__(self, schedules):
         super(ListSchedule, self).__init__()
         self.schedules = schedules
@@ -42,6 +62,7 @@ class ListSchedule(Schedule):
 
     def __repr__(self):
         return repr(self.schedules)
+
 
 class MinuteSchedule(Schedule):
     # Syntax: EVERY MINUTE
