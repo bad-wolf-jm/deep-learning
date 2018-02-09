@@ -5,9 +5,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = "NUMBER SPACE NEWLINE COMMENT EVERY AT ON WEEKDAY MINUTE HOUR DAY MONTH\n        schedule : list\n        \n        schedule_element : EVERY every_week\n                         | EVERY every_day\n                         | EVERY every_hour\n                         | EVERY every_month\n                         | EVERY every_minute\n\n        \n        every_minute : MINUTE\n        \n        every_month : MONTH ON DAY list AT time\n        \n        every_week : WEEKDAY AT time\n                   | list AT time\n                   | list\n        \n        every_hour : HOUR ON MINUTE list\n        \n        every_day : DAY AT list\n                  | DAY AT time\n        \n        list : '(' list_of_times ')'\n             | '(' list_of_numbers ')'\n             | '(' list_of_weekdays ')'\n             | '(' list_of_weekdays_w_times ')'\n             | '(' list_of_schedules ')'\n        \n        list_of_schedules : list_of_schedules ',' schedule_element\n                          | schedule_element\n        \n        list_of_weekdays_w_times : list_of_weekdays_w_times ',' WEEKDAY AT time\n                                 | WEEKDAY AT time\n        \n        list_of_weekdays : list_of_weekdays ',' WEEKDAY\n                         | WEEKDAY\n        \n        list_of_numbers : list_of_numbers ',' NUMBER\n                        | NUMBER\n        \n        list_of_times : list_of_times ',' time\n                      | time\n        \n        time : NUMBER ':' NUMBER\n        "
+_lr_signature = "NUMBER SPACE NEWLINE COMMENT EVERY AT ON WEEKDAY MINUTE HOUR DAY MONTH STARTING ENDING INTERVAL\n        schedule : list\n        \n        schedule_element : schedule_prefix schedule_spec\n        \n        schedule_spec : every_week\n                      | every_day\n                      | every_hour\n                      | every_month\n                      | every_minute\n                      | every_interval\n                      | schedule_date\n        \n        schedule_prefix : EVERY\n                        | STARTING\n                        | ENDING\n        \n        schedule_date : ON date AT time\n        \n        every_interval : NUMBER INTERVAL\n        \n        every_minute : MINUTE\n        \n        every_month : MONTH ON DAY list AT time\n        \n        every_week : WEEKDAY AT time\n                   | list AT time\n                   | list\n        \n        every_hour : HOUR ON MINUTE list\n        \n        every_day : DAY AT list\n                  | DAY AT time\n        \n        list : '(' list_of_times ')'\n             | '(' list_of_numbers ')'\n             | '(' list_of_weekdays ')'\n             | '(' list_of_weekdays_w_times ')'\n             | '(' list_of_schedules ')'\n        \n        list_of_schedules : list_of_schedules ',' schedule_element\n                          | schedule_element\n        \n        list_of_weekdays_w_times : list_of_weekdays_w_times ',' WEEKDAY AT time\n                                 | WEEKDAY AT time\n        \n        list_of_weekdays : list_of_weekdays ',' WEEKDAY\n                         | WEEKDAY\n        \n        list_of_numbers : list_of_numbers ',' NUMBER\n                        | NUMBER\n        \n        list_of_times : list_of_times ',' time\n                      | time\n        \n        time : NUMBER ':' NUMBER\n        \n        date : NUMBER '-' NUMBER '-' NUMBER\n        "
     
-_lr_action_items = {'ON':([23,29,],[42,45,]),'HOUR':([8,],[23,]),')':([4,5,6,7,9,10,11,12,13,14,16,20,21,22,24,26,27,28,31,33,35,37,39,40,46,48,49,50,52,53,54,57,59,61,],[14,16,-29,-27,-25,31,-21,33,35,-17,-15,-6,-4,-5,-3,-2,-7,-11,-18,-16,-19,-24,-28,-30,-23,-26,-20,-9,-13,-14,-10,-12,-22,-8,]),'(':([0,8,43,51,55,],[2,2,2,2,2,]),'NUMBER':([2,17,18,30,34,41,43,44,56,60,],[7,38,40,38,48,38,38,38,38,38,]),',':([4,5,6,7,9,10,11,12,13,14,16,20,21,22,24,26,27,28,31,33,35,37,39,40,46,48,49,50,52,53,54,57,59,61,],[15,17,-29,-27,-25,32,-21,34,36,-17,-15,-6,-4,-5,-3,-2,-7,-11,-18,-16,-19,-24,-28,-30,-23,-26,-20,-9,-13,-14,-10,-12,-22,-8,]),'EVERY':([2,36,],[8,8,]),'WEEKDAY':([2,8,15,32,],[9,19,37,47,]),'MONTH':([8,],[29,]),'AT':([9,14,16,19,25,28,31,33,35,47,58,],[30,-17,-15,41,43,44,-18,-16,-19,56,60,]),':':([7,38,],[18,18,]),'DAY':([8,45,],[25,55,]),'MINUTE':([8,42,],[27,51,]),'$end':([1,3,14,16,31,33,35,],[0,-1,-17,-15,-18,-16,-19,]),}
+_lr_action_items = {'ON':([4,9,10,15,22,32,],[26,-11,-10,-12,47,52,]),',':([5,6,7,8,11,12,13,14,16,19,20,21,23,25,27,28,29,30,31,33,35,39,41,43,45,53,55,56,57,59,60,61,63,64,67,70,72,74,78,],[34,36,-37,-35,-33,40,-29,42,44,-7,-5,-6,-4,-2,-8,-3,-9,-15,-19,-25,-23,-26,-24,-27,-14,-32,-36,-38,-31,-34,-28,-17,-21,-22,-18,-20,-13,-30,-16,]),':':([8,54,],[37,37,]),'HOUR':([4,9,10,15,],[22,-11,-10,-12,]),')':([5,6,7,8,11,12,13,14,16,19,20,21,23,25,27,28,29,30,31,33,35,39,41,43,45,53,55,56,57,59,60,61,63,64,67,70,72,74,78,],[33,35,-37,-35,-33,39,-29,41,43,-7,-5,-6,-4,-2,-8,-3,-9,-15,-19,-25,-23,-26,-24,-27,-14,-32,-36,-38,-31,-34,-28,-17,-21,-22,-18,-20,-13,-30,-16,]),'(':([0,4,9,10,15,48,62,68,],[2,2,-11,-10,-12,2,2,2,]),'INTERVAL':([17,],[45,]),'-':([49,71,],[65,75,]),'NUMBER':([2,4,9,10,15,26,36,37,38,42,46,48,51,65,66,69,75,76,],[8,17,-11,-10,-12,49,54,56,54,59,54,54,54,71,54,54,77,54,]),'ENDING':([2,44,],[15,15,]),'EVERY':([2,44,],[10,10,]),'WEEKDAY':([2,4,9,10,15,34,40,],[11,18,-11,-10,-12,53,58,]),'AT':([11,18,24,31,33,35,39,41,43,50,58,73,77,],[38,46,48,51,-25,-23,-26,-24,-27,66,69,76,-39,]),'MONTH':([4,9,10,15,],[32,-11,-10,-12,]),'STARTING':([2,44,],[9,9,]),'DAY':([4,9,10,15,52,],[24,-11,-10,-12,68,]),'MINUTE':([4,9,10,15,47,],[30,-11,-10,-12,62,]),'$end':([1,3,33,35,39,41,43,],[0,-1,-25,-23,-26,-24,-27,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'every_minute':([8,],[20,]),'every_hour':([8,],[21,]),'every_month':([8,],[22,]),'list_of_weekdays':([2,],[4,]),'schedule':([0,],[1,]),'list_of_times':([2,],[5,]),'time':([2,17,30,41,43,44,56,60,],[6,39,46,50,53,54,59,61,]),'list':([0,8,43,51,55,],[3,28,52,57,58,]),'every_week':([8,],[26,]),'every_day':([8,],[24,]),'list_of_weekdays_w_times':([2,],[10,]),'schedule_element':([2,36,],[11,49,]),'list_of_numbers':([2,],[12,]),'list_of_schedules':([2,],[13,]),}
+_lr_goto_items = {'every_minute':([4,],[19,]),'schedule_prefix':([2,44,],[4,4,]),'every_hour':([4,],[20,]),'every_month':([4,],[21,]),'list_of_weekdays':([2,],[5,]),'schedule':([0,],[1,]),'every_interval':([4,],[27,]),'list_of_times':([2,],[6,]),'time':([2,36,38,46,48,51,66,69,76,],[7,55,57,61,64,67,72,74,78,]),'list':([0,4,48,62,68,],[3,31,63,70,73,]),'schedule_spec':([4,],[25,]),'every_week':([4,],[28,]),'every_day':([4,],[23,]),'list_of_weekdays_w_times':([2,],[12,]),'date':([26,],[50,]),'schedule_element':([2,44,],[13,60,]),'schedule_date':([4,],[29,]),'list_of_numbers':([2,],[14,]),'list_of_schedules':([2,],[16,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,33 +27,42 @@ del _lr_goto_items
 _lr_productions = [
   ("S' -> schedule","S'",1,None,None,None),
   ('schedule -> list','schedule',1,'p_schedule','parser.py',25),
-  ('schedule_element -> EVERY every_week','schedule_element',2,'p_schedule_element','parser.py',35),
-  ('schedule_element -> EVERY every_day','schedule_element',2,'p_schedule_element','parser.py',36),
-  ('schedule_element -> EVERY every_hour','schedule_element',2,'p_schedule_element','parser.py',37),
-  ('schedule_element -> EVERY every_month','schedule_element',2,'p_schedule_element','parser.py',38),
-  ('schedule_element -> EVERY every_minute','schedule_element',2,'p_schedule_element','parser.py',39),
-  ('every_minute -> MINUTE','every_minute',1,'p_every_minute','parser.py',47),
-  ('every_month -> MONTH ON DAY list AT time','every_month',6,'p_every_month','parser.py',54),
-  ('every_week -> WEEKDAY AT time','every_week',3,'p_every_week','parser.py',69),
-  ('every_week -> list AT time','every_week',3,'p_every_week','parser.py',70),
-  ('every_week -> list','every_week',1,'p_every_week','parser.py',71),
-  ('every_hour -> HOUR ON MINUTE list','every_hour',4,'p_every_hour','parser.py',98),
-  ('every_day -> DAY AT list','every_day',3,'p_every_day','parser.py',107),
-  ('every_day -> DAY AT time','every_day',3,'p_every_day','parser.py',108),
-  ('list -> ( list_of_times )','list',3,'p_list','parser.py',126),
-  ('list -> ( list_of_numbers )','list',3,'p_list','parser.py',127),
-  ('list -> ( list_of_weekdays )','list',3,'p_list','parser.py',128),
-  ('list -> ( list_of_weekdays_w_times )','list',3,'p_list','parser.py',129),
-  ('list -> ( list_of_schedules )','list',3,'p_list','parser.py',130),
-  ('list_of_schedules -> list_of_schedules , schedule_element','list_of_schedules',3,'p_list_of_schedules','parser.py',137),
-  ('list_of_schedules -> schedule_element','list_of_schedules',1,'p_list_of_schedules','parser.py',138),
-  ('list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT time','list_of_weekdays_w_times',5,'p_list_of_weekdays_w_times','parser.py',149),
-  ('list_of_weekdays_w_times -> WEEKDAY AT time','list_of_weekdays_w_times',3,'p_list_of_weekdays_w_times','parser.py',150),
-  ('list_of_weekdays -> list_of_weekdays , WEEKDAY','list_of_weekdays',3,'p_list_of_weekdays','parser.py',161),
-  ('list_of_weekdays -> WEEKDAY','list_of_weekdays',1,'p_list_of_weekdays','parser.py',162),
-  ('list_of_numbers -> list_of_numbers , NUMBER','list_of_numbers',3,'p_list_of_numbers','parser.py',173),
-  ('list_of_numbers -> NUMBER','list_of_numbers',1,'p_list_of_numbers','parser.py',174),
-  ('list_of_times -> list_of_times , time','list_of_times',3,'p_list_of_times','parser.py',185),
-  ('list_of_times -> time','list_of_times',1,'p_list_of_times','parser.py',186),
-  ('time -> NUMBER : NUMBER','time',3,'p_time','parser.py',197),
+  ('schedule_element -> schedule_prefix schedule_spec','schedule_element',2,'p_schedule_element','parser.py',34),
+  ('schedule_spec -> every_week','schedule_spec',1,'p_schedule_spec','parser.py',46),
+  ('schedule_spec -> every_day','schedule_spec',1,'p_schedule_spec','parser.py',47),
+  ('schedule_spec -> every_hour','schedule_spec',1,'p_schedule_spec','parser.py',48),
+  ('schedule_spec -> every_month','schedule_spec',1,'p_schedule_spec','parser.py',49),
+  ('schedule_spec -> every_minute','schedule_spec',1,'p_schedule_spec','parser.py',50),
+  ('schedule_spec -> every_interval','schedule_spec',1,'p_schedule_spec','parser.py',51),
+  ('schedule_spec -> schedule_date','schedule_spec',1,'p_schedule_spec','parser.py',52),
+  ('schedule_prefix -> EVERY','schedule_prefix',1,'p_schedule_prefix','parser.py',58),
+  ('schedule_prefix -> STARTING','schedule_prefix',1,'p_schedule_prefix','parser.py',59),
+  ('schedule_prefix -> ENDING','schedule_prefix',1,'p_schedule_prefix','parser.py',60),
+  ('schedule_date -> ON date AT time','schedule_date',4,'p_schedule_date','parser.py',66),
+  ('every_interval -> NUMBER INTERVAL','every_interval',2,'p_every_interval','parser.py',78),
+  ('every_minute -> MINUTE','every_minute',1,'p_every_minute','parser.py',84),
+  ('every_month -> MONTH ON DAY list AT time','every_month',6,'p_every_month','parser.py',90),
+  ('every_week -> WEEKDAY AT time','every_week',3,'p_every_week','parser.py',104),
+  ('every_week -> list AT time','every_week',3,'p_every_week','parser.py',105),
+  ('every_week -> list','every_week',1,'p_every_week','parser.py',106),
+  ('every_hour -> HOUR ON MINUTE list','every_hour',4,'p_every_hour','parser.py',132),
+  ('every_day -> DAY AT list','every_day',3,'p_every_day','parser.py',140),
+  ('every_day -> DAY AT time','every_day',3,'p_every_day','parser.py',141),
+  ('list -> ( list_of_times )','list',3,'p_list','parser.py',158),
+  ('list -> ( list_of_numbers )','list',3,'p_list','parser.py',159),
+  ('list -> ( list_of_weekdays )','list',3,'p_list','parser.py',160),
+  ('list -> ( list_of_weekdays_w_times )','list',3,'p_list','parser.py',161),
+  ('list -> ( list_of_schedules )','list',3,'p_list','parser.py',162),
+  ('list_of_schedules -> list_of_schedules , schedule_element','list_of_schedules',3,'p_list_of_schedules','parser.py',168),
+  ('list_of_schedules -> schedule_element','list_of_schedules',1,'p_list_of_schedules','parser.py',169),
+  ('list_of_weekdays_w_times -> list_of_weekdays_w_times , WEEKDAY AT time','list_of_weekdays_w_times',5,'p_list_of_weekdays_w_times','parser.py',179),
+  ('list_of_weekdays_w_times -> WEEKDAY AT time','list_of_weekdays_w_times',3,'p_list_of_weekdays_w_times','parser.py',180),
+  ('list_of_weekdays -> list_of_weekdays , WEEKDAY','list_of_weekdays',3,'p_list_of_weekdays','parser.py',190),
+  ('list_of_weekdays -> WEEKDAY','list_of_weekdays',1,'p_list_of_weekdays','parser.py',191),
+  ('list_of_numbers -> list_of_numbers , NUMBER','list_of_numbers',3,'p_list_of_numbers','parser.py',201),
+  ('list_of_numbers -> NUMBER','list_of_numbers',1,'p_list_of_numbers','parser.py',202),
+  ('list_of_times -> list_of_times , time','list_of_times',3,'p_list_of_times','parser.py',212),
+  ('list_of_times -> time','list_of_times',1,'p_list_of_times','parser.py',213),
+  ('time -> NUMBER : NUMBER','time',3,'p_time','parser.py',223),
+  ('date -> NUMBER - NUMBER - NUMBER','date',5,'p_date','parser.py',229),
 ]

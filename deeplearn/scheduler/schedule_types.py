@@ -4,8 +4,21 @@ import datetime
 class Schedule(object):
     def __init__(self):
         super(Schedule, self).__init__()
+        self._starting = None
+        self._ending = None
 
     def scheduled_at(self, time):
+        if self._starting is not None and self._ending is not None:
+            return time >= self._starting and time <= self._ending
+
+        if self._starting is not None:
+            return time >= self._starting
+
+        if self._ending is not None:
+            return time <= self._ending
+
+        return True
+
         raise NotImplemented()
 
     def should_run_now(self):
@@ -49,11 +62,55 @@ class Schedule(object):
         raise NotImplemented()
 
 
+class Start(object):
+    """docstring for Start."""
+    # Syntax: STARTING ON date AT time
+    def __init__(self, date):
+        super(Start, self).__init__()
+        self.date = datetime.datetime(
+            year=date.year,
+            month=date.month,
+            day=date.day,
+            hour=date.hour,
+            minute=date.minute
+        )
+
+
+class End(object):
+    """docstring for Start."""
+    # Syntax: ENDING ON date AT time
+
+    def __init__(self, date):
+        super(End, self).__init__()
+        self.date = datetime.datetime(
+            year=date.year,
+            month=date.month,
+            day=date.day,
+            hour=date.hour,
+            minute=date.minute)
+
+
 class ListSchedule(Schedule):
     # Syntax: (<schedule>, <schedule>, <schedule>,...)
     def __init__(self, schedules):
         super(ListSchedule, self).__init__()
-        self.schedules = schedules
+        self.schedules = []  # schedules
+        for s in schedules:
+            if isinstance(s, Start):
+                if self._starting is None:
+                    self._starting = s.date
+                else:
+                    raise Exception()
+            elif isinstance(s, End):
+                if self._ending is None:
+                    self._ending = s.date
+                else:
+                    raise Exception()
+            else:
+                self.schedules.append(s)
+        for s in self.schedules:
+            s._starting = self._starting
+            s._ending = self._ending
 
     def scheduled_at(self, time):
         for s in self.schedules:
@@ -67,6 +124,26 @@ class ListSchedule(Schedule):
         return repr(self.schedules)
 
 
+class IntervalSchedule(Schedule):
+    # Syntax: EVERY number unit
+    def __init__(self, number, unit):
+        super(IntervalSchedule, self).__init__()
+        self._number = number
+        self._unit = unit
+        pass
+
+    def __repr__(self):
+        return "EVERY {} {}".format(self._number, self._unit)
+
+    def scheduled_at(self, time):
+        return True  # time >= self._starting and time
+
+    def first_event_after(self, date):
+        f = self._round_date(date)
+        return f + datetime.timedelta(minutes=1)
+
+
+
 class MinuteSchedule(Schedule):
     # Syntax: EVERY MINUTE
     def __init__(self):
@@ -77,7 +154,7 @@ class MinuteSchedule(Schedule):
         return "EVERY MINUTE"
 
     def scheduled_at(self, time):
-        return True
+        return True  # time >= self._starting and time
 
     def first_event_after(self, date):
         f = self._round_date(date)
@@ -140,7 +217,7 @@ class WeeklySchedule(Schedule):
     # Syntax: EVERY <list_of_weekdays> AT <time>
     # Syntax: EVERY <list_of_(<weekday AT TIME>)>
     def __init__(self, weekday, time):
-        super(WeeklySchedule, self).__init__
+        super(WeeklySchedule, self).__init__()
         _days = {
             'MONDAY': 0, 'TUESDAY': 1, 'WEDNESDAY': 2, 'THURSDAY': 3,
             'FRIDAY': 4, 'SATURDAY': 5, 'SUNDAY': 6
@@ -174,22 +251,22 @@ class MonthlySchedule(Schedule):
     def first_event_after(self, date):
         raise NotImplemented()
 
-
-if __name__ == '__main__':
-    x = datetime.datetime.today().date()
-    x = datetime.datetime(year=x.year, month=x.month, day=x.day, hour=0, minute=0, second=0)
-    delta = datetime.timedelta(minutes=1)
-    y = x
-    job = DailySchedule(times_list=[
-        datetime.time(9, 23),
-        datetime.time(12, 3),
-        datetime.time(13, 43),
-        datetime.time(23, 56),
-        datetime.time(10, 45)
-    ])
-    #job = MinuteSchedule()
-    #job = HourlySchedule(minute_list = [5, 10, 15, 20, 35, 36, 45, 52])
-    while y.day == x.day:
-        if job.scheduled_at(y):
-            print(y, job.scheduled_at(y))
-        y += delta
+#
+# if __name__ == '__main__':
+#     x = datetime.datetime.today().date()
+#     x = datetime.datetime(year=x.year, month=x.month, day=x.day, hour=0, minute=0, second=0)
+#     delta = datetime.timedelta(minutes=1)
+#     y = x
+#     job = DailySchedule(times_list=[
+#         datetime.time(9, 23),
+#         datetime.time(12, 3),
+#         datetime.time(13, 43),
+#         datetime.time(23, 56),
+#         datetime.time(10, 45)
+#     ])
+#     #job = MinuteSchedule()
+#     #job = HourlySchedule(minute_list = [5, 10, 15, 20, 35, 36, 45, 52])
+#     while y.day == x.day:
+#         if job.scheduled_at(y):
+#             print(y, job.scheduled_at(y))
+#         y += delta

@@ -1,7 +1,7 @@
 import ply.yacc as yacc
 
 import datetime
-from schedule_types import ListSchedule, MinuteSchedule, HourlySchedule, DailySchedule, WeeklySchedule, MonthlySchedule
+from schedule_types import Start, End, ListSchedule, IntervalSchedule, MinuteSchedule, HourlySchedule, DailySchedule, WeeklySchedule, MonthlySchedule
 from lexer import ScheduleLexer
 
 
@@ -31,14 +31,53 @@ class ScheduleParser(object):
 
     def p_schedule_element(self, t):
         """
-        schedule_element : EVERY every_week
-                         | EVERY every_day
-                         | EVERY every_hour
-                         | EVERY every_month
-                         | EVERY every_minute
-
+        schedule_element : schedule_prefix schedule_spec
         """
-        t[0] = t[2]
+        schedule_prefix = t[1]
+        if schedule_prefix == 'EVERY':
+            t[0] = t[2]
+        elif schedule_prefix == 'STARTING':
+            t[0] = Start(t[2])
+        else:
+            t[0] = End(t[2])
+
+    def p_schedule_spec(self, t):
+        """
+        schedule_spec : every_week
+                      | every_day
+                      | every_hour
+                      | every_month
+                      | every_minute
+                      | every_interval
+                      | schedule_date
+        """
+        t[0] = t[1]
+
+    def p_schedule_prefix(self, t):
+        """
+        schedule_prefix : EVERY
+                        | STARTING
+                        | ENDING
+        """
+        t[0] = t[1]
+
+    def p_schedule_date(self, t):
+        """
+        schedule_date : ON date AT time
+        """
+        t[0] = datetime.datetime(
+            year=t[2].year,
+            month=t[2].month,
+            day=t[2].day,
+            hour=t[4].hour,
+            minute=t[4].minute
+        )
+
+    def p_every_interval(self, t):
+        """
+        every_interval : NUMBER INTERVAL
+        """
+        t[0] = IntervalSchedule(t[1], t[2])
 
     def p_every_minute(self, t):
         """
@@ -185,13 +224,11 @@ class ScheduleParser(object):
         """
         t[0] = datetime.time(hour=t[1], minute=t[3])
 
-
-# lexer = lex.lex()
-# parser = yacc.yacc()
-
-#
-# def parse_schedule(code):
-#     return parser.parse(code)
+    def p_date(self, t):
+        """
+        date : NUMBER '-' NUMBER '-' NUMBER
+        """
+        t[0] = datetime.date(year=t[1], month=t[3], day=t[5])
 
 
 data = [
@@ -202,7 +239,7 @@ data = [
     "(EVERY WEDNESDAY AT 15:45)",
     "(EVERY THURSDAY AT 16:45)",
     "(EVERY FRIDAY AT 13:40)",
-    "(EVERY SATURDAY AT 1:45)",
+    "(EVERY SATURDAY AT 01:45)",
     "(EVERY SUNDAY AT 15:04)",
     "(EVERY (MONDAY, WEDNESDAY, FRIDAY) AT 15:04)",
     "(EVERY (MONDAY AT 15:04, WEDNESDAY AT 15:04, FRIDAY AT 15:04))",
@@ -210,13 +247,19 @@ data = [
     "(EVERY DAY AT (15:45))",
     "(EVERY DAY AT (15:45, 12:31, 15:34))",
     "(EVERY MONTH ON DAY (1, 3, 5, 7, 9) AT 12:00)",
+    #"(STARTING ON 2018-12-12 AT 12:00)",
     """
     # WITH A COMMENT
     (
-        EVERY DAY AT 15:45,
-        EVERY DAY AT (15:45),
-        EVERY DAY AT (15:45, 12:31, 15:34),
-        EVERY MONTH ON DAY (1, 3, 5, 7, 9) AT 12:00
+        STARTING ON 2018-01-01 AT 12:00,
+            EVERY 15 MINUTES,
+            EVERY 2 DAYS,
+            EVERY 3 WEEKS,
+            EVERY DAY AT 15:45,
+            EVERY DAY AT (15:45),
+            EVERY DAY AT (15:45, 12:31, 15:34),
+            EVERY MONTH ON DAY (1, 3, 5, 7, 9) AT 12:00,
+        ENDING ON 2019-01-01 AT 12:00
     )
     """
 ]
@@ -226,4 +269,4 @@ p = ScheduleParser()
 for d in data:
     print('PARSING', d)
     result = p.parse(d)
-    print(result)
+    print(result, result._starting, result._ending)

@@ -4,16 +4,21 @@ import ply.lex as lex
 class ScheduleLexer(object):
     tokens = (
         'NUMBER', 'SPACE', 'NEWLINE', 'COMMENT', 'EVERY', 'AT',
-        'ON', 'WEEKDAY', 'MINUTE', 'HOUR', 'DAY', 'MONTH',
+        'ON', 'WEEKDAY', 'MINUTE', 'HOUR', 'DAY', 'MONTH', 'STARTING',
+        'ENDING', 'INTERVAL'
     )
 
     literals = [':', '-', '(', ')', ' ', ',']
 
     t_WEEKDAY = r'SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY'
 
+    t_INTERVAL = r'MINUTES|HOURS|DAYS|WEEKS|MONTHS'
+
     t_EVERY = r'EVERY'
     t_AT = r'AT'
     t_ON = r'ON'
+    t_STARTING = r'STARTING'
+    t_ENDING = r'ENDING'
 
     t_MINUTE = r'MINUTE'
     t_HOUR = r'HOUR'
@@ -24,7 +29,7 @@ class ScheduleLexer(object):
         super(ScheduleLexer, self).__init__()
 
     def t_NUMBER(self, t):
-        r'\d\d+'
+        r'\d+'
         t.value = int(t.value)
         return t
 
