@@ -1,11 +1,13 @@
 import ply.yacc as yacc
 
 import datetime
-from schedule_types import *
+from schedule_types import ListSchedule, MinuteSchedule, HourlySchedule, DailySchedule, WeeklySchedule, MonthlySchedule
 from lexer import ScheduleLexer
+
 
 class ScheduleParser(object):
     """docstring for ScheduleParser."""
+
     def __init__(self):
         super(ScheduleParser, self).__init__()
         self.lexer = ScheduleLexer()
@@ -27,7 +29,6 @@ class ScheduleParser(object):
         else:
             t[0] = ListSchedule(schedules=t[1])
 
-
     def p_schedule_element(self, t):
         """
         schedule_element : EVERY every_week
@@ -39,13 +40,11 @@ class ScheduleParser(object):
         """
         t[0] = t[2]
 
-
     def p_every_minute(self, t):
         """
         every_minute : MINUTE
         """
         t[0] = MinuteSchedule()
-
 
     def p_every_month(self, t):
         """
@@ -60,7 +59,6 @@ class ScheduleParser(object):
             days=t[4],
             time=t[6]
         )
-
 
     def p_every_week(self, t):
         """
@@ -90,7 +88,6 @@ class ScheduleParser(object):
                 )
             t[0] = ListSchedule(e)
 
-
     def p_every_hour(self, t):
         """
         every_hour : HOUR ON MINUTE list
@@ -98,7 +95,6 @@ class ScheduleParser(object):
         t[0] = HourlySchedule(
             minute_list=t[4]
         )
-
 
     def p_every_day(self, t):
         """
@@ -118,7 +114,6 @@ class ScheduleParser(object):
                 times_list=[t[3]]
             )
 
-
     def p_list(self, t):
         """
         list : '(' list_of_times ')'
@@ -128,7 +123,6 @@ class ScheduleParser(object):
              | '(' list_of_schedules ')'
         """
         t[0] = t[2]
-
 
     def p_list_of_schedules(self, t):
         """
@@ -141,7 +135,6 @@ class ScheduleParser(object):
             t[1].append(t[3])
             t[0] = t[1]
 
-
     def p_list_of_weekdays_w_times(self, t):
         """
         list_of_weekdays_w_times : list_of_weekdays_w_times ',' WEEKDAY AT time
@@ -152,7 +145,6 @@ class ScheduleParser(object):
         else:
             t[1].append((t[3], t[5]))
             t[0] = t[1]
-
 
     def p_list_of_weekdays(self, t):
         """
@@ -165,7 +157,6 @@ class ScheduleParser(object):
             t[1].append(t[3])
             t[0] = t[1]
 
-
     def p_list_of_numbers(self, t):
         """
         list_of_numbers : list_of_numbers ',' NUMBER
@@ -177,7 +168,6 @@ class ScheduleParser(object):
             t[1].append(t[3])
             t[0] = t[1]
 
-
     def p_list_of_times(self, t):
         """
         list_of_times : list_of_times ',' time
@@ -188,7 +178,6 @@ class ScheduleParser(object):
         else:
             t[1].append(t[3])
             t[0] = t[1]
-
 
     def p_time(self, t):
         """
@@ -223,10 +212,12 @@ data = [
     "(EVERY MONTH ON DAY (1, 3, 5, 7, 9) AT 12:00)",
     """
     # WITH A COMMENT
-    (EVERY DAY AT 15:45,
-    EVERY DAY AT (15:45),
-    EVERY DAY AT (15:45, 12:31, 15:34),
-    EVERY MONTH ON DAY (1, 3, 5, 7, 9) AT 12:00)
+    (
+        EVERY DAY AT 15:45,
+        EVERY DAY AT (15:45),
+        EVERY DAY AT (15:45, 12:31, 15:34),
+        EVERY MONTH ON DAY (1, 3, 5, 7, 9) AT 12:00
+    )
     """
 ]
 

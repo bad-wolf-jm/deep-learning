@@ -60,6 +60,9 @@ class ListSchedule(Schedule):
             if s.scheduled_at(time):
                 return True
 
+    def first_event_after(self, date):
+        return min([x.first_event_after(date) for x in self.schedules])
+
     def __repr__(self):
         return repr(self.schedules)
 
@@ -80,18 +83,6 @@ class MinuteSchedule(Schedule):
         f = self._round_date(date)
         return f + datetime.timedelta(minutes=1)
 
-    def next_n_events(self, n=2):
-        now = datetime.datetime.today()
-        delta = datetime.timedelta(minutes=1)
-        f = self._round_date(now)
-        r = []
-        if now.time().second != 0:
-            f += delta
-        for d in range(n):
-            r.append(f)
-            f += delta
-        return r
-
 
 class HourlySchedule(Schedule):
     # Syntax: EVERY HOUR ON MINUTE <minute>
@@ -106,8 +97,24 @@ class HourlySchedule(Schedule):
     def scheduled_at(self, time):
         return time.time().minute in self.minute_list
 
-    def next_n_events(self, n=2):
-        pass
+    def _set_minute(self, date, minute):
+        return datetime.datetime(
+            year=date.year,
+            month=date.month,
+            day=date.day,
+            hour=date.hour,
+            minute=minute
+        )
+
+    def first_event_after(self, date):
+        d = self._round_date(date)
+        m = date.time().minute
+        for x in self.minute_list:
+            if x > m:
+                return self._set_minute(d, x)
+        else:
+            d += datetime.timedelta(hours=1)
+            return self._set_minute(d, self.minute_list[0])
 
 
 class DailySchedule(Schedule):
@@ -124,8 +131,8 @@ class DailySchedule(Schedule):
         rounded_time = datetime.time(time.time().hour, time.time().minute)
         return rounded_time in self.times_list
 
-    def next_n_events(self, n=2):
-        pass
+    def first_event_after(self, date):
+        raise NotImplemented()
 
 
 class WeeklySchedule(Schedule):
@@ -135,13 +142,8 @@ class WeeklySchedule(Schedule):
     def __init__(self, weekday, time):
         super(WeeklySchedule, self).__init__
         _days = {
-            'MONDAY': 0,
-            'TUESDAY': 1,
-            'WEDNESDAY': 2,
-            'THURSDAY': 3,
-            'FRIDAY': 4,
-            'SATURDAY': 5,
-            'SUNDAY': 6
+            'MONDAY': 0, 'TUESDAY': 1, 'WEDNESDAY': 2, 'THURSDAY': 3,
+            'FRIDAY': 4, 'SATURDAY': 5, 'SUNDAY': 6
         }
         self.weekday = [_days[w] for w in weekday]
         self.time = time
@@ -152,8 +154,8 @@ class WeeklySchedule(Schedule):
     def scheduled_at(self, time):
         return (time.weekday() == self.weekday) and (self.time == time.time())
 
-    def next_n_events(self, n=2):
-        pass
+    def first_event_after(self, date):
+        raise NotImplemented()
 
 
 class MonthlySchedule(Schedule):
@@ -169,8 +171,8 @@ class MonthlySchedule(Schedule):
     def scheduled_at(self, time):
         return (time.day in self.days) and (time.time() == self.time)
 
-    def next_n_events(self, n=2):
-        pass
+    def first_event_after(self, date):
+        raise NotImplemented()
 
 
 if __name__ == '__main__':

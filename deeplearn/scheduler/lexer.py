@@ -1,8 +1,4 @@
 import ply.lex as lex
-#import ply.yacc as yacc
-
-#import datetime
-#from schedule_types import *
 
 
 class ScheduleLexer(object):
@@ -28,12 +24,12 @@ class ScheduleLexer(object):
         super(ScheduleLexer, self).__init__()
 
     def t_NUMBER(self, t):
-        r'\d+'
+        r'\d\d+'
         t.value = int(t.value)
         return t
 
     def t_SPACE(self, t):
-        r'\ '
+        r'\ |\t'
         pass
 
     def t_NEWLINE(self, t):
