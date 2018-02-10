@@ -19,8 +19,6 @@ class Schedule(object):
 
         return True
 
-        raise NotImplemented()
-
     def should_run_now(self):
         return self.scheduled_at(datetime.datetime.today)
 
@@ -58,12 +56,16 @@ class Schedule(object):
             minute=d.minute
         )
 
+    def first_event(self):
+        if self.scheduled_at(self._starting):
+            return self._starting
+        return self.first_event_after(self._starting)
+
     def first_event_after(self, date):
         raise NotImplemented()
 
 
 class Start(object):
-    """docstring for Start."""
     # Syntax: STARTING ON date AT time
     def __init__(self, date):
         super(Start, self).__init__()
@@ -77,9 +79,7 @@ class Start(object):
 
 
 class End(object):
-    """docstring for Start."""
     # Syntax: ENDING ON date AT time
-
     def __init__(self, date):
         super(End, self).__init__()
         self.date = datetime.datetime(
@@ -130,18 +130,29 @@ class IntervalSchedule(Schedule):
         super(IntervalSchedule, self).__init__()
         self._number = number
         self._unit = unit
-        pass
 
     def __repr__(self):
         return "EVERY {} {}".format(self._number, self._unit)
 
+    @property
+    def unit_factor(self):
+        return {
+            "MINUTES": 60.0,
+            "HOURS": 3600.0,
+            "DAYS": 24 * 3600.0,
+            "WEEKS": 7 * 24 * 3600.0
+        }[self._unit]
+
     def scheduled_at(self, time):
-        return True  # time >= self._starting and time
+        delta = time - self._starting
+        interval = self._number * self.unit_factor
+        return (delta.total_seconds() % interval) == 0
 
     def first_event_after(self, date):
-        f = self._round_date(date)
-        return f + datetime.timedelta(minutes=1)
-
+        delta = date - self._starting
+        interval = self._number * self.unit_factor
+        q = (delta.total_seconds() // interval) + interval
+        return self._starting + datetime.timedelta(seconds=q)
 
 
 class MinuteSchedule(Schedule):
@@ -152,9 +163,6 @@ class MinuteSchedule(Schedule):
 
     def __repr__(self):
         return "EVERY MINUTE"
-
-    def scheduled_at(self, time):
-        return True  # time >= self._starting and time
 
     def first_event_after(self, date):
         f = self._round_date(date)
@@ -208,8 +216,24 @@ class DailySchedule(Schedule):
         rounded_time = datetime.time(time.time().hour, time.time().minute)
         return rounded_time in self.times_list
 
+    def _set_time(self, date, time):
+        return datetime.datetime(
+            year=date.year,
+            month=date.month,
+            day=date.day,
+            hour=time.hour,
+            minute=time.minute
+        )
+
     def first_event_after(self, date):
-        raise NotImplemented()
+        d = self._round_date(date)
+        m = date.time()
+        for x in self.times_list:
+            if x > d:
+                return self._set_time(d, x)
+        else:
+            d += datetime.timedelta(days=1)
+            return self._set_time(d, self.times_list[0])
 
 
 class WeeklySchedule(Schedule):
@@ -229,10 +253,34 @@ class WeeklySchedule(Schedule):
         return "EVERY {weekday} AT {time}".format(weekday=self.weekday, time=self.time)
 
     def scheduled_at(self, time):
-        return (time.weekday() == self.weekday) and (self.time == time.time())
+        return (time.weekday() in self.weekday) and (self.time == time.time())
+
+    def _set_time(self, date, time):
+        return datetime.datetime(
+            year=date.year,
+            month=date.month,
+            day=date.day,
+            hour=time.hour,
+            minute=time.minute
+        )
 
     def first_event_after(self, date):
-        raise NotImplemented()
+        #weekdays = [0,1,2,3,4,5]
+        day = date.weekday()
+        time = date.time()
+        if day in self.weekday and time < self.time:
+            return self._set_time(date, self.time)
+        else:
+            for d in self.weekday:
+                if d > day:
+                    diff_day = d - day
+                    delta = datetime.timedelta(days=diff_day)
+                    next_date = date + delta
+                    return self._set_time(next_date, self.time)
+            diff_day = day - self.weekday[0]
+            delta = datetime.timedelta(days=diff_day)
+            next_date = date + delta
+            return self._set_time(next_date, self.time)
 
 
 class MonthlySchedule(Schedule):
@@ -249,24 +297,18 @@ class MonthlySchedule(Schedule):
         return (time.day in self.days) and (time.time() == self.time)
 
     def first_event_after(self, date):
-        raise NotImplemented()
-
-#
-# if __name__ == '__main__':
-#     x = datetime.datetime.today().date()
-#     x = datetime.datetime(year=x.year, month=x.month, day=x.day, hour=0, minute=0, second=0)
-#     delta = datetime.timedelta(minutes=1)
-#     y = x
-#     job = DailySchedule(times_list=[
-#         datetime.time(9, 23),
-#         datetime.time(12, 3),
-#         datetime.time(13, 43),
-#         datetime.time(23, 56),
-#         datetime.time(10, 45)
-#     ])
-#     #job = MinuteSchedule()
-#     #job = HourlySchedule(minute_list = [5, 10, 15, 20, 35, 36, 45, 52])
-#     while y.day == x.day:
-#         if job.scheduled_at(y):
-#             print(y, job.scheduled_at(y))
-#         y += delta
+        day = date.day()
+        time = date.time()
+        if day in self.days and time < self.time:
+            return self._set_time(date, self.time)
+        else:
+            for d in self.days:
+                if d > day:
+                    diff_day = d - day
+                    delta = datetime.timedelta(days=diff_day)
+                    next_date = date + delta
+                    return self._set_time(next_date, self.time)
+            diff_day = day - self.days[0]
+            delta = datetime.timedelta(days=diff_day)
+            next_date = date + delta
+            return self._set_time(next_date, self.time)
