@@ -7,6 +7,29 @@ class Schedule(object):
         self._starting = None
         self._ending = None
 
+    def _round_date(self, d):
+        return datetime.datetime(
+            year=d.year,
+            month=d.month,
+            day=d.day,
+            hour=d.hour,
+            minute=d.minute
+        )
+
+    def _set_time(self, date, time):
+        return datetime.datetime(
+            year=date.year,
+            month=date.month,
+            day=date.day,
+            hour=time.hour,
+            minute=time.minute
+        )
+
+    def _n_days_from(self, date, n, time):
+        delta = datetime.timedelta(days=n)
+        next_date = date + delta
+        return self._set_time(next_date, self.time)
+
     def scheduled_at(self, time):
         if self._starting is not None and self._ending is not None:
             return time >= self._starting and time <= self._ending
@@ -46,15 +69,6 @@ class Schedule(object):
                 yield ev
             else:
                 break
-
-    def _round_date(self, d):
-        return datetime.datetime(
-            year=d.year,
-            month=d.month,
-            day=d.day,
-            hour=d.hour,
-            minute=d.minute
-        )
 
     def first_event(self):
         if self.scheduled_at(self._starting):
@@ -216,15 +230,6 @@ class DailySchedule(Schedule):
         rounded_time = datetime.time(time.time().hour, time.time().minute)
         return rounded_time in self.times_list
 
-    def _set_time(self, date, time):
-        return datetime.datetime(
-            year=date.year,
-            month=date.month,
-            day=date.day,
-            hour=time.hour,
-            minute=time.minute
-        )
-
     def first_event_after(self, date):
         d = self._round_date(date)
         m = date.time()
@@ -255,17 +260,7 @@ class WeeklySchedule(Schedule):
     def scheduled_at(self, time):
         return (time.weekday() in self.weekday) and (self.time == time.time())
 
-    def _set_time(self, date, time):
-        return datetime.datetime(
-            year=date.year,
-            month=date.month,
-            day=date.day,
-            hour=time.hour,
-            minute=time.minute
-        )
-
     def first_event_after(self, date):
-        #weekdays = [0,1,2,3,4,5]
         day = date.weekday()
         time = date.time()
         if day in self.weekday and time < self.time:
@@ -274,13 +269,9 @@ class WeeklySchedule(Schedule):
             for d in self.weekday:
                 if d > day:
                     diff_day = d - day
-                    delta = datetime.timedelta(days=diff_day)
-                    next_date = date + delta
-                    return self._set_time(next_date, self.time)
+                    return self._n_days_from(date, diff_day)
             diff_day = day - self.weekday[0]
-            delta = datetime.timedelta(days=diff_day)
-            next_date = date + delta
-            return self._set_time(next_date, self.time)
+            return self._n_days_from(date, diff_day)
 
 
 class MonthlySchedule(Schedule):
@@ -305,10 +296,6 @@ class MonthlySchedule(Schedule):
             for d in self.days:
                 if d > day:
                     diff_day = d - day
-                    delta = datetime.timedelta(days=diff_day)
-                    next_date = date + delta
-                    return self._set_time(next_date, self.time)
+                    return self._n_days_from(date, diff_day)
             diff_day = day - self.days[0]
-            delta = datetime.timedelta(days=diff_day)
-            next_date = date + delta
-            return self._set_time(next_date, self.time)
+            return self._n_days_from(date, diff_day)
