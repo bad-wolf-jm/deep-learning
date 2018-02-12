@@ -28,7 +28,11 @@ class Schedule(object):
     def _n_days_from(self, date, n, time):
         delta = datetime.timedelta(days=n)
         next_date = date + delta
-        return self._set_time(next_date, self.time)
+        return self._set_time(next_date, time)
+
+    #@property
+    # def starting(self):
+    #    if self._starting is None:
 
     def scheduled_at(self, time):
         if self._starting is not None and self._ending is not None:
@@ -66,6 +70,7 @@ class Schedule(object):
     def get_events_in_range(self, date_start, date_end):
         for ev in self.list_events(date_start):
             if ev <= date_end:
+                print(ev)
                 yield ev
             else:
                 break
@@ -165,8 +170,11 @@ class IntervalSchedule(Schedule):
     def first_event_after(self, date):
         delta = date - self._starting
         interval = self._number * self.unit_factor
-        q = (delta.total_seconds() // interval) + interval
-        return self._starting + datetime.timedelta(seconds=q)
+        q = (delta.total_seconds() // interval)
+        r = delta.total_seconds() % interval
+        return date + datetime.timedelta(seconds=interval - r)
+
+        # return self._starting + datetime.timedelta(seconds=q)
 
 
 class MinuteSchedule(Schedule):
@@ -234,7 +242,7 @@ class DailySchedule(Schedule):
         d = self._round_date(date)
         m = date.time()
         for x in self.times_list:
-            if x > d:
+            if x > m:
                 return self._set_time(d, x)
         else:
             d += datetime.timedelta(days=1)
@@ -251,7 +259,7 @@ class WeeklySchedule(Schedule):
             'MONDAY': 0, 'TUESDAY': 1, 'WEDNESDAY': 2, 'THURSDAY': 3,
             'FRIDAY': 4, 'SATURDAY': 5, 'SUNDAY': 6
         }
-        self.weekday = [_days[w] for w in weekday]
+        self.weekday = sorted([_days[w] for w in weekday])
         self.time = time
 
     def __repr__(self):
@@ -266,12 +274,19 @@ class WeeklySchedule(Schedule):
         if day in self.weekday and time < self.time:
             return self._set_time(date, self.time)
         else:
-            for d in self.weekday:
-                if d > day:
-                    diff_day = d - day
-                    return self._n_days_from(date, diff_day)
-            diff_day = day - self.weekday[0]
-            return self._n_days_from(date, diff_day)
+            if day in self.weekday:
+                d = self.weekday.index(day)
+                d = self.weekday[(d + 1) % len(self.weekday)]
+                diff_day = d - day
+                diff_day += 7 if diff_day < 0 else 0
+                return self._n_days_from(date, diff_day, self.time)
+            else:
+                for d in self.weekday:
+                    if d > day:
+                        diff_day = d - day
+                        return self._n_days_from(date, diff_day, self.time)
+                diff_day = day - self.weekday[0]
+                return self._n_days_from(date, diff_day, self.time)
 
 
 class MonthlySchedule(Schedule):
@@ -288,7 +303,7 @@ class MonthlySchedule(Schedule):
         return (time.day in self.days) and (time.time() == self.time)
 
     def first_event_after(self, date):
-        day = date.day()
+        day = date.day
         time = date.time()
         if day in self.days and time < self.time:
             return self._set_time(date, self.time)
@@ -296,6 +311,61 @@ class MonthlySchedule(Schedule):
             for d in self.days:
                 if d > day:
                     diff_day = d - day
-                    return self._n_days_from(date, diff_day)
-            diff_day = day - self.days[0]
-            return self._n_days_from(date, diff_day)
+                    return self._n_days_from(date, diff_day, self.time)
+
+            M = (date.month + 1)
+            if M == 13:
+                M = 1
+                Y = date.year + 1
+            else:
+                Y = date.year
+            return self._set_time(datetime.date(Y, M, self.days[0]), self.time)
+
+
+if __name__ == '__main__':
+    dates = []
+    d = datetime.timedelta(minutes=1)
+    f = datetime.datetime(year=2017, month=1, day=1)
+    while f.year < 2018:
+        dates.append(f)
+        f += d
+
+    x = IntervalSchedule(4, 'WEEKS')
+    x = HourlySchedule([12, 13, 14, 34, 56, 7])
+    x = DailySchedule([
+        datetime.time(hour=1, minute=23),
+        datetime.time(hour=3, minute=56),
+        datetime.time(hour=13, minute=42)
+    ])
+
+    x = WeeklySchedule([
+        'MONDAY', 'WEDNESDAY', 'FRIDAY', 'SUNDAY'
+    ],
+        datetime.time(13, 43)
+    )
+
+    x = MonthlySchedule([
+        1, 3, 5, 15, 21, 29, 30, 31
+    ],
+        datetime.time(13, 43)
+    )
+
+    x._starting = datetime.datetime(year=2017, month=1, day=1)
+
+    l1 = [t for t in dates if x.scheduled_at(t)]
+    l2 = list(x.get_events_in_range(
+        datetime.datetime(year=2017, month=1, day=1),
+        datetime.datetime(year=2017, month=12, day=31, hour=23, minute=59, second=59)))
+
+    m = min(len(l1), len(l2))
+    for a, b in zip(l1[:m], l2[:m]):
+        # if (a-b).total_seconds() != 0:
+        print a, b, a - b
+    print(len(l1), len(l2))
+    # print(l1[m:])
+
+    # print len([t for t in dates if x.scheduled_at(t)])
+    # print len(list(x.get_events_in_range(
+    #         datetime.datetime(year=2017, month=1, day=1),
+    #         datetime.datetime(year=2017, month=12, day=31))
+    #     ))
