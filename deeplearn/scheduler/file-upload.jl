@@ -4,8 +4,10 @@ const ROOT::String = "/root/data/uploads"
 function mk_unique_filename(root::AbstractString, extension::AnstractString)
 end
 
-mime_extensions = Dict(
-
+mime_extensions = Dict{AbstractString, AbstractString}(
+    "image/jpeg" => "jpg",
+    "image/png" => "png",
+    "image/bmp" => "bmp"
 )
 
 function write_json(stream::HTTP.Stream, json_object::Dict)
@@ -41,11 +43,8 @@ function save_stream(stream::HTTP.Stream, content_type::AbstractString, content_
         :filesize => filestats.size
     )
     new_id = insert!(db_connection, "vault__files", metadata)
+    write_json(stream, Dict(:id => new_id, :hash => hash, :filesize => filestats.size))
+end
 
-    write_json(stream, Dict(
-                :id => new_id,
-                :hash => hash,
-                :filesize => filestats.size
-            )
-        )
+macro get (route, func_name, params...)
 end
