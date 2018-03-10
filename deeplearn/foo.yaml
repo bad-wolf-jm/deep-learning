@@ -1,0 +1,15 @@
+
+id: 123
+bar:
+    - list
+    - "list 3"
+    - 123
+
+
+POST -- scheduler.php?action=UPDATE
+POST -- scheduler.php?action=ADD
+
+GET -- scheduler.php?action=GET_SCHEDULED_JOBS
+GET -- scheduler.php?action=GET_JOB_LOGS&time=last_24_hours
+
+GET -- system_logs.php?action=GET_LOGS&time=last_24_hours[&logger=<logger_name>][&level=<level>][&date_start=<date>][&date_end=<date>]
