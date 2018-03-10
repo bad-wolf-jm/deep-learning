@@ -48,3 +48,55 @@ end
 
 macro get (route, func_name, params...)
 end
+
+macro GET(route, func_name, param, body)
+    #query_args = param.args
+    if typeof(param) == Symbol
+        # parameter is a single symbol without type
+        query_args = Array([[param, :Any]])
+    else
+        # param is an expression
+        type_ = param.head
+        if type_ === Symbol("::")
+            A = param.args
+            query_args =  Array([[param, A[2]]])
+        elseif type_ === :tuple
+            query_args = Array([])
+            for parameter ∈ param.args
+                if typeof(parameter) == Symbol
+                    push!(query_args, [parameter, :Any])
+                elseif typeof(parameter) == Expr
+                    type_ = parameter.head
+                    if type_ === Symbol("::")
+                        A = parameter.args
+                        push!(query_args, [A[1], A[2]])
+                    else
+                        println("BADD Syntax")
+                    end
+                else
+                    println("BAR SYNTAX")
+                end
+            end
+            
+        end
+    end
+    
+    wrapper_function = :(
+        function $(esc(func_name))(stream, query)
+        end
+    )
+    
+    f_body = wrapper_function.args[2].args
+    
+    println(query_args)
+    query_parse = Array([])
+    for (arg_name, arg_type) ∈ query_args
+        push!(f_body, :($arg_name = parse($arg_type, query[$arg_name])))
+    end
+    push!(f_body, body)
+    
+    return :(begin
+            $wrapper_function
+            routes[$route] = $(esc(func_name))
+            end) 
+end
