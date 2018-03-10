@@ -49,6 +49,32 @@ end
 macro get (route, func_name, params...)
 end
 
+@inline is_symbol(expr) = (typeof(expr) == Symbol)
+@inline is_typed_variable(expr) = (typeof(expr) == Expr) && (expr.head === :(::))
+@inline is_variable_with_default(expr) = (typeof(expr) == Expr) && (expr.head === :(=))
+
+@inline function get_variable_type(expr)
+    if is_symbol(expr)
+        :Any
+    elseif is_typed_variable(expr)
+        expr.args[2]
+    elseif is_variable_with_default(expr)
+        get_variable_type(expr.args[1])
+    else
+        :Any
+    end
+end
+
+
+@inline function get_variable_default(expr)
+    if is_variable_with_default(expr)
+        expr.args[2]
+    else
+        nothing
+    end
+end
+
+
 macro GET(route, func_name, param, body)
     #query_args = param.args
     if typeof(param) == Symbol
@@ -88,15 +114,14 @@ macro GET(route, func_name, param, body)
     
     f_body = wrapper_function.args[2].args
     
-    println(query_args)
     query_parse = Array([])
     for (arg_name, arg_type) ∈ query_args
-        push!(f_body, :($arg_name = parse($arg_type, query[$arg_name])))
+        push!(f_body, :($arg_name = parse($arg_type,getitem(query, $arg_name, nothing))))
     end
     push!(f_body, body)
     
-    return :(begin
-            $wrapper_function
-            routes[$route] = $(esc(func_name))
-            end) 
+    :(begin
+        $wrapper_function
+        routes[$route] = $(esc(func_name))
+    end) 
 end
