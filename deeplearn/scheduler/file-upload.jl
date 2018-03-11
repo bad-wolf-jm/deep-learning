@@ -46,17 +46,29 @@ function save_stream(stream::HTTP.Stream, content_type::AbstractString, content_
     write_json(stream, Dict(:id => new_id, :hash => hash, :filesize => filestats.size))
 end
 
-macro get (route, func_name, params...)
-end
+
+get_routes = Dict{String, Function}()
+post_routes = Dict{String, Function}()
 
 @inline is_symbol(expr) = (typeof(expr) == Symbol)
 @inline is_typed_variable(expr) = (typeof(expr) == Expr) && (expr.head === :(::))
 @inline is_variable_with_default(expr) = (typeof(expr) == Expr) && (expr.head === :(=))
+@inline is_variable_spec(expr) = (is_symbol(expr) || is_typed_variable(expr) || is_variable_with_default(expr))
+
+
+@inline function get_variable_name(expr)
+    if is_typed_variable(expr)
+        expr.args[1]
+    elseif is_variable_with_default(expr)
+        get_variable_name(expr.args[1])
+    else
+        expr
+    end
+end
+
 
 @inline function get_variable_type(expr)
-    if is_symbol(expr)
-        :Any
-    elseif is_typed_variable(expr)
+    if is_typed_variable(expr)
         expr.args[2]
     elseif is_variable_with_default(expr)
         get_variable_type(expr.args[1])
@@ -75,6 +87,27 @@ end
 end
 
 
+@inline function parse_parameter_tuple(args)
+    query_args = Array([])
+    for parameter ∈ args
+        if is_variable_spec(parameter)
+            name = get_variable_name(parameter)
+            type_ = get_variable_type(parameter)
+            default = get_variable_default(parameter)
+            push!(query_args, [name, type_, default])
+        else
+            throw("Badd parameter syntax")
+        end
+    end
+    return query_args
+end
+
+QueryStringValue = Union{AbstractString, Void}
+
+parse(T::Type{AbstractString}, x::QueryStringValue) = x
+parse(T::Type{Any}, x::QueryStringValue) = x
+
+
 macro GET(route, func_name, param, body)
     #query_args = param.args
     if typeof(param) == Symbol
@@ -87,41 +120,112 @@ macro GET(route, func_name, param, body)
             A = param.args
             query_args =  Array([[param, A[2]]])
         elseif type_ === :tuple
-            query_args = Array([])
-            for parameter ∈ param.args
-                if typeof(parameter) == Symbol
-                    push!(query_args, [parameter, :Any])
-                elseif typeof(parameter) == Expr
-                    type_ = parameter.head
-                    if type_ === Symbol("::")
-                        A = parameter.args
-                        push!(query_args, [A[1], A[2]])
-                    else
-                        println("BADD Syntax")
-                    end
-                else
-                    println("BAR SYNTAX")
-                end
-            end
-            
+            query_args = parse_parameter_tuple(param.args)
+        else
+            throw("Baddd parameter syntax")
         end
     end
     
     wrapper_function = :(
-        function $(esc(func_name))(stream, query)
+        function $(esc(func_name))(stream, route, query)
         end
     )
     
     f_body = wrapper_function.args[2].args
-    
     query_parse = Array([])
-    for (arg_name, arg_type) ∈ query_args
-        push!(f_body, :($arg_name = parse($arg_type,getitem(query, $arg_name, nothing))))
+    for (arg_name, arg_type, arg_default) ∈ query_args
+        push!(f_body, :($arg_name = parse($arg_type, getitem(query, $arg_name, $arg_default))))
     end
     push!(f_body, body)
     
     :(begin
         $wrapper_function
-        routes[$route] = $(esc(func_name))
+        get_routes[$route] = $(esc(func_name))
     end) 
 end
+
+macro POST(route, func_name, param, body)
+end
+
+
+
+
+# macro get (route, func_name, params...)
+# end
+
+# @inline is_symbol(expr) = (typeof(expr) == Symbol)
+# @inline is_typed_variable(expr) = (typeof(expr) == Expr) && (expr.head === :(::))
+# @inline is_variable_with_default(expr) = (typeof(expr) == Expr) && (expr.head === :(=))
+
+# @inline function get_variable_type(expr)
+#     if is_symbol(expr)
+#         :Any
+#     elseif is_typed_variable(expr)
+#         expr.args[2]
+#     elseif is_variable_with_default(expr)
+#         get_variable_type(expr.args[1])
+#     else
+#         :Any
+#     end
+# end
+
+
+# @inline function get_variable_default(expr)
+#     if is_variable_with_default(expr)
+#         expr.args[2]
+#     else
+#         nothing
+#     end
+# end
+
+
+# macro GET(route, func_name, param, body)
+#     #query_args = param.args
+#     if typeof(param) == Symbol
+#         # parameter is a single symbol without type
+#         query_args = Array([[param, :Any]])
+#     else
+#         # param is an expression
+#         type_ = param.head
+#         if type_ === Symbol("::")
+#             A = param.args
+#             query_args =  Array([[param, A[2]]])
+#         elseif type_ === :tuple
+#             query_args = Array([])
+#             for parameter ∈ param.args
+#                 if typeof(parameter) == Symbol
+#                     push!(query_args, [parameter, :Any])
+#                 elseif typeof(parameter) == Expr
+#                     type_ = parameter.head
+#                     if type_ === Symbol("::")
+#                         A = parameter.args
+#                         push!(query_args, [A[1], A[2]])
+#                     else
+#                         println("BADD Syntax")
+#                     end
+#                 else
+#                     println("BAR SYNTAX")
+#                 end
+#             end
+            
+#         end
+#     end
+    
+#     wrapper_function = :(
+#         function $(esc(func_name))(stream, query)
+#         end
+#     )
+    
+#     f_body = wrapper_function.args[2].args
+    
+#     query_parse = Array([])
+#     for (arg_name, arg_type) ∈ query_args
+#         push!(f_body, :($arg_name = parse($arg_type,getitem(query, $arg_name, nothing))))
+#     end
+#     push!(f_body, body)
+    
+#     :(begin
+#         $wrapper_function
+#         routes[$route] = $(esc(func_name))
+#     end) 
+# end
