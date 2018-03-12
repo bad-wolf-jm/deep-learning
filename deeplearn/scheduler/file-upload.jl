@@ -107,25 +107,27 @@ QueryStringValue = Union{AbstractString, Void}
 parse(T::Type{AbstractString}, x::QueryStringValue) = x
 parse(T::Type{Any}, x::QueryStringValue) = x
 
-
-macro GET(route, func_name, param, body)
+@inline function parse_function_arguments(param)
     #query_args = param.args
     if typeof(param) == Symbol
         # parameter is a single symbol without type
-        query_args = Array([[param, :Any]])
+       return Array([[param, :Any]])
     else
         # param is an expression
         type_ = param.head
         if type_ === Symbol("::")
             A = param.args
-            query_args =  Array([[param, A[2]]])
+            return Array([[param, A[2]]])
         elseif type_ === :tuple
-            query_args = parse_parameter_tuple(param.args)
+            return parse_parameter_tuple(param.args)
         else
             throw("Baddd parameter syntax")
         end
     end
-    
+
+end
+
+@inline function make_function_body(query_args, func_name, body)
     wrapper_function = :(
         function $(esc(func_name))(stream, route, query)
         end
@@ -137,6 +139,12 @@ macro GET(route, func_name, param, body)
         push!(f_body, :($arg_name = parse($arg_type, getitem(query, $arg_name, $arg_default))))
     end
     push!(f_body, body)
+    return wrapper_function
+end
+
+macro GET(route, func_name, param, body)
+    query_args = parse_function_arguments(param)
+    wrapper_function = make_function_body(query_args, func_name, body)
     
     :(begin
         $wrapper_function
@@ -145,87 +153,11 @@ macro GET(route, func_name, param, body)
 end
 
 macro POST(route, func_name, param, body)
+    query_args = parse_function_arguments(param)
+    wrapper_function = make_function_body(query_args, func_name, body)
+    
+    :(begin
+        $wrapper_function
+        post_routes[$route] = $(esc(func_name))
+    end) 
 end
-
-
-
-
-# macro get (route, func_name, params...)
-# end
-
-# @inline is_symbol(expr) = (typeof(expr) == Symbol)
-# @inline is_typed_variable(expr) = (typeof(expr) == Expr) && (expr.head === :(::))
-# @inline is_variable_with_default(expr) = (typeof(expr) == Expr) && (expr.head === :(=))
-
-# @inline function get_variable_type(expr)
-#     if is_symbol(expr)
-#         :Any
-#     elseif is_typed_variable(expr)
-#         expr.args[2]
-#     elseif is_variable_with_default(expr)
-#         get_variable_type(expr.args[1])
-#     else
-#         :Any
-#     end
-# end
-
-
-# @inline function get_variable_default(expr)
-#     if is_variable_with_default(expr)
-#         expr.args[2]
-#     else
-#         nothing
-#     end
-# end
-
-
-# macro GET(route, func_name, param, body)
-#     #query_args = param.args
-#     if typeof(param) == Symbol
-#         # parameter is a single symbol without type
-#         query_args = Array([[param, :Any]])
-#     else
-#         # param is an expression
-#         type_ = param.head
-#         if type_ === Symbol("::")
-#             A = param.args
-#             query_args =  Array([[param, A[2]]])
-#         elseif type_ === :tuple
-#             query_args = Array([])
-#             for parameter ∈ param.args
-#                 if typeof(parameter) == Symbol
-#                     push!(query_args, [parameter, :Any])
-#                 elseif typeof(parameter) == Expr
-#                     type_ = parameter.head
-#                     if type_ === Symbol("::")
-#                         A = parameter.args
-#                         push!(query_args, [A[1], A[2]])
-#                     else
-#                         println("BADD Syntax")
-#                     end
-#                 else
-#                     println("BAR SYNTAX")
-#                 end
-#             end
-            
-#         end
-#     end
-    
-#     wrapper_function = :(
-#         function $(esc(func_name))(stream, query)
-#         end
-#     )
-    
-#     f_body = wrapper_function.args[2].args
-    
-#     query_parse = Array([])
-#     for (arg_name, arg_type) ∈ query_args
-#         push!(f_body, :($arg_name = parse($arg_type,getitem(query, $arg_name, nothing))))
-#     end
-#     push!(f_body, body)
-    
-#     :(begin
-#         $wrapper_function
-#         routes[$route] = $(esc(func_name))
-#     end) 
-# end
