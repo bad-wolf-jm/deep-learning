@@ -104,8 +104,11 @@ end
 
 QueryStringValue = Union{AbstractString, Void}
 
-parse(T::Type{AbstractString}, x::QueryStringValue) = x
-parse(T::Type{Any}, x::QueryStringValue) = x
+Base.parse(T::Type{Y}, x::Y) where {Y} = x
+Base.parse(T::Type{AbstractString}, x::QueryStringValue) = x
+Base.parse(T::Type{Any}, x::QueryStringValue) = x
+Base.parse(T::Type{Y}, x::Union{Y, Void}) where {Y} = x
+
 
 @inline function parse_function_arguments(param)
     #query_args = param.args
@@ -132,11 +135,16 @@ end
         function $(esc(func_name))(stream, route, query)
         end
     )
+    wrapper_function = :(
+        (stream, route, headers, query) -> begin end
+    )
     
     f_body = wrapper_function.args[2].args
     query_parse = Array([])
     for (arg_name, arg_type, arg_default) ∈ query_args
-        push!(f_body, :($arg_name = parse($arg_type, getitem(query, $arg_name, $arg_default))))
+        println(arg_name, " ", arg_type, " ", arg_default)
+        arg_key = String(arg_name)
+        push!(f_body, :($arg_name = Base.parse($arg_type, get(query, $arg_key, $arg_default))))
     end
     push!(f_body, body)
     return wrapper_function
@@ -147,8 +155,7 @@ macro GET(route, func_name, param, body)
     wrapper_function = make_function_body(query_args, func_name, body)
     
     :(begin
-        $wrapper_function
-        get_routes[$route] = $(esc(func_name))
+        get_routes[$route] = $wrapper_function #$(esc(func_name))
     end) 
 end
 
@@ -157,7 +164,7 @@ macro POST(route, func_name, param, body)
     wrapper_function = make_function_body(query_args, func_name, body)
     
     :(begin
-        $wrapper_function
-        post_routes[$route] = $(esc(func_name))
+        # $wrapper_function
+        post_routes[$route] = $wrapper_function #$(esc(func_name))
     end) 
 end
