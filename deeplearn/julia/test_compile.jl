@@ -10,7 +10,6 @@ function main()
     show(y)
 end
 
-
 @time for i ∈ 1:10000000
     u = rand()
 end

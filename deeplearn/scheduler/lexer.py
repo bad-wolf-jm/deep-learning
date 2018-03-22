@@ -7,7 +7,7 @@ class ScheduleLexer(object):
         'ON', 'WEEKDAY', 'MINUTE', 'HOUR', 'DAY', 'MONTH', 'STARTING',
         'ENDING', 'INTERVAL'
     )
-
+ 
     literals = [':', '-', '(', ')', ' ', ',']
 
     t_WEEKDAY = r'SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY'
