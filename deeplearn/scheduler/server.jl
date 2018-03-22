@@ -98,14 +98,8 @@ function handle_transaction(f::Function, t::Transaction;
     try
         startread(http)
     catch e
-        # @show typeof(e)
-        # @show fieldnames(e)
         if e isa EOFError && isempty(request.method)
             return
-# FIXME https://github.com/JuliaWeb/HTTP.jl/pull/178#pullrequestreview-92547066
-#        elseif !isopen(http)
-#            @warn "Connection closed"
-#            return
         elseif e isa HTTP.ParseError
             @error e
             status = e.code == :HEADER_SIZE_EXCEEDS_LIMIT  ? 413 : 400
@@ -149,11 +143,7 @@ Close the `Stream` for read and write (in case `f` has not already done so).
 function handle_stream(f::Function, http::Stream)
 
     try
-        # if applicable(f, http)
             f(http)
-        # else
-        #     handle_request(f, http)
-        # end
     catch e
         if isopen(http) && !iswritable(http)
             @error e catch_stacktrace()
@@ -169,21 +159,6 @@ function handle_stream(f::Function, http::Stream)
     closewrite(http)
     return
 end
-
-# """
-# Execute Request processing function `f(::HTTP.Request) -> HTTP.Response`.
-# """
-# function handle_request(f::Function, http::Stream)
-#     request::HTTP.Request = http.message
-#     request.body = read(http)
-#     request.response::HTTP.Response = f(request)
-#     startwrite(http)
-#     write(http, request.response.body)
-#     return
-# end
-
-
-
 
 
 end # module
